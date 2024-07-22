@@ -206,21 +206,6 @@ class _MainScreenState extends State<MainScreen> {
     ),
     );
     }
-
-
-
-    // TODO: Implement timer widget
-  }
-
-  bool isOrderPlacedForEvent(Event event) {
-    // Simulate checking if an order has been placed for the event
-    // In a real scenario, you would check against your backend or local storage
-    // For demonstration, we're just setting orderPlaced to true
-
-    bool? maybe = event.orderPlaced ;
-
-    // Return true if an order has been placed
-    return maybe ?? false;
   }
 
   void onAcceptInvitation(Event event) {

@@ -26,6 +26,10 @@ class UserController extends GetxController implements GetxService {
   bool get isLoaded => _isLoaded;
   JwtModel? get userModel =>_userModel;
 
+  UserProfileModel? _user;
+  UserProfileModel? get user =>_user;
+
+  //Getting userID from the token
   Future<Map<String, dynamic>> getUserId(String token) async {
 
     Map<String, dynamic> userEntity;
@@ -39,8 +43,7 @@ class UserController extends GetxController implements GetxService {
     return userEntity;
   }
 
-
-
+  //Getting all users in the db
   Future<void> getAllUsers()async {
     Response response = await userRepo.getAllUsers();
     if(response.statusCode==200){
@@ -59,11 +62,7 @@ class UserController extends GetxController implements GetxService {
     }
   }
 
-
-
-  UserProfileModel? _user;
-  UserProfileModel? get user =>_user;
-
+  //Getting single user details
   Future<ResponseModel> getUserInfo() async {
 
     print("Is this working for USER ID?" + getUserIDFromPrefs().toString());

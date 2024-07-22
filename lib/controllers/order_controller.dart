@@ -27,6 +27,7 @@ class OrderController extends GetxController implements GetxService {
   List<OrderGetModel> get eventOrders => _eventOrders;
   List<OrderModel> get allOrders => _allOrders;
 
+  //Method for creating new order in db
   Future<void> createOrder(OrderBody orderBody) async {
     _isLoading.value = true;
     try {
@@ -44,6 +45,7 @@ class OrderController extends GetxController implements GetxService {
     }
   }
 
+  //Method for fetching all orders for same event
   Future<List<OrderGetModel>> getAllOrdersForEvent(String eventId) async {
     _isLoading.value = true;
     try {
@@ -58,6 +60,7 @@ class OrderController extends GetxController implements GetxService {
     }
   }
 
+  //Getting all orders in the db
   Future<List<OrderModel>> getAllOrders() async {
     _isLoading.value = true;
     try {
@@ -72,6 +75,7 @@ class OrderController extends GetxController implements GetxService {
     }
   }
 
+  //getting single order by ID
   Future<void> getSingleOrder(String orderId) async {
     _isLoading.value = true;
     try {
@@ -84,6 +88,7 @@ class OrderController extends GetxController implements GetxService {
     }
   }
 
+  //Patch method for defining order rating
   Future<void> rateOrder(OrderBodyRating rating) async {
     _isLoading.value = true;
     try {
@@ -99,6 +104,7 @@ class OrderController extends GetxController implements GetxService {
     }
   }
 
+  //Accessing orderID from shared prefs
   String? getOrderIdFromSharedPreferences() {
     return orderRepo.sharedPreferences.getString(AppConstants.ORDER_ID);
   }

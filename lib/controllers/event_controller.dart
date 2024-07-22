@@ -32,14 +32,6 @@ class EventController extends GetxController implements GetxService {
     required this.userRepo,
   });
 
-
-  String? getEventIDFromPrefs() {
-    return eventRepo.getEventIdFromSharedPref();
-  }
-
-  // Optionally, you can also add a getter for easier access
-  String? get cachedUserId => getEventIDFromPrefs();
-
   final Rx<bool> _isLoading = false.obs;
   final Rx<EventModel?> _currentEvent = Rx<EventModel?>(null);
   final RxList<EventStatusModel> _pendingEvents = <EventStatusModel>[].obs;
@@ -52,6 +44,7 @@ class EventController extends GetxController implements GetxService {
   List<EventStatusModel> get inProgressEvents => _inProgressEvents;
   List<OrderGetModel> get currentEventOrders => _currentEventOrders;
 
+  //Method for fetching event details about users and orders they made
   Future<Event> getEventDetails(String eventId) async {
     _isLoading.value = true;
     try {
@@ -124,6 +117,7 @@ class EventController extends GetxController implements GetxService {
     return remainingSeconds;
   }
 
+  //Method for creating event
   Future<bool?> createEvent(EventBody eventBody) async {
     _isLoading.value = true;
     try {
@@ -145,6 +139,7 @@ class EventController extends GetxController implements GetxService {
   }
 
 
+  //Getting pending events
   Future<List<Event>> fetchPendingEvents() async {
     _isLoading.value = true;
     try {
@@ -161,6 +156,7 @@ class EventController extends GetxController implements GetxService {
     }
   }
 
+  //Getting in_progress events
   Future<List<Event>> fetchInProgressEvents() async {
     _isLoading.value = true;
     try {
@@ -176,6 +172,7 @@ class EventController extends GetxController implements GetxService {
     }
   }
 
+  //Getting completed events
   Future<List<Event>> fetchCompleteEvents() async {
     _isLoading.value = true;
     try {
@@ -198,6 +195,7 @@ class EventController extends GetxController implements GetxService {
   }
 
 
+  //Method for fetching all orders from single event
   Future<void> fetchEventOrders(String eventId) async {
     try {
       final orders = await orderRepo.getAllOrdersForEvent(eventId);
@@ -207,15 +205,6 @@ class EventController extends GetxController implements GetxService {
     }
   }
 
-  Future<OrderGetModel> getOrderById(String eventId) async {
-    try {
-      final orders = await orderRepo.getSingleOrder(eventId);
-      return orders;
-    } catch (e) {
-      print('Error fetching event orders: $e');
-      return OrderGetModel();
-    }
-  }
 
   Future<EventModel> getEventById(String eventId) async {
     try {
@@ -229,6 +218,7 @@ class EventController extends GetxController implements GetxService {
 
 
 
+  //Method for changing event status into "COMPLETED"
   Future<void> finishEvent() async {
     if (_currentEvent.value == null) return;
 
@@ -248,23 +238,8 @@ class EventController extends GetxController implements GetxService {
   }
 
 
-  Future<void> fetchEventDetails(String eventId) async {
-    _isLoading.value = true;
-    try {
-      final event = await eventRepo.getEventById(eventId);
-      _currentEvent.value = event;
 
-      await fetchEventOrders(eventId);
-      await fetchEventCreator(event.creator);
-    } catch (e) {
-      print('Error fetching event details: $e');
-    } finally {
-      _isLoading.value = false;
-    }
-  }
-
-
-
+  // Getting details for user who created the event
   Future<void> fetchEventCreator(String creatorId) async {
     try {
       await userRepo.getUserById(creatorId);
@@ -282,4 +257,11 @@ class EventController extends GetxController implements GetxService {
       print('Error fetching order users: $e');
     }
   }
+
+  String? getEventIDFromPrefs() {
+    return eventRepo.getEventIdFromSharedPref();
+  }
+
+  // Optionally, you can also add a getter for easier access
+  String? get cachedUserId => getEventIDFromPrefs();
 }

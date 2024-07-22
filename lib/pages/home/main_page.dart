@@ -11,6 +11,10 @@ import '../../controllers/user_controller.dart';
 import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
 
+//
+//First try in making home screen but, the approach wasnt good.
+//
+
 class MainPage extends StatefulWidget {
   @override
   _MainPageState createState() => _MainPageState();

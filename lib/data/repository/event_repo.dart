@@ -50,8 +50,6 @@ class EventRepo {
     final response = await apiClient.getData(url);
 
     if (response.statusCode == 200) {
-      print("FETCHING EVENTS ______________________________________"+ response.body
-          .toString());
       final List<dynamic> eventsJson = response.body;
       return eventsJson.map((json) => EventStatusModel.fromJson(json)).toList();
     } else {
@@ -84,7 +82,6 @@ class EventRepo {
   }
 
   Future<bool> saveEventID(String eventId) async {
-    print("911");
      apiClient.userId = eventId;
     return await sharedPreferences.setString(AppConstants.EVENT_ID, eventId);
   }
