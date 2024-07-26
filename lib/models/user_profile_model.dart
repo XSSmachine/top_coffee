@@ -1,32 +1,32 @@
 class UserProfileModel{
-  String? id;
+  String? userId;
   String name;
   String surname;
-  String? email;
-  String? password;
-  int? coffeeNumber;
-  double? score;
+  String? groupId;
 
 
   UserProfileModel({
-    required this.id,
+    required this.userId,
     required this.name,
     required this.surname,
-    required this.email,
-    required this.password,
-    required this.coffeeNumber,
-    required this.score,
+    required this.groupId,
   });
 
 
   factory UserProfileModel.fromJson(Map<String,dynamic> json){
     return UserProfileModel(
-        id: json['_id'],
+        userId: json['userId'],
         name: json['firstName'],
         surname: json['lastName'],
-        email: json['email'],
-        password: json['password'],
-        coffeeNumber: json['coffeeNumber'],
-        score: json['score']);
+        groupId: json['groupId'],
+        );
+  }
+  Map<String,dynamic> toJson(){
+    final Map<String,dynamic> data = new Map<String,dynamic>();
+    data["firstName"] = this.name;
+    data["userId"] = this.userId;
+    data["lastName"] = this.surname;
+    data["groupId"] = this.groupId;
+    return data;
   }
 }

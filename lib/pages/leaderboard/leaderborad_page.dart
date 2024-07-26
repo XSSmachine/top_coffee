@@ -8,7 +8,9 @@ import '../../controllers/user_controller.dart';
 import '../../models/user_model.dart';
 
 
-
+/**
+ * This class will display leaderboard with top 10 users in the group
+ */
 
 class LeaderboardScreen extends StatefulWidget {
   @override
@@ -24,7 +26,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   }
 
   Future<void> _loadResource() async {
-    await Get.find<UserController>().getAllUsers();
+    await Get.find<UserController>();
   }
 
   @override
@@ -36,28 +38,22 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
       appBar: AppBar(
         title: Text('Leaderboard'),
       ),
-      body: GetBuilder<UserController>(
-        builder: (userController) {
-          if (userController.isLoaded) {
-            if (userController.allUserList.isNotEmpty) {
-              return RefreshIndicator(
-                onRefresh: _loadResource,
-                child: ListView.builder(
-                  itemCount: userController.allUserList.length,
+      body:
+               ListView.builder(
+                  itemCount: 10,
                   itemBuilder: (context, index) {
-                    final user = userController.allUserList[index];
-                    print(user.score);
+                    final user = "marko";
                     return ListTile(
                       leading: CircleAvatar(
                         backgroundImage: AssetImage(
                             '/Users/karlokovacevic/Documents/team_coffee/assets/image/user.png'),
                       ),
-                      title: Text('${user.name}'),
+                      title: Text('${user}'),
                       subtitle: Row(
                         children: [
-                          Icon(Icons.coffee, size: 16),
+                          Icon(Icons.event, size: 16),
                           SizedBox(width: 4),
-                          Text('${user.coffeeNumber}'),
+                          Text('${14}'),
                         ],
                       ),
                       trailing: Row(
@@ -65,7 +61,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                         children: [
                           Icon(Icons.star, size: 16, color: Colors.amber),
                           SizedBox(width: 4),
-                          Text('${user.score?.toStringAsFixed(2)}',
+                          Text('5.00',
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.bold)),
                           SizedBox(width: 8),
@@ -75,16 +71,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       ),
                     );
                   },
-                ),
-              );
-            } else {
-              return Center(child: Text('No users found'));
-            }
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
+                )
+
+
     );
   }
 }

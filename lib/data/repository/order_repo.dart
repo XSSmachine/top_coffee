@@ -23,7 +23,7 @@ class OrderRepo {
       throw Exception('Invalid event ID: event ID is null');
     }
     try {
-      final eventResponse = await apiClient.getData('${AppConstants.EVENTS_URI}/$eventId');
+      final eventResponse = await apiClient.getData('${AppConstants.EVENT_ID}/$eventId');
       if (eventResponse.body == null) {
         throw Exception('No data received for event ID: $eventId');
       }
@@ -90,7 +90,7 @@ class OrderRepo {
   }
   // Patch RATE order
   Future<Response> rateOrder(OrderBodyRating rating) async {
-    return await apiClient.patchData(AppConstants.ORDER_RATING_URI, rating);
+    return await apiClient.patchData(AppConstants.ORDER_ID, rating);
   }
 
   Future<List<OrderModel>> getAllOrders() async {

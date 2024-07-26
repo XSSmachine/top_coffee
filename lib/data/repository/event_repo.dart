@@ -46,7 +46,7 @@ class EventRepo {
   }
 
   Future<List<EventStatusModel>> _getEventsByStatus(String status) async {
-    final String url = '${AppConstants.EVENTS_URI}?status=$status';
+    final String url = '${AppConstants.EVENT_ID}?status=$status';
     final response = await apiClient.getData(url);
 
     if (response.statusCode == 200) {
@@ -64,7 +64,7 @@ class EventRepo {
 
   Future<EventModel> getEventById(String eventId) async {
     try {
-      final response = await apiClient.getData('${AppConstants.EVENTS_URI}/$eventId');
+      final response = await apiClient.getData('${AppConstants.EVENT_ID}/$eventId');
       //final orderData = json.decode(response.body);
       return EventModel.fromJson(response.body);
     } catch (e) {
@@ -77,7 +77,7 @@ class EventRepo {
     if (userId == null) {
       throw Exception('User ID not found in SharedPreferences');
     }
-    Response response = await apiClient.patchData(AppConstants.EVENT_FINISH_URI, {"creatorId": userId});
+    Response response = await apiClient.patchData(AppConstants.EVENT_ID, {"creatorId": userId});
     return response;
   }
 

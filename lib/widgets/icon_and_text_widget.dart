@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:team_coffee/widgets/small_text.dart';
 import '../utils/dimensions.dart';
 
@@ -18,7 +19,7 @@ class IconAndTextWidget extends StatelessWidget {
       children: [
         Icon(icon, color: iconColor,size: Dimensions.iconSize24,),
         SizedBox(width: 5,),
-        SmallText(text: text),
+        SmallText(text: text,color: Colors.white,),
       ]
       
       

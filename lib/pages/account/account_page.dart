@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:team_coffee/widgets/user_profile.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/user_controller.dart';
 import '../../routes/route_helper.dart';
@@ -11,6 +12,9 @@ import '../../widgets/app_icon.dart';
 import '../../widgets/big_text.dart';
 import '../../widgets/stats_value_title.dart';
 
+/**
+ * This class displays user profile
+ */
 class AccountPage extends StatefulWidget {
   const AccountPage({Key? key}) : super(key: key);
 
@@ -20,7 +24,7 @@ class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> {
   final AuthController authController = Get.find<AuthController>();
-  final UserController userController = Get.find<UserController>();
+  //final UserController userController = Get.find<UserController>();
   bool _isInitialized = false;
 
   @override
@@ -33,8 +37,8 @@ class _AccountPageState extends State<AccountPage> {
     await authController.fetchAndSetUserToken();
     if (authController.userLoggedIn()) {
       print("User Token: ${authController.userToken}");
-      await userController.getUserId(authController.userToken);
-      await userController.getUserInfo();
+      //await userController.getUserId(authController.userToken);
+      //await userController.getUserProfile();
       print("User has logged in");
     }
     setState(() {
@@ -56,14 +60,14 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   Widget _buildLoggedInView() {
-    return GetBuilder<UserController>(
-        builder: (userController) {
+
           return Container(
             width: double.maxFinite,
             margin: EdgeInsets.only(top: Dimensions.height30*2),
             child: Column(
               children: [
-                Stack(
+                WordCustomCard(),
+                /*Stack(
                   children: [
                     Container(
                       height: Dimensions.height30*10,
@@ -84,27 +88,27 @@ class _AccountPageState extends State<AccountPage> {
                                   color: Colors.amberAccent,
                                   size: Dimensions.iconSize24),
                               SizedBox(width: 5,),
-                              BigText(text: userController.user?.score==0?"4.00":userController.user?.score.toString().substring(0,3) ?? "5.00", size: 24,)
+                              BigText(text:  "5.00", size: 24,)
                             ],
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              BigText(text: userController.user?.name ?? "User name", size: 32,),
+                              BigText(text:  "Name", size: 32,),
                               SizedBox(width: Dimensions.width10,),
-                              BigText(text: userController.user?.surname ?? "User name", size: 32,),
+                              BigText(text:  "Surname", size: 32,),
                             ],
                           ),
 
-                          BigText(text: userController.user?.email ?? "user.name@kava.com", size: 16,),
+                          //BigText(text: userController.user?.email ?? "user.name@kava.com", size: 16,),
                           SizedBox(height: Dimensions.height20,),
                           Padding(
                             padding: EdgeInsets.only(top: Dimensions.height20),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                StatsValueTitle(title: "# of coffees made", dataValue:  userController.user?.coffeeNumber.toString() ?? "16"),
-                                StatsValueTitle(title: "time per coffee", dataValue:  "2.15 min")
+                                StatsValueTitle(title: "# of events made", dataValue:  "16"),
+                                StatsValueTitle(title: "# of events made", dataValue:  "45")
                               ],
                             ),
                           )
@@ -117,7 +121,7 @@ class _AccountPageState extends State<AccountPage> {
                         iconColor: Colors.white,iconSize: Dimensions.height30*2.5,size: Dimensions.height30*4.5,),
                     ),
                   ],
-                ),
+                ),*/
                 SizedBox(height: 20,),
                 Expanded(
                   child: SingleChildScrollView(
@@ -146,8 +150,7 @@ class _AccountPageState extends State<AccountPage> {
             ),
           );
         }
-    );
-  }
+
 
   Widget _buildSignInPrompt(BuildContext context) {
     return Center(

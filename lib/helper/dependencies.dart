@@ -1,4 +1,5 @@
 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:team_coffee/controllers/event_controller.dart';
@@ -19,7 +20,14 @@ import '../utils/app_constants.dart';
 Future<void> init()async {
 
   final sharedPreferences = await SharedPreferences.getInstance();
+  /*
+  final secureStorage = await FlutterSecureStorage(
+      aOptions: AndroidOptions(encryptedSharedPreferences: true)
+  );
+
+   */
   Get.lazyPut(()=>sharedPreferences);
+  //Get.lazyPut(() => secureStorage);
   Get.lazyPut(()=>UserPreferences(preferences:Get.find()));
   Get.lazyPut(()=>RatedEventsPreferences(preferences:Get.find()));
 

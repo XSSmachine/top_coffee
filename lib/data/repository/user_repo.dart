@@ -21,16 +21,8 @@ class UserRepo{
     return decodedToken;
   }
 
-  Future<Response>getUserInfo(String userId) async {
-    return await apiClient.getData(AppConstants.USER_INFO+"/$userId");
-  }
-
-  Future<bool> saveUserID(String userId) async {
-    return await sharedPreferences.setString(AppConstants.USER_ID,userId);
-  }
-
-  String? getUserIDFromPrefs() {
-    return sharedPreferences.getString(AppConstants.USER_ID);
+  Future<Response>getUserInfo() async {
+    return await apiClient.getData(AppConstants.FETCH_ME_URI);
   }
 
   Future<Response>getAllUsers() async {
@@ -42,7 +34,7 @@ class UserRepo{
 
   Future<UserModel> getUserById(String userId) async {
     try {
-      final response = await apiClient.getData('${AppConstants.USERS_URI}/$userId');
+      final response = await apiClient.getData('${AppConstants.USER_PROFILE}/$userId');
       final orderData = response.body;
       return UserModel.fromJson(orderData);
     } catch (e) {

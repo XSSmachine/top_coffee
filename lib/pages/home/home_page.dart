@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
-import 'package:team_coffee/pages/auth/sign_in_page.dart';
-import 'package:team_coffee/pages/home/main_screen.dart';
+import 'package:team_coffee/pages/home/top_appBar.dart';
 import 'package:team_coffee/pages/leaderboard/leaderborad_page.dart';
-import '../../controllers/auth_controller.dart';
+import 'package:team_coffee/pages/orders/orders_screen.dart';
+import 'package:team_coffee/routes/route_helper.dart';
 import '../../utils/colors.dart';
 import '../account/account_page.dart';
-import 'main_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -26,7 +25,6 @@ class _HomePageState extends State<HomePage> {
 
 
   List pages=[
-    MainPage(),
     Container(child: Center(child: Text("Next page"))),
     Container(child: Center(child: Text("Next next page"))),
     Container(child: Center(child: Text("Next next next page"))),
@@ -42,14 +40,16 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState(){
     super.initState();
+    //Get.find<AuthController>().clearSharedData();
     _controller = PersistentTabController(initialIndex: 0);
   }
 
   List<Widget> _buildScreens() {
     return [
-      MainScreen(),
+      TopAppbar(),
+      OrdersScreen(),
+      Container(),
       LeaderboardScreen(),
-      //LeaderboardPage(),
       AccountPage()
     ];
   }
@@ -57,21 +57,38 @@ class _HomePageState extends State<HomePage> {
   List<PersistentBottomNavBarItem> _navBarsItems() {
     return [
       PersistentBottomNavBarItem(
-        icon: Icon(Icons.coffee),
-        title: ("Home"),
-        activeColorPrimary: AppColors.iconColor1,
+        icon: Icon(CupertinoIcons.compass_fill),
+        title: ("Explore"),
+        activeColorPrimary: Color(0xFF4A43EC),
         inactiveColorPrimary: AppColors.mainColor,
+      ),
+      PersistentBottomNavBarItem(
+        icon: Icon(Icons.rule_rounded),
+        title: ("My activities"),
+        activeColorPrimary: Color(0xFF4A43EC),
+        inactiveColorPrimary: AppColors.mainColor,
+      ),
+      PersistentBottomNavBarItem(
+        iconSize: 28,
+        icon: Icon(Icons.add,color: Colors.white
+          ,),
+        title: ("Add"),
+        activeColorPrimary: Color(0xFF4A43EC),
+        inactiveColorPrimary: AppColors.mainBlackColor,
+        onPressed: (context) {
+          Get.toNamed(RouteHelper.eventCreatePage);
+        },
       ),
       PersistentBottomNavBarItem(
         icon: Icon(Icons.emoji_events),
         title: ("Leaderboard"),
-        activeColorPrimary: AppColors.iconColor1,
+        activeColorPrimary: Color(0xFF4A43EC),
         inactiveColorPrimary: AppColors.mainColor,
       ),
       PersistentBottomNavBarItem(
         icon: Icon(CupertinoIcons.person_fill),
         title: ("Me"),
-        activeColorPrimary: AppColors.iconColor1,
+        activeColorPrimary: Color(0xFF4A43EC),
         inactiveColorPrimary: AppColors.mainColor,
       ),
     ];
@@ -105,7 +122,7 @@ class _HomePageState extends State<HomePage> {
         curve: Curves.ease,
         duration: Duration(milliseconds: 200),
       ),
-      navBarStyle: NavBarStyle.style6, // Choose the nav bar style with this property.
+      navBarStyle: NavBarStyle.style15, // Choose the nav bar style with this property.
     );
   }
 }

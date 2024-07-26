@@ -6,6 +6,7 @@ import 'package:team_coffee/models/jwt_model.dart';
 import 'package:team_coffee/models/user_profile_model.dart';
 
 import '../data/repository/user_repo.dart';
+import '../models/fetch_me_model.dart';
 import '../models/response_model.dart';
 import '../models/user_model.dart';
 class UserController extends GetxController implements GetxService {
@@ -18,16 +19,16 @@ class UserController extends GetxController implements GetxService {
   List<UserModel> _allUserList= [];
   List<UserModel> get allUserList => _allUserList;
 
-  bool _isLoading = false;
   JwtModel? _userModel;
 
+  bool _isLoading = false;
   bool get isLoading => _isLoading;
   bool _isLoaded = false;
   bool get isLoaded => _isLoaded;
   JwtModel? get userModel =>_userModel;
 
-  UserProfileModel? _user;
-  UserProfileModel? get user =>_user;
+  FetchMeModel? _user;
+  FetchMeModel? get user =>_user;
 
   //Getting userID from the token
   Future<Map<String, dynamic>> getUserId(String token) async {
@@ -37,7 +38,6 @@ class UserController extends GetxController implements GetxService {
 
     _userModel = JwtModel.fromJson(userEntity);
 
-    userRepo.saveUserID(_userModel!.id);
     _isLoading=true;
     update();
     return userEntity;
@@ -45,7 +45,7 @@ class UserController extends GetxController implements GetxService {
 
   //Getting all users in the db
   Future<void> getAllUsers()async {
-    Response response = await userRepo.getAllUsers();
+    /*Response response = await userRepo.getAllUsers();
     if(response.statusCode==200){
       _allUserList=[];
       List<UserModel> localList = [];
@@ -59,17 +59,16 @@ class UserController extends GetxController implements GetxService {
       update();
     }else{
       print("ERROR"+response.body);
-    }
+    }*/
   }
 
   //Getting single user details
-  Future<ResponseModel> getUserInfo() async {
+  Future<ResponseModel> getUserProfile() async {
 
-    print("Is this working for USER ID?" + getUserIDFromPrefs().toString());
-    Response response = await userRepo.getUserInfo(getUserIDFromPrefs()!);
+    Response response = await userRepo.getUserInfo();
     late ResponseModel responseModel;
     if (response.statusCode == 200) {
-      _user = UserProfileModel.fromJson(response.body);
+      _user = FetchMeModel.fromJson(response.body);
       _isLoading=true;
       responseModel = ResponseModel(true, "successfully");
     } else {
@@ -80,10 +79,4 @@ class UserController extends GetxController implements GetxService {
     return responseModel;
   }
 
-  String? getUserIDFromPrefs() {
-    return userRepo.getUserIDFromPrefs();
-  }
-
-  // Optionally, you can also add a getter for easier access
-  String? get cachedUserId => getUserIDFromPrefs();
 }

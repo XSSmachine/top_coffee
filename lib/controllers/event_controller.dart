@@ -48,17 +48,14 @@ class EventController extends GetxController implements GetxService {
   Future<Event> getEventDetails(String eventId) async {
     _isLoading.value = true;
     try {
-      print(0);
+
       final eventStatus = await eventRepo.getEventById(eventId);
-      print(0.5);
       final creatorName = await userRepo.getUserById(eventStatus.creator);
-      print(1);
       final orders = await orderRepo.getAllOrdersForEvent(eventId);
-      print(2);
       final allOrders = await orderRepo.getAllOrders();
       List<Future<String>> participantNamesFutures = allOrders
-          .where((order) => eventStatus.orders.contains(order.id)) // Filter orders first
-          .map<Future<String>>((order) async { // Then map to get user details
+          .where((order) => eventStatus.orders.contains(order.id))
+          .map<Future<String>>((order) async {
         UserModel user = await userRepo.getUserById(order.userId);
         return "${user.name} ${user.surname}";
       }).toList();
@@ -107,9 +104,6 @@ class EventController extends GetxController implements GetxService {
     int elapsedTimeSeconds = elapsedTime.inSeconds-(120*60);
     // Calculate the remaining time in seconds
     int remainingSeconds = (pendingTime*60)-(elapsedTimeSeconds+(pendingTime*60));
-
-    // Convert seconds to minutes and round up
-    //int remainingMinutes = (remainingSeconds) ~/ 60; // Adding 59 seconds before integer division to round up
 
     int timerTime = remainingSeconds + 120*60 + pendingTime*60;
     print("remainding seconds   "+remainingSeconds.toString());
