@@ -1,27 +1,24 @@
-import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:team_coffee/controllers/auth_controller.dart';
-import 'package:team_coffee/pages/auth/group_page.dart';
+import 'package:team_coffee/controllers/event_controller.dart';
 import 'package:team_coffee/pages/auth/sign_in_page.dart';
 import 'package:team_coffee/pages/home/home_page.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
-import '../../routes/route_helper.dart';
-import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
-
-
-import 'package:flutter/material.dart';
+import '../error/error_page.dart';
 
 class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _donutsAnimation;
   late Animation<double> _kafaAnimation;
@@ -30,53 +27,55 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   late Animation<double> _sodaAnimation;
   late Animation<double> _titleOpacityAnimation;
 
-  late AuthController auth;
+  final AuthController auth = Get.find<AuthController>();
 
   late AudioPlayer player = AudioPlayer();
+
+  final EventController _eventController = Get.find<EventController>();
 
   @override
   void initState() {
     super.initState();
-    auth=Get.find<AuthController>();
+    ;
     player = AudioPlayer();
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 3),
+      duration: const Duration(seconds: 3),
     );
     _donutsAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: Interval(0, 0.6, curve: Curves.easeOut),
+        curve: const Interval(0, 0.6, curve: Curves.easeOut),
       ),
     );
     _kafaAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: Interval(0.2, 0.8, curve: Curves.easeOut),
+        curve: const Interval(0.2, 0.8, curve: Curves.easeOut),
       ),
     );
     _friesAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: Interval(0.4, 1, curve: Curves.easeOutCirc),
+        curve: const Interval(0.4, 1, curve: Curves.easeOutCirc),
       ),
     );
     _hamburgerAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: Interval(0.3, 0.7, curve: Curves.easeOut),
+        curve: const Interval(0.3, 0.7, curve: Curves.easeOut),
       ),
     );
     _sodaAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: Interval(0.1, 0.6, curve: Curves.easeOut),
+        curve: const Interval(0.1, 0.6, curve: Curves.easeOut),
       ),
     );
     _titleOpacityAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: Interval(0.6, 1, curve: Curves.decelerate),
+        curve: const Interval(0.6, 1, curve: Curves.decelerate),
       ),
     );
     _kafaAnimation.addListener(() async {
@@ -86,34 +85,52 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       }
     });
 
-   _startAnimation();
+    _startAnimation();
   }
 
-  void _startAnimation() {
-    _animationController.forward().then((_) {
-      if(auth.groupId.isNotEmpty){
-        if(auth.userLoggedIn()){
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => HomePage()),
-          );
-        }else{
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => SignInPage()),
-          );
-        }
-      }else{
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => GroupPage()),
-        );
+  Future<void> _startAnimation() async {
+    _animationController.forward().then((_) async {
+      // Check internet connectivity
+      var connectivityResult = await (Connectivity().checkConnectivity());
+      if (connectivityResult == ConnectivityResult.none) {
+        _navigateToErrorPage("No internet connection");
+        return;
       }
 
-
+      if (auth.userLoggedIn()) {
+        try {
+          await _eventController.fetchPendingEvents("MIX");
+          await _eventController.fetchInProgressEvents("MIX");
+          _navigateToHomePage();
+        } catch (e) {
+          _navigateToErrorPage(
+              "Failed to fetch events. Please try again later.");
+        }
+      } else {
+        _navigateToSignInPage();
+      }
     });
+  }
 
+  void _navigateToErrorPage(String message) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => ErrorPage(message: message)),
+    );
+  }
 
+  void _navigateToHomePage() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const HomePage()),
+    );
+  }
+
+  void _navigateToSignInPage() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const SignInPage()),
+    );
   }
 
   @override
@@ -131,8 +148,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         child: Stack(
           children: [
             Positioned(
-              top: -50,
-              right: 180,
+              top: -Dimensions.height10 * 5,
+              right: Dimensions.width10 * 16,
               child: AnimatedBuilder(
                 animation: _donutsAnimation,
                 builder: (context, child) {
@@ -149,19 +166,19 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 },
                 child: CircleAvatar(
                   backgroundColor: Colors.white,
-                  radius: 130,
+                  radius: Dimensions.radius20 * 6.5,
                   child: Image.asset(
                     "assets/image/donuts.png",
-                    width: 330,
-                    height: 330,
+                    width: Dimensions.width10 * 33,
+                    height: Dimensions.width10 * 33,
                     fit: BoxFit.cover,
                   ),
                 ),
               ),
             ),
             Positioned(
-              top: -20,
-              right: 20,
+              top: -Dimensions.height10 * 5,
+              right: Dimensions.width20,
               child: AnimatedBuilder(
                 animation: _kafaAnimation,
                 builder: (context, child) {
@@ -178,19 +195,19 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 },
                 child: CircleAvatar(
                   backgroundColor: Colors.white,
-                  radius: 80,
+                  radius: Dimensions.radius20 * 4,
                   child: Image.asset(
                     "assets/image/kafa.png",
-                    width: 150,
-                    height: 150,
+                    width: Dimensions.width10 * 15,
+                    height: Dimensions.width10 * 15,
                     fit: BoxFit.cover,
                   ),
                 ),
               ),
             ),
             Positioned(
-              top: 200,
-              right: 60,
+              top: Dimensions.height20 * 9.5,
+              right: Dimensions.width20 * 2.2,
               child: AnimatedBuilder(
                 animation: _friesAnimation,
                 builder: (context, child) {
@@ -207,19 +224,19 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 },
                 child: CircleAvatar(
                   backgroundColor: Colors.white,
-                  radius: 70,
+                  radius: Dimensions.radius20 * 3.5,
                   child: Image.asset(
                     "assets/image/fries.png",
-                    width: 180,
-                    height: 180,
+                    width: Dimensions.width20 * 9,
+                    height: Dimensions.width20 * 9,
                     fit: BoxFit.cover,
                   ),
                 ),
               ),
             ),
             Positioned(
-              top: 400,
-              right: 50,
+              top: Dimensions.height20 * 20,
+              right: Dimensions.width20 * 2.5,
               child: AnimatedBuilder(
                 animation: _hamburgerAnimation,
                 builder: (context, child) {
@@ -236,19 +253,19 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 },
                 child: CircleAvatar(
                   backgroundColor: Colors.white,
-                  radius: 90,
+                  radius: Dimensions.radius15 * 6,
                   child: Image.asset(
                     "assets/image/hamburger.png",
-                    width: 250,
-                    height: 250,
+                    width: Dimensions.width20 * 12.5,
+                    height: Dimensions.width20 * 12.5,
                     fit: BoxFit.cover,
                   ),
                 ),
               ),
             ),
             Positioned(
-              top: 360,
-              right: 250,
+              top: Dimensions.height10 * 36,
+              right: Dimensions.width20 * 12.5,
               child: AnimatedBuilder(
                 animation: _sodaAnimation,
                 builder: (context, child) {
@@ -265,11 +282,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 },
                 child: CircleAvatar(
                   backgroundColor: Colors.white,
-                  radius: 80,
+                  radius: Dimensions.radius20 * 4,
                   child: Image.asset(
                     "assets/image/soda.png",
-                    width: 150,
-                    height: 150,
+                    width: Dimensions.width15 * 10,
+                    height: Dimensions.width15 * 10,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -292,7 +309,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       Text(
                         "Sync",
                         style: TextStyle(
-                          fontSize: 50,
+                          fontSize: Dimensions.font20 * 2.5,
                           fontWeight: FontWeight.w600,
                           height: 0.8,
                         ),
@@ -300,7 +317,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       Text(
                         "Snack",
                         style: TextStyle(
-                          fontSize: 50,
+                          fontSize: Dimensions.font20 * 2.5,
                           fontWeight: FontWeight.w900,
                           height: 0.8,
                         ),

@@ -11,9 +11,9 @@ class OrderBodyRating{
   });
 
   Map<String,dynamic> toJson(){
-    final Map<String,dynamic> data = new Map<String,dynamic>();
-    data["coffeeOrderId"] = this.orderId;
-    data["ratingUpdate"] = this.ratingUpdate;
+    final Map<String,dynamic> data = <String,dynamic>{};
+    data["coffeeOrderId"] = orderId;
+    data["ratingUpdate"] = ratingUpdate;
 
     return data;
   }

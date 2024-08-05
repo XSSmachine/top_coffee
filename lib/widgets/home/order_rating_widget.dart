@@ -13,22 +13,22 @@ class CoffeeRatingWidget extends StatelessWidget {
   final VoidCallback onRatingSubmit;
 
   const CoffeeRatingWidget({
-    Key? key,
+    super.key,
     this.initialRating = 3,
     this.itemCount = 5,
     this.starColor = Colors.amberAccent,
     this.buttonColor = Colors.blue,
-    this.buttonText = 'Rate the coffee',
+    this.buttonText = 'Submit your rating',
     this.iconSize = 30,
     this.spacing = 20,
     required this.onRatingUpdate,
     required this.onRatingSubmit,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
@@ -37,7 +37,7 @@ class CoffeeRatingWidget extends StatelessWidget {
             color: Colors.grey.withOpacity(0.1),
             spreadRadius: 5,
             blurRadius: 7,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -52,7 +52,7 @@ class CoffeeRatingWidget extends StatelessWidget {
             allowHalfRating: true,
             itemCount: itemCount,
             itemSize: iconSize,
-            itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+            itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
             itemBuilder: (context, _) => Icon(
               Icons.star,
               color: starColor,
@@ -66,12 +66,12 @@ class CoffeeRatingWidget extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30),
               ),
-              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
             ),
             onPressed: onRatingSubmit,
             child: Text(
               buttonText,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,

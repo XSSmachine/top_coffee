@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
 import '../controllers/auth_controller.dart';
 import '../utils/colors.dart';
@@ -12,7 +10,7 @@ class CustomLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("I am printing loading state "+ Get.find<AuthController>().isLoading.toString());
+    print("I am printing loading state ${Get.find<AuthController>().isLoading}");
     return Center(
       child: Container(
         height: Dimensions.height20*5,
@@ -22,7 +20,7 @@ class CustomLoader extends StatelessWidget {
           color: AppColors.mainColor
         ),
         alignment: Alignment.center,
-        child: CircularProgressIndicator(color: Colors.white,),
+        child: const CircularProgressIndicator(color: Colors.white,),
       ),
     );
   }

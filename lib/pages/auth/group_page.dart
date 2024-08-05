@@ -4,20 +4,18 @@ import 'package:tab_container/tab_container.dart';
 import 'package:team_coffee/controllers/auth_controller.dart';
 import 'package:team_coffee/widgets/group/create_group_widget.dart';
 import 'package:team_coffee/widgets/group/join_group_widget.dart';
+import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
 
-/**
- * This class displays 2 forms for joining or creating new group
- */
+/// This class displays 2 forms for joining or creating new group
 class GroupPage extends StatefulWidget {
   const GroupPage({super.key});
 
   @override
   _GroupPageState createState() => _GroupPageState();
-  }
+}
 
-  class _GroupPageState extends State<GroupPage>
-  with TickerProviderStateMixin {
+class _GroupPageState extends State<GroupPage> with TickerProviderStateMixin {
   late final TabController _tabController;
   late TextTheme textTheme;
 
@@ -27,22 +25,22 @@ class GroupPage extends StatefulWidget {
   late Animation<double> _donutsAnimation;
   late Animation<double> _friesAnimation;
   late Animation<double> _kafaAnimation;
-  bool _rememberMe = false;
+  final bool _rememberMe = false;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(vsync: this, length: 2);
     _donutsController = AnimationController(
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
       vsync: this,
     );
     _friesController = AnimationController(
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
       vsync: this,
     );
     _kafaController = AnimationController(
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
       vsync: this,
     );
 
@@ -87,13 +85,10 @@ class GroupPage extends StatefulWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-      body: GetBuilder<AuthController>(builder: (controller){
-        return
-        Column(
-
+    return Scaffold(body: GetBuilder<AuthController>(builder: (controller) {
+      return SingleChildScrollView(
+        child: Column(
           children: [
-
             Container(
               color: Colors.white,
               margin: EdgeInsets.zero,
@@ -190,16 +185,14 @@ class GroupPage extends StatefulWidget {
                             style: TextStyle(
                                 fontSize: Dimensions.font20 * 2,
                                 fontWeight: FontWeight.w600,
-                                height: 0.8
-                            ),
+                                height: 0.8),
                           ),
                           Text(
                             "Snack",
                             style: TextStyle(
                                 fontSize: Dimensions.font20 * 2,
                                 fontWeight: FontWeight.w900,
-                                height: 0.8
-                            ),
+                                height: 0.8),
                           ),
                         ],
                       ),
@@ -208,17 +201,14 @@ class GroupPage extends StatefulWidget {
                 ],
               ),
             ),
-
             SizedBox(
-
               width: double.maxFinite,
-              height: Dimensions.screenHeight/1.734,
+              height: Dimensions.screenHeight / 1.734 -
+                  MediaQuery.of(context).viewInsets.bottom,
               child: DecoratedBox(
-                decoration: BoxDecoration(
-                    color: Colors.white
-                ),
+                decoration: const BoxDecoration(color: Colors.white),
                 child: AspectRatio(
-                  aspectRatio: 10/8,
+                  aspectRatio: 10 / 8,
                   child: TabContainer(
                     controller: _tabController,
                     borderRadius: BorderRadius.circular(20),
@@ -238,40 +228,41 @@ class GroupPage extends StatefulWidget {
                         ),
                       );
                     },
-                    colors: <Color>[
-                      Color(0xff5669FF),
-                      Color(0xff9856ff),
-
-
+                    colors: const <Color>[
+                      AppColors.mainBlueColor,
+                      AppColors.candyPurpleColor,
                     ],
                     selectedTextStyle:
-                    textTheme.bodyMedium?.copyWith(fontSize: 15.0),
+                        textTheme.bodyMedium?.copyWith(fontSize: 15.0),
                     unselectedTextStyle:
-                    textTheme.bodyMedium?.copyWith(fontSize: 13.0),
+                        textTheme.bodyMedium?.copyWith(fontSize: 13.0),
                     tabs: [
-                      Text('Join Group',style: TextStyle(fontWeight: FontWeight.w600,fontSize: Dimensions.font16-2),),
-                      Text('Create Group',style: TextStyle(fontWeight: FontWeight.w600,fontSize: Dimensions.font16-2),),
-
+                      Text(
+                        'Join Group',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: Dimensions.font16 - 2),
+                      ),
+                      Text(
+                        'Create Group',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: Dimensions.font16 - 2),
+                      ),
                     ],
                     children: [
                       JoinGroupWidget(controller: controller),
-                      CreateGroupWidget(controller: controller,)
-
+                      CreateGroupWidget(
+                        controller: controller,
+                      )
                     ],
-
                   ),
                 ),
               ),
-            ),],
-        );
-
-      })
-    );
+            ),
+          ],
+        ),
+      );
+    }));
   }
-
-
 }
-
-
-
-

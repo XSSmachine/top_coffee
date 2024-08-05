@@ -1,60 +1,52 @@
-class OrderModel{
-  late String _id;
-  late String _eventId;
-  late String _userId;
-  late String? _type;
-  late int? _sugarQuantity;
-  late int? _milkQuantity;
-  late int? _rating;
+
+class OrderModel {
+  String eventId;
+  String orderId;
+  String? userProfileId;
+  String title;
+  String? description;
+  String groupId;
+  String status;
+  String eventType;
+  DateTime createdAt;
 
   OrderModel({
-    id,
-    required eventId,
-    required userId,
-    type,
-    sugarQuantity,
-    milkQuantity,
-    rating,
-  }){
-    _id=id;
-    _eventId=eventId;
-    _userId = userId;
-    _type = type;
-    _sugarQuantity=sugarQuantity;
-    _milkQuantity=milkQuantity;
-    _rating=rating;
+    required this.eventId,
+    required this.orderId,
+    required this.userProfileId,
+    required this.title,
+    required this.description,
+    required this.groupId,
+    required this.status,
+    required this.eventType,
+    required this.createdAt,
+  });
 
+  factory OrderModel.fromJson(Map<String, dynamic> json) {
+    return OrderModel(
+      eventId: json['eventId'],
+      orderId: json['orderId'],
+      userProfileId: json['userProfileId'],
+      title: json['title'],
+      description: json['description'],
+      groupId: json['groupId'],
+      status: json['status'],
+      eventType: json['eventType'],
+      createdAt: DateTime.parse(json['createdAt']),
+    );
   }
 
-  String? get id=>_id;
-  String get eventId=>_eventId;
-  String get userId=>_userId;
-  String? get type=>_type;
-  int? get sugarQuantity=>_sugarQuantity;
-  int? get milkQuantity => _milkQuantity;
-  int? get rating=>_rating;
-
-
-  OrderModel.fromJson(Map<String,dynamic> json){
-    _id=json['coffeeOrderId'];
-    _eventId=json["eventId"]??"";
-    _userId=json["userId"]??"";
-    _type=json["type"]??"";
-    _sugarQuantity=json["sugarQuantity"]??"";
-    _milkQuantity=json["milkQuantity"];
-    _rating=json["rating"];
-  }
-
-  Map<String,dynamic> toJson(){
-    final Map<String, dynamic> data= Map<String, dynamic>();
-    data['coffeeOrderId']=this._id;
-    data['eventId']=this._eventId;
-    data['userId']=this._userId;
-    data['type']=this._type;
-    data['sugarQuantity']=this._sugarQuantity;
-    data['milkQuantity']=this._milkQuantity;
-    data['rating']=this._rating;
-    return data;
-
+  Map<String, dynamic> toJson() {
+    return {
+      'eventId': eventId,
+      'orderId': orderId,
+      'userProfileId': userProfileId,
+      'title': title,
+      'description': description,
+      'groupId': groupId,
+      'status': status,
+      'eventType': eventType,
+      'createdAt': createdAt.toIso8601String(),
+    };
   }
 }

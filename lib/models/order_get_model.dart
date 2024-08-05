@@ -1,47 +1,54 @@
 class OrderGetModel{
-  late String _id;
-  late String? _type;
-  late int? _sugarQuantity;
-  late int? _milkQuantity;
-
+  late String _userProfileId;
+  late String? _status;
+  late Map<String,dynamic>? _additionalOptions;
+  late int? _rating;
+  late String? _createdAt;
 
   OrderGetModel({
-    id,
-    type,
-    sugarQuantity,
-    milkQuantity,
+    userProfileId,
+    status,
+    additionalOptions,
+    rating,
+    createdAt
 
   }){
-    _id=id;
-    _type = type;
-    _sugarQuantity=sugarQuantity;
-    _milkQuantity=milkQuantity;
+    _userProfileId= userProfileId;
+    _status=status;
+    _additionalOptions=additionalOptions;
+    _rating=rating;
+    _createdAt=createdAt;
+
+
 
 
   }
 
-  String? get id=>_id;
+  String? get userProfileId=>_userProfileId;
 
-  String? get type=>_type;
-  int? get sugarQuantity=>_sugarQuantity;
-  int? get milkQuantity => _milkQuantity;
+  String? get status=>_status;
+  Map<String,dynamic>? get additionalOptions=>_additionalOptions;
+  int? get rating => _rating;
+  String? get createdAt=>_createdAt;
 
 
 
   OrderGetModel.fromJson(Map<String,dynamic> json){
-    _id=json['coffeeOrderId'];
-    _type=json["type"]??"";
-    _sugarQuantity=json["sugarQuantity"]??"";
-    _milkQuantity=json["milkQuantity"];
+    _userProfileId=json['userProfileId'];
+    _status=json["status"]??"";
+    _additionalOptions=json["additionalOptions"]??"";
+    _rating=json["rating"];
+    _createdAt=json["createdAt"];
 
   }
 
   Map<String,dynamic> toJson(){
-    final Map<String, dynamic> data= Map<String, dynamic>();
-    data['coffeeOrderId']=this._id;
-    data['type']=this._type;
-    data['sugarQuantity']=this._sugarQuantity;
-    data['milkQuantity']=this._milkQuantity;
+    final Map<String, dynamic> data= <String, dynamic>{};
+    data['userProfileId']=_userProfileId;
+    data['status']=_status;
+    data['additionalOptions']=_additionalOptions;
+    data['rating']=_rating;
+    data['cratedAt']=_createdAt;
     return data;
 
   }

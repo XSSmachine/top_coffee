@@ -1,10 +1,7 @@
 
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:team_coffee/controllers/event_controller.dart';
-import 'package:team_coffee/helper/rated_events_preferences.dart';
-import 'package:team_coffee/helper/user_preferences.dart';
 
 import '../controllers/auth_controller.dart';
 import '../controllers/order_controller.dart';
@@ -17,33 +14,28 @@ import '../data/repository/user_repo.dart';
 import '../utils/app_constants.dart';
 
 
-Future<void> init()async {
-
+Future<void> init() async {
   final sharedPreferences = await SharedPreferences.getInstance();
-  /*
-  final secureStorage = await FlutterSecureStorage(
-      aOptions: AndroidOptions(encryptedSharedPreferences: true)
-  );
 
-   */
-  Get.lazyPut(()=>sharedPreferences);
-  //Get.lazyPut(() => secureStorage);
-  Get.lazyPut(()=>UserPreferences(preferences:Get.find()));
-  Get.lazyPut(()=>RatedEventsPreferences(preferences:Get.find()));
+  // SharedPreferences
+  Get.put(sharedPreferences);
 
-  //1. api client
-  Get.lazyPut(()=>ApiClient(appBaseUrl: AppConstants.BASE_URL,sharedPreferences:Get.find()));
+  // ApiClient
+  Get.put(ApiClient(appBaseUrl: AppConstants.BASE_URL, sharedPreferences: Get.find()));
 
-  //2. repos
-  Get.lazyPut(()=>OrderRepo(apiClient: Get.find(),sharedPreferences:Get.find()));
-  Get.lazyPut(()=>EventRepo(apiClient: Get.find(),sharedPreferences: Get.find()));
-  Get.lazyPut(()=>AuthRepo(apiClient: Get.find(),sharedPreferences: Get.find()));
-  Get.lazyPut(()=>UserRepo(apiClient: Get.find(),sharedPreferences:Get.find()));
+  // Repositories
+  Get.put(OrderRepo(apiClient: Get.find(), sharedPreferences: Get.find()));
+  Get.put(EventRepo(apiClient: Get.find(), sharedPreferences: Get.find()));
+  Get.put(AuthRepo(apiClient: Get.find(), sharedPreferences: Get.find()));
+  Get.put(UserRepo(apiClient: Get.find(), sharedPreferences: Get.find()));
 
-  //3. controllers
-  Get.lazyPut(()=>AuthController(authRepo: Get.find(),userRepo: Get.find()));
-  Get.lazyPut(()=>UserController(userRepo: Get.find()));
-  Get.lazyPut(()=>EventController(eventRepo: Get.find(), orderRepo: Get.find(),userRepo: Get.find()));
-  Get.lazyPut(()=>OrderController(orderRepo: Get.find()));
 
+
+  // Controllers
+  Get.put(AuthController(authRepo: Get.find(), userRepo: Get.find()));
+  Get.put(UserController(userRepo: Get.find()));
+  Get.put(EventController(eventRepo: Get.find(), orderRepo: Get.find(), userRepo: Get.find()));
+  Get.put(OrderController(orderRepo: Get.find()));
+
+  print("All dependencies initialized"); // Add this line for debugging
 }

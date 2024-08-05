@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CoffeeOrderWidget extends StatefulWidget {
@@ -11,7 +10,7 @@ class CoffeeOrderWidget extends StatefulWidget {
   final Color buttonColor;
 
   const CoffeeOrderWidget({
-    Key? key,
+    super.key,
     required this.coffeeTypes,
     required this.coffeeIcons, // Initialize the icons list
     required this.onOrderPlaced,
@@ -19,7 +18,7 @@ class CoffeeOrderWidget extends StatefulWidget {
     this.textColor = Colors.white,
     this.accentColor = Colors.red,
     this.buttonColor = Colors.teal,
-  }) : super(key: key);
+  });
 
   @override
   _CoffeeOrderWidgetState createState() => _CoffeeOrderWidgetState();
@@ -47,15 +46,15 @@ class _CoffeeOrderWidgetState extends State<CoffeeOrderWidget> {
       ),
       child: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 "Coffee Order",
                 style: TextStyle(color: Colors.white, fontSize: 20),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               DropdownButton<String>(
                 value: selectedCoffeeType,
                 onChanged: (String? newValue) {
@@ -68,20 +67,20 @@ class _CoffeeOrderWidgetState extends State<CoffeeOrderWidget> {
                     value: value,
                     child: Row(
                       children: [
-                        Icon(Icons.coffee),
-                        SizedBox(width: 8),
+                        const Icon(Icons.coffee),
+                        const SizedBox(width: 8),
                         Text(value),
                       ],
                     ),
                   );
                 }).toList(),
               ),
-              SizedBox(height: 20),
-              Text(
+              const SizedBox(height: 20),
+              const Text(
                 "Select Milk Quantity:",
                 style: TextStyle(color: Colors.white, fontSize: 16),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               GridView.count(
                 shrinkWrap: true,
                 crossAxisCount: 3,
@@ -101,12 +100,12 @@ class _CoffeeOrderWidgetState extends State<CoffeeOrderWidget> {
                     ),
                 ],
               ),
-              SizedBox(height: 20),
-              Text(
+              const SizedBox(height: 20),
+              const Text(
                 "Select Sugar Quantity:",
                 style: TextStyle(color: Colors.white, fontSize: 16),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               GridView.count(
                 shrinkWrap: true,
                 crossAxisCount: 3,
@@ -126,12 +125,12 @@ class _CoffeeOrderWidgetState extends State<CoffeeOrderWidget> {
                     ),
                 ],
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
                   // ... (keep the existing code)
                 },
-                child: Text("Order Up!"),
+                child: const Text("Order Up!"),
               ),
             ],
           ),

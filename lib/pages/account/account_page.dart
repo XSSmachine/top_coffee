@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+import 'package:team_coffee/models/fetch_me_model.dart';
 import 'package:team_coffee/widgets/user_profile.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/user_controller.dart';
@@ -10,21 +10,19 @@ import '../../utils/dimensions.dart';
 import '../../widgets/account_widget.dart';
 import '../../widgets/app_icon.dart';
 import '../../widgets/big_text.dart';
-import '../../widgets/stats_value_title.dart';
+import '../../widgets/edit_profile_widget.dart';
 
-/**
- * This class displays user profile
- */
+/// This class displays user profile
 class AccountPage extends StatefulWidget {
-  const AccountPage({Key? key}) : super(key: key);
+  const AccountPage({super.key});
 
   @override
   _AccountPageState createState() => _AccountPageState();
 }
 
+final AuthController authController = Get.find<AuthController>();
+
 class _AccountPageState extends State<AccountPage> {
-  final AuthController authController = Get.find<AuthController>();
-  //final UserController userController = Get.find<UserController>();
   bool _isInitialized = false;
 
   @override
@@ -33,13 +31,33 @@ class _AccountPageState extends State<AccountPage> {
     _initializeData();
   }
 
+  Future<void> _showEditProfileDialog() async {
+    final UserController userController = Get.find<UserController>();
+    final result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomAlertDialog(
+          initialData: userController.user!,
+          userController: userController,
+        );
+      },
+    );
+
+    if (result == true) {
+      // Profile updated successfully, refresh the user data
+      await userController.getUserProfile();
+      setState(() {}); // Rebuild the widget to reflect changes
+    }
+  }
+
   Future<void> _initializeData() async {
     await authController.fetchAndSetUserToken();
     if (authController.userLoggedIn()) {
       print("User Token: ${authController.userToken}");
-      //await userController.getUserId(authController.userToken);
-      //await userController.getUserProfile();
+      await Get.find<UserController>().getUserProfile();
+      FetchMeModel? userData = Get.find<UserController>().user;
       print("User has logged in");
+      print("${userData!.name}/${userData.surname}/${userData.profileId}/${userData.groupId}");
     }
     setState(() {
       _isInitialized = true;
@@ -49,7 +67,7 @@ class _AccountPageState extends State<AccountPage> {
   @override
   Widget build(BuildContext context) {
     if (!_isInitialized) {
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -60,97 +78,66 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   Widget _buildLoggedInView() {
-
-          return Container(
-            width: double.maxFinite,
-            margin: EdgeInsets.only(top: Dimensions.height30*2),
-            child: Column(
-              children: [
-                WordCustomCard(),
-                /*Stack(
-                  children: [
-                    Container(
-                      height: Dimensions.height30*10,
-                      margin: EdgeInsets.only(right: 20,left: 20,top: Dimensions.height30*1.75),
-                      width: double.maxFinite,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                        color: AppColors.mainColor,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(height: Dimensions.height20*3,),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.star,
-                                  color: Colors.amberAccent,
-                                  size: Dimensions.iconSize24),
-                              SizedBox(width: 5,),
-                              BigText(text:  "5.00", size: 24,)
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              BigText(text:  "Name", size: 32,),
-                              SizedBox(width: Dimensions.width10,),
-                              BigText(text:  "Surname", size: 32,),
-                            ],
-                          ),
-
-                          //BigText(text: userController.user?.email ?? "user.name@kava.com", size: 16,),
-                          SizedBox(height: Dimensions.height20,),
-                          Padding(
-                            padding: EdgeInsets.only(top: Dimensions.height20),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                StatsValueTitle(title: "# of events made", dataValue:  "16"),
-                                StatsValueTitle(title: "# of events made", dataValue:  "45")
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child: AppIcon(icon: Icons.person, backgroungColor: AppColors.iconColor1,
-                        iconColor: Colors.white,iconSize: Dimensions.height30*2.5,size: Dimensions.height30*4.5,),
-                    ),
-                  ],
-                ),*/
-                SizedBox(height: 20,),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        SizedBox(height: Dimensions.height20,),
-                        AccountWidget(appIcon: AppIcon(icon: Icons.message_outlined, backgroungColor: AppColors.titleColor,
-                          iconColor: Colors.white,iconSize: Dimensions.height10*2.5,size: Dimensions.height10*5,),
-                            bigText: BigText(text: "Messages",)),
-                        SizedBox(height: Dimensions.height20,),
-                        GestureDetector(
-                          onTap: () {
-                            Get.find<AuthController>().clearSharedData();
-                            Get.toNamed(RouteHelper.getSignInPage());
-                          },
-                          child: AccountWidget(appIcon: AppIcon(icon: Icons.logout, backgroungColor: Colors.redAccent,
-                            iconColor: Colors.white,iconSize: Dimensions.height10*2.5,size: Dimensions.height10*5,),
-                              bigText: BigText(text: "Logout",)),
-                        ),
-                        Container(),
-                      ],
-                    ),
+    return Container(
+      width: double.maxFinite,
+      margin: EdgeInsets.only(top: Dimensions.height30 * 2),
+      child: Column(
+        children: [
+          WordCustomCard(
+            user: Get.find<UserController>().user!,
+            userController: Get.find<UserController>(),
+            onEditProfile: _showEditProfileDialog,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: Dimensions.height20,
                   ),
-                )
-              ],
+                  AccountWidget(
+                      appIcon: AppIcon(
+                        icon: Icons.message_outlined,
+                        backgroungColor: AppColors.titleColor,
+                        iconColor: Colors.white,
+                        iconSize: Dimensions.height10 * 2.5,
+                        size: Dimensions.height10 * 5,
+                      ),
+                      bigText: BigText(
+                        text: "Messages",
+                      )),
+                  SizedBox(
+                    height: Dimensions.height20,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Get.find<AuthController>().clearSharedData();
+                      Get.toNamed(RouteHelper.getSignInPage());
+                    },
+                    child: AccountWidget(
+                        appIcon: AppIcon(
+                          icon: Icons.logout,
+                          backgroungColor: Colors.black,
+                          iconColor: Colors.white,
+                          iconSize: Dimensions.height10 * 2.5,
+                          size: Dimensions.height10 * 5,
+                        ),
+                        bigText: BigText(
+                          text: "Logout",
+                        )),
+                  ),
+                  Container(),
+                ],
+              ),
             ),
-          );
-        }
-
+          )
+        ],
+      ),
+    );
+  }
 
   Widget _buildSignInPrompt(BuildContext context) {
     return Center(
@@ -159,16 +146,15 @@ class _AccountPageState extends State<AccountPage> {
         children: [
           Container(
               width: double.maxFinite,
-              height: Dimensions.height20*8,
-              margin: EdgeInsets.only(left: Dimensions.width20, right: Dimensions.width20),
+              height: Dimensions.height20 * 8,
+              margin: EdgeInsets.only(
+                  left: Dimensions.width20, right: Dimensions.width20),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(Dimensions.radius20),
-                image: DecorationImage(
+                image: const DecorationImage(
                     fit: BoxFit.cover,
-                    image: AssetImage("assets/image/signintocontinue.png")
-                ),
-              )
-          ),
+                    image: AssetImage("assets/image/signintocontinue.png")),
+              )),
           SizedBox(height: Dimensions.height20),
           GestureDetector(
             onTap: () {
@@ -176,8 +162,9 @@ class _AccountPageState extends State<AccountPage> {
             },
             child: Container(
               width: double.maxFinite,
-              height: Dimensions.height20*5,
-              margin: EdgeInsets.only(left: Dimensions.width20, right: Dimensions.width20),
+              height: Dimensions.height20 * 5,
+              margin: EdgeInsets.only(
+                  left: Dimensions.width20, right: Dimensions.width20),
               decoration: BoxDecoration(
                 color: AppColors.mainColor,
                 borderRadius: BorderRadius.circular(Dimensions.radius20),

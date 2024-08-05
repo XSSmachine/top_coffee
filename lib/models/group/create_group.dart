@@ -9,10 +9,10 @@ class CreateGroup{
   });
 
   Map<String,dynamic> toJson(){
-    final Map<String,dynamic> data = new Map<String,dynamic>();
-    data["name"] = this.name;
-    data["description"] = this.description;
-    data["password"] = this.password;
+    final Map<String,dynamic> data = <String,dynamic>{};
+    data["name"] = name;
+    data["description"] = description;
+    data["password"] = password;
     return data;
   }
 }

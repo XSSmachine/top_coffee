@@ -1,10 +1,36 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:team_coffee/models/fetch_me_model.dart';
+
+import '../controllers/user_controller.dart';
+import '../utils/colors.dart';
 import '../utils/dimensions.dart';
 
-class WordCustomCard extends StatelessWidget {
-  const WordCustomCard({Key? key}) : super(key: key);
+class WordCustomCard extends StatefulWidget {
+  final FetchMeModel user;
+  final UserController userController;
+  final Function() onEditProfile;
+
+  const WordCustomCard(
+      {super.key,
+      required this.user,
+      required this.userController,
+      required this.onEditProfile});
+
+  @override
+  _WordCustomCardState createState() => _WordCustomCardState();
+}
+
+class _WordCustomCardState extends State<WordCustomCard> {
+  Future<Uint8List?>? _profilePhotoFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _profilePhotoFuture = widget.userController.fetchProfilePhoto();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,27 +38,37 @@ class WordCustomCard extends StatelessWidget {
       alignment: Alignment.topCenter,
       children: [
         Card(
-          margin: EdgeInsets.only(top: 50), // Adjust the margin to position the card below the image
+          margin: const EdgeInsets.only(top: 50),
           child: Container(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CircleAvatar(
-                  radius: 80,
-                  backgroundImage: AssetImage('assets/image/profile.png'), // Replace with your image asset
-                ),
+                Obx(() {
+                  if (widget.userController.profileImage.value != null) {
+                    return CircleAvatar(
+                      radius: 80,
+                      backgroundImage: MemoryImage(
+                          widget.userController.profileImage.value!),
+                    );
+                  } else {
+                    return const CircleAvatar(
+                      radius: 80,
+                      child: Icon(Icons.person, size: 80),
+                    );
+                  }
+                }),
                 SizedBox(height: Dimensions.height30), // Space for the image
                 Text(
-                  'Marko Urić',
-                  style: TextStyle(
+                  '${widget.user.name} ${widget.user.surname}',
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 10),
-                Row(
+                const SizedBox(height: 10),
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Column(
@@ -74,15 +110,19 @@ class WordCustomCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: Icon(Icons.edit),
-                  label: Text('Edit Profile',style: TextStyle(fontWeight: FontWeight.w600),),
+                  onPressed: widget.onEditProfile,
+                  icon: const Icon(Icons.edit),
+                  label: const Text(
+                    'Edit Profile',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Color(0xff5669FF),
+                    foregroundColor: AppColors.mainBlueColor,
                     backgroundColor: Colors.white,
-                    side: BorderSide(color: Color(0xff5669FF),width: 2.0),
+                    side: const BorderSide(
+                        color: AppColors.mainBlueColor, width: 2.0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),

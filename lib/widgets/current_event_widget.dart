@@ -1,46 +1,49 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../models/event_model.dart';
+import '../models/order_model.dart';
 import '../routes/route_helper.dart';
+import '../utils/colors.dart';
 import '../utils/dimensions.dart';
 
 class CurrentEventWidget extends StatefulWidget {
+  final EventModel event;
+
+  const CurrentEventWidget({super.key, required this.event});
+
   @override
   _CurrentEventWidgetState createState() => _CurrentEventWidgetState();
 }
 
-  class _CurrentEventWidgetState extends State<CurrentEventWidget> {
+class _CurrentEventWidgetState extends State<CurrentEventWidget> {
   double _shadowOpacity = 0.6;
 
   void _animateShadow() {
-  setState(() {
-  _shadowOpacity = _shadowOpacity == 0.6 ? 1.0 : 0.6;
-  });
+    setState(() {
+      _shadowOpacity = _shadowOpacity == 0.6 ? 1.0 : 0.6;
+    });
   }
 
   @override
   void initState() {
-  super.initState();
-  // Start the animation loop
-  _startAnimationLoop();
+    super.initState();
+    // Start the animation loop
+    _startAnimationLoop();
   }
 
   void _startAnimationLoop() async {
-  while (true) {
-  await Future.delayed(Duration(seconds: 1));
-  _animateShadow();
-  }
+    while (true) {
+      await Future.delayed(const Duration(seconds: 1));
+      _animateShadow();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    DateTime now = DateTime.now();
-    String formattedDate = "${now.day}-${now.month}-${now.year}";
-
     return Container(
-      padding: EdgeInsets.all(16.0),
-      margin: EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16.0),
+      margin: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: Colors.grey[200],
         borderRadius: BorderRadius.circular(10.0),
@@ -49,7 +52,7 @@ class CurrentEventWidget extends StatefulWidget {
             color: Colors.amber.withOpacity(_shadowOpacity),
             spreadRadius: 4,
             blurRadius: 5,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -58,25 +61,25 @@ class CurrentEventWidget extends StatefulWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.event, size: 40, color: Color(0xff5669FF)),
-              SizedBox(width: 10),
+              const Icon(Icons.event, size: 40, color: AppColors.mainBlueColor),
+              const SizedBox(width: 10),
               Text(
-                'TITLE EVENT',
-                style: TextStyle(
+                widget.event.title ?? "Title",
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Spacer(),
+              const Spacer(),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Color(0xff5669FF),
+                  color: AppColors.mainBlueColor,
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: Text(
-                  'IN PROGRESS',
-                  style: TextStyle(
+                  widget.event.status ?? "Status",
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
@@ -84,22 +87,22 @@ class CurrentEventWidget extends StatefulWidget {
               ),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             children: [
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.green,
                   borderRadius: BorderRadius.circular(Dimensions.radius15),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.fastfood, color: Colors.white, size: 16),
-                    SizedBox(width: 5),
+                    const Icon(Icons.fastfood, color: Colors.white, size: 16),
+                    const SizedBox(width: 5),
                     Text(
-                      'Food',
-                      style: TextStyle(
+                      widget.event.eventType ?? "Food",
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
@@ -107,31 +110,34 @@ class CurrentEventWidget extends StatefulWidget {
                   ],
                 ),
               ),
-              SizedBox(width: 10),
-
+              const SizedBox(width: 10),
             ],
           ),
-          Divider(color: Colors.black),
+          const Divider(color: Colors.black),
           Align(
             alignment: Alignment.center,
             child: ElevatedButton(
               onPressed: () {
-                  Get.toNamed(RouteHelper.getAllOrderPage());
+                Get.toNamed(RouteHelper.getAllOrderPage(widget.event.eventId!));
               },
               style: ElevatedButton.styleFrom(
                 elevation: 2,
-                foregroundColor: Color(0xff5669FF),
+                foregroundColor: AppColors.mainBlueColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(Dimensions.radius20),
                 ),
               ),
-              child: Text('My orders',style: TextStyle(fontSize: Dimensions.font16,fontWeight: FontWeight.w700),),
+              child: Text(
+                'My orders',
+                style: TextStyle(
+                  fontSize: Dimensions.font16,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           ),
         ],
       ),
     );
   }
-
-
 }

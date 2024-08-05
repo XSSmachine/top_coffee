@@ -1,4 +1,3 @@
-import 'order_model.dart';
 
 class Event {
 final String id;
@@ -32,7 +31,7 @@ String toString() {
 
 
   void setOrderPlaced(bool value) {
-    this.orderPlaced = value;
+    orderPlaced = value;
   }
 
 }

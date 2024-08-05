@@ -22,11 +22,11 @@ class UserProfileModel{
         );
   }
   Map<String,dynamic> toJson(){
-    final Map<String,dynamic> data = new Map<String,dynamic>();
-    data["firstName"] = this.name;
-    data["userId"] = this.userId;
-    data["lastName"] = this.surname;
-    data["groupId"] = this.groupId;
+    final Map<String,dynamic> data = <String,dynamic>{};
+    data["firstName"] = name;
+    data["userId"] = userId;
+    data["lastName"] = surname;
+    data["groupId"] = groupId;
     return data;
   }
 }

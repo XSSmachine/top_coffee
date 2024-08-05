@@ -1,106 +1,136 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+import 'package:team_coffee/controllers/event_controller.dart';
+import 'package:team_coffee/controllers/order_controller.dart';
+import 'package:team_coffee/utils/colors.dart';
 
+import '../../models/my_orders_model.dart';
 
-/**
- * This class displays a list of all orders, event creator can tick off each order to track all of them
- * and also has button to finish whole event when he is ready to do so.
- */
+/// This class displays a list of all orders, event creator can tick off each order to track all of them
+/// and also has button to finish whole event when he is ready to do so.
 class AllOrdersScreen extends StatefulWidget {
-  const AllOrdersScreen({super.key});
+  final String eventId;
+  const AllOrdersScreen({super.key, required this.eventId});
 
   @override
   State<AllOrdersScreen> createState() => _AllOrdersScreenState();
 }
 
+List<MyOrder> orders = [];
 
-  List<Order> orders = [
-    Order(name: 'Marko Urić', description: 'Ja zelim pečenu patku sa žara, sa strane umak od gljiva', isChecked: false),
-    Order(name: 'Marko Urić', description: 'Ja zelim pečenu patku sa žara, sa strane umak od gljiva', isChecked: true),
-    Order(name: 'Marko Urić', description: 'Ja zelim pečenu patku sa žara, sa strane umak od gljiva', isChecked: false),
-  ];
+void _finishEvent(EventController eventController, String eventId) {
+  print("called finishEvent");
+  bool allChecked = orders.every((order) => order.isChecked ?? false);
 
-  void _finishEvent() {
-    bool allChecked = orders.every((order) => order.isChecked);
+  if (!allChecked) {
+    showDialog(
+      context: Get.context!,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Are you sure?'),
+          content: const Text('Are you sure you want to finish the event?'),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Finish'),
+              onPressed: () {
+                // Handle the finish event logic here
+                eventController.updateEvent(eventId, "COMPLETED");
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  } else {
+    // Handle the finish event logic here
+    eventController.updateEvent(eventId, "COMPLETED");
+    Get.back();
+  }
+}
 
-    if (!allChecked) {
-      showDialog(
-        context: Get.context!,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Are you sure?'),
-            content: Text('Are you sure you want to finish the event? All orders left unchecked will be cancelled.'),
-            actions: [
-              TextButton(
-                child: Text('Cancel'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                child: Text('Finish'),
-                onPressed: () {
-                  // Handle the finish event logic here
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    } else {
-      // Handle the finish event logic here
+class _AllOrdersScreenState extends State<AllOrdersScreen> {
+  OrderController orderController = Get.find<OrderController>();
+  EventController eventController = Get.find<EventController>();
+  List<MyOrder> orders = []; // Move orders list here
+
+  @override
+  void initState() {
+    super.initState();
+    fetchOrders();
+  }
+
+  void fetchOrders() async {
+    try {
+      final orderList =
+          await orderController.getAllOrdersForMyEvent(widget.eventId);
+      setState(() {
+        orders = orderList;
+      });
+    } catch (e) {
+      print('Error fetching orders: $e');
+      // Handle error (e.g., show a snackbar)
     }
   }
 
-class _AllOrdersScreenState extends State<AllOrdersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Orders'),
+        title: const Text('Orders'),
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
+            icon: const Icon(Icons.search),
             onPressed: () {},
           ),
           IconButton(
-            icon: Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_vert),
             onPressed: () {},
           ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: orders.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            leading: CircleAvatar(
-              backgroundImage: AssetImage('assets/avatar.png'), // Replace with your image asset
-            ),
-            title: Text(orders[index].name),
-            subtitle: Text(orders[index].description),
-            trailing: Checkbox(
-              value: orders[index].isChecked,
-              onChanged: (bool? value) {
-                setState(() {
-                  orders[index].isChecked = value!;
-                });
+      body: orders.isEmpty
+          ? Center(
+              child:
+                  CircularProgressIndicator()) // Show loading indicator while fetching
+          : ListView.builder(
+              itemCount: orders.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  leading: const CircleAvatar(
+                    backgroundImage: AssetImage('assets/image/user.png'),
+                  ),
+                  title: Text(orders[index].firstName),
+                  subtitle: Text(orders[index].additionalOptions.toString()),
+                  trailing: Checkbox(
+                    value: orders[index].isChecked ?? false,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        orders[index].isChecked = value!;
+                      });
+                    },
+                  ),
+                );
               },
             ),
-          );
-        },
-      ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
-          onPressed: _finishEvent,
-          child: Text('FINISH'),
+          onPressed: () {
+            _finishEvent(eventController, widget.eventId);
+          },
           style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.blue,
-            padding: EdgeInsets.symmetric(vertical: 16.0),
-            textStyle: TextStyle(fontSize: 18),
+            foregroundColor: AppColors.mainBlueDarkColor,
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            textStyle: const TextStyle(fontSize: 18),
           ),
+          child: const Text('FINISH'),
         ),
       ),
     );
@@ -112,6 +142,6 @@ class Order {
   String description;
   bool isChecked;
 
-  Order({required this.name, required this.description, this.isChecked = false});
+  Order(
+      {required this.name, required this.description, this.isChecked = false});
 }
-

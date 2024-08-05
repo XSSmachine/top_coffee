@@ -1,63 +1,82 @@
-import 'order_model.dart';
 
-class EventModel{
-  late String? _id;
-  late String _creator;
-  late String? _startTime;
+class EventModel {
+  late String? _eventId;
+  late String? _groupId;
+  late String _userProfileId;
+  late String _userProfileFirstName;
+  late String _userProfileLastName;
+  late String? _createdAt;
+  late String? _pendingUntil;
+  late String? _title;
+  late String? _description;
   late String? _status;
-  late int _pendingTime;
-  late List<String> _orders;
-
-
+  late String? _eventType;
 
   EventModel({
-    id,
-    required creator,
-    startTime,
+    groupId,
+    eventId,
+    required userProfileId,
+    required userProfileFirstName,
+    required userProfileLastName,
+    pendingUntil,
+    createdAt,
     status,
-    pendingTime,
-    orders,
-  }){
-    _id=id;
-    _creator = creator;
-    _startTime = startTime;
-    _status=status;
-    _pendingTime=pendingTime;
-    _orders=orders;
-
+    title,
+    description,
+    eventType,
+  }) {
+    _eventId = eventId;
+    _groupId = groupId;
+    _userProfileId = userProfileId;
+    _userProfileFirstName = userProfileFirstName;
+    _userProfileLastName = userProfileLastName;
+    _pendingUntil = pendingUntil;
+    _createdAt = createdAt;
+    _status = status;
+    _title = title;
+    _description = description;
+    _eventType = eventType;
   }
 
-  String? get id=>_id;
-  String get creator=>_creator;
-  String? get startTIme=>_startTime;
-  String? get status=>_status;
-  int get pendingTime => _pendingTime;
-  List<String> get orders=>_orders;
+  String? get eventId => _eventId;
+  String? get groupId => _groupId;
+  String get userProfileId => _userProfileId;
+  String get userProfileFirstName => _userProfileFirstName;
+  String get userProfileLastName => _userProfileLastName;
+  String? get pendingUntil => _pendingUntil;
+  String? get createdAt => _createdAt;
+  String? get status => _status;
+  String? get title => _title;
+  String? get description => _description;
+  String? get eventType => _eventType;
 
-
-  EventModel.fromJson(Map<String,dynamic> json){
-    _id=json['eventId'];
-    _creator=json["userId"]??"";
-    _startTime=json["startTime"]??"";
-    _status=json["status"]??"";
-    _pendingTime=json["pendingTime"];
-    if (json['orderIds'] != null) {
-      _orders = <String>[];
-      json['orderIds'].forEach((v) {
-        _orders.add(v.toString());
-      });
-    }
+  EventModel.fromJson(Map<String, dynamic> json) {
+    _eventId = json['eventId'];
+    _groupId = json['groupId'];
+    _userProfileId = json["userProfileId"] ?? "";
+    _userProfileFirstName = json["userProfileFirstName"] ?? "";
+    _userProfileLastName = json["userProfileLastName"] ?? "";
+    _pendingUntil = json["pendingUntil"] ?? "";
+    _createdAt = json["createdAt"] ?? "";
+    _status = json["status"] ?? "";
+    _eventType = json["eventType"];
+    _title = json["title"] ?? "";
+    _description = json["description"] ?? "";
   }
 
-  Map<String,dynamic> toJson(){
-    final Map<String, dynamic> data= Map<String, dynamic>();
-    data['_id']=this._id;
-    data['userId']=this._creator;
-    data['startTime']=this._startTime;
-    data['pendingTime']=this._pendingTime;
-    data['orderIds']=this._orders;
-    data['status']=this._status;
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['eventId'] = _eventId;
+    data['groupId'] = _groupId;
+    data['userProfileId'] = _userProfileId;
+    data['userProfileFirstName'] = _userProfileFirstName;
+    data['userProfileLastName'] = _userProfileLastName;
+    data['pendingUntil'] = _pendingUntil;
+    data['createdAt'] = _createdAt;
+    data['eventType'] = _eventType;
+    data['title'] = _title;
+    data['description'] = _description;
+    data['status'] = _status;
     return data;
-
   }
 }

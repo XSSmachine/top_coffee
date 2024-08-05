@@ -1,17 +1,13 @@
-import 'dart:ui';
-
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
 import 'package:flutter/material.dart';
+
 import 'package:team_coffee/utils/dimensions.dart';
 
-import '../big_text.dart';
 
 class BrewCoffeeWidget extends StatelessWidget {
   final VoidCallback onStartBrewing;
 
-  BrewCoffeeWidget({super.key, required this.onStartBrewing});
+  const BrewCoffeeWidget({super.key, required this.onStartBrewing});
 
   @override
   Widget build(BuildContext context) {
@@ -49,12 +45,12 @@ class BrewCoffeeWidget extends StatelessWidget {
                 ElevatedButton(
 
                   onPressed: onStartBrewing,
-                  child: Text("Start Brewing!"),
                   style: ElevatedButton.styleFrom(
                     elevation: 0.0,
                     foregroundColor: Colors.black, // Button color
                     backgroundColor: Colors.transparent, // Text color
                   ),
+                  child: const Text("Start Brewing!"),
                 ),
 
             ),

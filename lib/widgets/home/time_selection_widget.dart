@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:team_coffee/utils/dimensions.dart';
 
@@ -28,16 +27,16 @@ class TimeSelectionWidget extends StatelessWidget {
             top: 0,
             right: 0,
             child: IconButton(
-              icon: Icon(Icons.close, color: Colors.white),
+              icon: const Icon(Icons.close, color: Colors.white),
               onPressed: onClose,
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(34.0),
+            padding: const EdgeInsets.all(34.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
+                const Text(
                   "In how many minutes will you start brewing coffee?",
                   style: TextStyle(
                     color: Colors.white,
@@ -46,7 +45,7 @@ class TimeSelectionWidget extends StatelessWidget {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -70,17 +69,17 @@ class TimeSelectionWidget extends StatelessWidget {
         print("Trying to create new event");
         createBrewEvent(minutes);
       },
-      child: Text(
-        label,
-        style: TextStyle(fontSize: 16),
-      ),
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white,
         backgroundColor: AppColors.paraColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(fontSize: 16),
       ),
     );
   }

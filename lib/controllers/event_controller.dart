@@ -1,25 +1,12 @@
-
-import 'dart:convert';
-
 import 'package:get/get.dart';
-import 'package:team_coffee/models/event_status_model.dart';
+import 'package:team_coffee/base/show_custom_snackbar.dart';
 
-import '../data/repository/auth_repo.dart';
 import '../data/repository/event_repo.dart';
 import '../data/repository/order_repo.dart';
 import '../data/repository/user_repo.dart';
-import '../models/event+order.dart';
 import '../models/event_body_model.dart';
 import '../models/event_model.dart';
 import '../models/order_get_model.dart';
-import '../models/order_model.dart';
-import '../models/response_model.dart';
-import '../models/signup_body_model.dart';
-
-import 'package:get/get.dart';
-
-import '../models/user_model.dart';
-
 
 class EventController extends GetxController implements GetxService {
   final EventRepo eventRepo;
@@ -34,18 +21,20 @@ class EventController extends GetxController implements GetxService {
 
   final Rx<bool> _isLoading = false.obs;
   final Rx<EventModel?> _currentEvent = Rx<EventModel?>(null);
-  final RxList<EventStatusModel> _pendingEvents = <EventStatusModel>[].obs;
-  final RxList<EventStatusModel> _inProgressEvents = <EventStatusModel>[].obs;
+  final RxList<EventModel> _pendingEvents = <EventModel>[].obs;
+  final RxList<EventModel> _inProgressEvents = <EventModel>[].obs;
   final RxList<OrderGetModel> _currentEventOrders = <OrderGetModel>[].obs;
 
   bool get isLoading => _isLoading.value;
   EventModel? get currentEvent => _currentEvent.value;
-  List<EventStatusModel> get pendingEvents => _pendingEvents;
-  List<EventStatusModel> get inProgressEvents => _inProgressEvents;
+  List<EventModel> get pendingEvents => _pendingEvents;
+  List<EventModel> get inProgressEvents => _inProgressEvents;
   List<OrderGetModel> get currentEventOrders => _currentEventOrders;
 
+  RxString selectedEventType = "MIX".obs;
+
   //Method for fetching event details about users and orders they made
-  Future<Event> getEventDetails(String eventId) async {
+/*  Future<Event> getEventDetails(String eventId) async {
     _isLoading.value = true;
     try {
 
@@ -88,41 +77,42 @@ class EventController extends GetxController implements GetxService {
     } finally {
       _isLoading.value = false;
     }
-  }
+  }*/
 
-  int calculateRemainingTimeInRoundedMinutes(String ISO, int pendingTime) {
-    // Parse the start time, assuming it's not null
+  double calculateRemainingTimeInRoundedMinutes(String ISO,
+      {Duration eventDuration = const Duration(hours: 1)}) {
+    // Parse the start time
     DateTime startTime = DateTime.parse(ISO);
+
+    // Calculate the end time
 
     // Get the current time
     DateTime now = DateTime.now();
-    print("Time im getting locally ------ "+now.toString());
-    print("Time im getting from server ------ "+startTime.toString());
-    // Calculate the elapsed time since the event started
-    Duration elapsedTime = now.difference(startTime);
 
-    int elapsedTimeSeconds = elapsedTime.inSeconds-(120*60);
-    // Calculate the remaining time in seconds
-    int remainingSeconds = (pendingTime*60)-(elapsedTimeSeconds+(pendingTime*60));
+    // Calculate the remaining time
+    Duration remainingTime = startTime.difference(now);
 
-    int timerTime = remainingSeconds + 120*60 + pendingTime*60;
-    print("remainding seconds   "+remainingSeconds.toString());
-    // Return the remaining rounded minutes
-    return remainingSeconds;
+    // Convert to minutes and round
+    double remainingMinutes = (remainingTime.inSeconds / 60);
+
+    // If remaining time is negative, return 0
+    return remainingMinutes > 0 ? remainingMinutes : 0;
   }
 
   //Method for creating event
   Future<bool?> createEvent(EventBody eventBody) async {
     _isLoading.value = true;
     try {
+      print(1);
       final response = await eventRepo.createEvent(eventBody);
+      print(2);
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (response.body != null) {
-          await eventRepo.saveEventID(response.body);
+          print(3);
           return true; // Event created successfully
         }
       } else if (response.statusCode == 400) {
-        return null; // Signal to show snackbar message
+        showCustomSnackBar("Error 400"); // Signal to show snackbar message
       }
     } catch (e) {
       print('Error creating event: $e');
@@ -132,73 +122,82 @@ class EventController extends GetxController implements GetxService {
     return false; // Event creation failed
   }
 
-
-  //Getting pending events
-  Future<List<Event>> fetchPendingEvents() async {
+  Future<bool?> updateEvent(String eventId, String status) async {
     _isLoading.value = true;
     try {
-      final eventStatusModels = await eventRepo.getPendingEvents();
-      List<Event> events = await _fetchEventDetailsForStatusModels(eventStatusModels);
-      print("PENDING........"+events.length.toString());
-      //_pendingEvents.assignAll(events);
+      final response = await eventRepo.updateEvent(eventId, status);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (response.body != null) {
+          return true; // Event created successfully
+        }
+      } else if (response.statusCode == 400) {
+        showCustomSnackBar("Error 400"); // Signal to show snackbar message
+      }
+    } catch (e) {
+      print('Error creating event: $e');
+    } finally {
+      _isLoading.value = false;
+    }
+    return false; // Event creation failed
+  }
+
+  void updateSelectedEventType(String newType) {
+    selectedEventType.value = newType;
+    fetchPendingEvents(newType);
+    //fetchInProgressEvents(newType);
+    update();
+  }
+
+  //Getting pending events
+  Future<List<EventModel>> fetchPendingEvents(String eventType) async {
+    _isLoading.value = true;
+    try {
+      final events = await eventRepo.getPendingEvents(eventType);
+      print("PENDING........${events.length}");
+      _pendingEvents.assignAll(events);
       return events;
     } catch (e) {
+      print(e.toString());
       print('Error fetching pending events: $e');
-      throw e;
+      rethrow;
     } finally {
       _isLoading.value = false;
     }
   }
 
   //Getting in_progress events
-  Future<List<Event>> fetchInProgressEvents() async {
+  Future<List<EventModel>> fetchInProgressEvents(String eventType) async {
     _isLoading.value = true;
     try {
-      final eventStatusModels = await eventRepo.getInProgressEvents();
-      List<Event> events = await _fetchEventDetailsForStatusModels(eventStatusModels);
-      //_inProgressEvents.assignAll(events);
+      final events = await eventRepo.getInProgressEvents(eventType);
+
+      _inProgressEvents.assignAll(events);
       return events;
     } catch (e) {
       print('Error fetching in-progress events: $e');
-      throw e;
+      rethrow;
     } finally {
       _isLoading.value = false;
     }
   }
 
   //Getting completed events
-  Future<List<Event>> fetchCompleteEvents() async {
+  Future<List<EventModel>> fetchCompleteEvents(String eventType) async {
     _isLoading.value = true;
     try {
-      final eventStatusModels = await eventRepo.getCompleteEvents();
-      List<Event> events = await _fetchEventDetailsForStatusModels(eventStatusModels);
+      final events = await eventRepo.getCompleteEvents(eventType);
       //_inProgressEvents.assignAll(events); // This should probably be _completedEvents
       return events;
     } catch (e) {
       print('Error fetching completed events: $e');
-      throw e;
+      rethrow;
     } finally {
       _isLoading.value = false;
     }
   }
 
-  Future<List<Event>> _fetchEventDetailsForStatusModels(List<EventStatusModel> models) async {
-    List<Future<Event>> eventFutures = models.map((model) => getEventDetails(model.id!)).toList();
-    List<Event> events = await Future.wait(eventFutures);
-    return events;
-  }
-
-
   //Method for fetching all orders from single event
-  Future<void> fetchEventOrders(String eventId) async {
-    try {
-      final orders = await orderRepo.getAllOrdersForEvent(eventId);
-      _currentEventOrders.assignAll(orders);
-    } catch (e) {
-      print('Error fetching event orders: $e');
-    }
-  }
-
+  Future<void> fetchEventOrders(String eventId) async {}
 
   Future<EventModel> getEventById(String eventId) async {
     try {
@@ -206,32 +205,27 @@ class EventController extends GetxController implements GetxService {
       return orders;
     } catch (e) {
       print('Error fetching event orders: $e');
-      return EventModel(creator: null);
+      return EventModel(
+          userProfileId: null,
+          userProfileFirstName: null,
+          userProfileLastName: null);
     }
   }
 
-
+  Future<EventModel> getActiveEvent() async {
+    try {
+      final orders = await eventRepo.getMyActiveEvent();
+      return orders;
+    } catch (e) {
+      print('Error fetching event orders: $e');
+      return EventModel(
+          userProfileId: null,
+          userProfileFirstName: null,
+          userProfileLastName: null);
+    }
+  }
 
   //Method for changing event status into "COMPLETED"
-  Future<void> finishEvent() async {
-    if (_currentEvent.value == null) return;
-
-    _isLoading.value = true;
-    try {
-      final response = await eventRepo.finishEvent(_currentEvent.value!.creator);
-      if (response.statusCode == 200) {
-        _currentEvent.value = null;
-        eventRepo.removeEventID();
-        await fetchInProgressEvents();
-      }
-    } catch (e) {
-      print('Error finishing event: $e');
-    } finally {
-      _isLoading.value = false;
-    }
-  }
-
-
 
   // Getting details for user who created the event
   Future<void> fetchEventCreator(String creatorId) async {
@@ -245,17 +239,10 @@ class EventController extends GetxController implements GetxService {
   Future<void> fetchOrderUsers() async {
     try {
       for (final order in _currentEventOrders) {
-        await userRepo.getUserById(order.id!);
+        await userRepo.getUserById(order.userProfileId!);
       }
     } catch (e) {
       print('Error fetching order users: $e');
     }
   }
-
-  String? getEventIDFromPrefs() {
-    return eventRepo.getEventIdFromSharedPref();
-  }
-
-  // Optionally, you can also add a getter for easier access
-  String? get cachedUserId => getEventIDFromPrefs();
 }

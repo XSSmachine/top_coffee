@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/colors.dart';
@@ -37,14 +36,14 @@ class AppTextField extends StatelessWidget {
             prefixIcon: Icon(icon, color: AppColors.mainColor,),
             focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(Dimensions.radius30),
-                borderSide:BorderSide(
+                borderSide:const BorderSide(
                   width: 1.0,
                   color: Colors.grey,
                 )
             ),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(Dimensions.radius30),
-                borderSide:BorderSide(
+                borderSide:const BorderSide(
                   width: 1.0,
                   color: Colors.grey,
                 )

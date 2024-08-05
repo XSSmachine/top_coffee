@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CoffeeBrewingNotification extends StatelessWidget {
@@ -10,14 +9,14 @@ class CoffeeBrewingNotification extends StatelessWidget {
   final EdgeInsetsGeometry padding;
 
   const CoffeeBrewingNotification({
-    Key? key,
+    super.key,
     this.message = "Creator is currently brewing coffee for the team!",
     this.backgroundColor = Colors.orange,
     this.textColor = Colors.black,
     this.fontSize = 20,
     this.borderRadius = 20,
     this.padding = const EdgeInsets.all(16.0),
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

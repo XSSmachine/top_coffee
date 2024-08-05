@@ -1,4 +1,3 @@
-import 'order_model.dart';
 
 class EventStatusModel{
   late String? _id;
@@ -35,10 +34,10 @@ class EventStatusModel{
   }
 
   Map<String,dynamic> toJson(){
-    final Map<String, dynamic> data= Map<String, dynamic>();
-    data['eventId']=this._id;
-    data['userId']=this._creator;
-    data['status']=this._status;
+    final Map<String, dynamic> data= <String, dynamic>{};
+    data['eventId']=_id;
+    data['userId']=_creator;
+    data['status']=_status;
     return data;
 
   }

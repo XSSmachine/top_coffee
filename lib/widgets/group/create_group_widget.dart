@@ -1,22 +1,18 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:team_coffee/models/group/create_group.dart';
 
 import '../../base/show_custom_snackbar.dart';
 import '../../controllers/auth_controller.dart';
-import '../../models/signup_body_model.dart';
 import '../../routes/route_helper.dart';
 import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
 import '../app_text_field.dart';
 
 class CreateGroupWidget extends StatelessWidget {
-  late final AuthController controller;
-  CreateGroupWidget({super.key,required this.controller});
+  final AuthController controller;
 
-
+  const CreateGroupWidget({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -25,76 +21,104 @@ class CreateGroupWidget extends StatelessWidget {
     var nameController = TextEditingController();
     var descriptionController = TextEditingController();
 
-
-    void _createGroup(AuthController authController)  {
-
+    void createGroup(AuthController authController) {
       String name = nameController.text.trim();
       String description = descriptionController.text.trim();
       String password = passwordController.text.trim();
       String password2 = password2Controller.text.trim();
 
-      if(name.isEmpty){
-        showCustomSnackBar("Type in your first name",title: "First name");
-      }else if(description.isEmpty){
-        showCustomSnackBar("Type in your last name",title: "Last name");
-      }else if (password2.isEmpty){
-        showCustomSnackBar("Type in correct password",title: "Confirm password");
-      }else if (password!=password2){
-        showCustomSnackBar("Type in correct password",title: "Confirm password");
-      }else if(password.isEmpty){
-        showCustomSnackBar("Type in your password",title: "Password");
-      }else if(password.length<3){
-        showCustomSnackBar("Password needs to be at least 3 characters long",title: "Password");
-      }else{
+      if (name.isEmpty) {
+        showCustomSnackBar("Type in your first name", title: "First name");
+      } else if (description.isEmpty) {
+        showCustomSnackBar("Type in your last name", title: "Last name");
+      } else if (password2.isEmpty) {
+        showCustomSnackBar("Type in correct password",
+            title: "Confirm password");
+      } else if (password != password2) {
+        showCustomSnackBar("Type in correct password",
+            title: "Confirm password");
+      } else if (password.isEmpty) {
+        showCustomSnackBar("Type in your password", title: "Password");
+      } else if (password.length < 3) {
+        showCustomSnackBar("Password needs to be at least 3 characters long",
+            title: "Password");
+      } else {
         CreateGroup signUpBody = CreateGroup(
-            name: name,
-            password: password,
-            description: description);
-        authController.createGroup(signUpBody).then((status){
-          if(status.isSuccess){
-            showCustomSnackBar(status.message,isError: false,title: "Success",color: Color(0xFF5669FF));
+            name: name, password: password, description: description);
+        authController.createGroup(signUpBody).then((status) async {
+          if (status.isSuccess) {
+            showCustomSnackBar(status.message,
+                isError: false,
+                title: "Success",
+                color: AppColors.mainBlueColor);
+            await controller.createUserProfile();
             Get.toNamed(RouteHelper.getSignInPage());
-          }else{
-            print("ERROR "+status.message.toString());
+          } else {
+            print("ERROR ${status.message}");
             showCustomSnackBar(status.message);
           }
         });
       }
     }
 
-
     return SingleChildScrollView(
       child: Column(
         children: [
           // your name
-          SizedBox(height: Dimensions.height20*1.5,),
-          AppTextField(textController: nameController, hintText: "Group name", icon: Icons.people_outline),
-          SizedBox(height: Dimensions.height20,),
-      
-          AppTextField(textController: descriptionController, hintText: "Short description", icon: Icons.description_outlined,minLines: 2,maxLines: 3,isMultiline: true,),
-          SizedBox(height: Dimensions.height20,),
+          SizedBox(
+            height: Dimensions.height20 * 1.5,
+          ),
+          AppTextField(
+              textController: nameController,
+              hintText: "Group name",
+              icon: Icons.people_outline),
+          SizedBox(
+            height: Dimensions.height20,
+          ),
+
+          AppTextField(
+            textController: descriptionController,
+            hintText: "Short description",
+            icon: Icons.description_outlined,
+            minLines: 2,
+            maxLines: 3,
+            isMultiline: true,
+          ),
+          SizedBox(
+            height: Dimensions.height20,
+          ),
           //your password
-          AppTextField(textController: passwordController, hintText: "Your password", icon: Icons.lock_outline,isObscure: true,),
-          SizedBox(height: Dimensions.height20,),
+          AppTextField(
+            textController: passwordController,
+            hintText: "Your password",
+            icon: Icons.lock_outline,
+            isObscure: true,
+          ),
+          SizedBox(
+            height: Dimensions.height20,
+          ),
           //
-          AppTextField(textController: password2Controller, hintText: "Confirm password", icon: Icons.lock_outline,isObscure: true,),
-          SizedBox(height: Dimensions.height20*1.5),
+          AppTextField(
+            textController: password2Controller,
+            hintText: "Confirm password",
+            icon: Icons.lock_outline,
+            isObscure: true,
+          ),
+          SizedBox(height: Dimensions.height20 * 1.5),
           GestureDetector(
-            onTap: (){
-              _createGroup(controller);
+            onTap: () {
+              createGroup(controller);
             },
             child: Container(
-              width: Dimensions.screenWidth/1.6,
-              height: Dimensions.screenHeight/14,
+              width: Dimensions.screenWidth / 1.6,
+              height: Dimensions.screenHeight / 14,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(Dimensions.radius30),
-                  color: AppColors.mainColor
-              ),
+                  color: AppColors.mainColor),
               child: Container(
-      
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(Dimensions.radius20),
-                  color: Color(0xFF5669ff),
+                  color: AppColors.mainBlueColor,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -104,20 +128,25 @@ class CreateGroupWidget extends StatelessWidget {
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: Dimensions.font16,
-                        fontWeight: FontWeight.w500
-                      ),
-      
+                          fontWeight: FontWeight.w500),
                     ),
-                    SizedBox(width: Dimensions.width30*1.85,),
+                    SizedBox(
+                      width: Dimensions.width30 * 1.85,
+                    ),
                     Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(Dimensions.radius30),
-                        color: Color(0xff5669ff),
+                        borderRadius:
+                            BorderRadius.circular(Dimensions.radius30),
+                        color: AppColors.mainBlueColor,
                       ),
-                      child: Icon(Icons.arrow_forward,color: Colors.white,),
+                      child: const Icon(
+                        Icons.arrow_forward,
+                        color: Colors.white,
+                      ),
                     ),
-                    SizedBox(width: Dimensions.width20,),
-      
+                    SizedBox(
+                      width: Dimensions.width20,
+                    ),
                   ],
                 ),
               ),

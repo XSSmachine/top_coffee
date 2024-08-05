@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:team_coffee/models/order_model.dart';
 
 import '../../models/order_get_model.dart';
 
@@ -13,13 +11,13 @@ class CoffeeOrderList extends StatefulWidget {
   final VoidCallback onFinishOrder;
 
   const CoffeeOrderList({
-    Key? key,
+    super.key,
     required this.coffeeOrders,
     this.backgroundColor = Colors.grey,
     this.textColor = Colors.white,
     this.checkboxColor = Colors.white,
     required this.onFinishOrder,
-  }) : super(key: key);
+  });
 
   @override
   _CoffeeOrderListState createState() => _CoffeeOrderListState();
@@ -41,7 +39,7 @@ class _CoffeeOrderListState extends State<CoffeeOrderList> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         color: widget.backgroundColor,
@@ -52,7 +50,7 @@ class _CoffeeOrderListState extends State<CoffeeOrderList> {
             "Coffee Orders",
             style: TextStyle(color: widget.textColor, fontSize: 20),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Expanded(
             child: ListView.builder(
               itemCount: widget.coffeeOrders.length,
@@ -63,15 +61,15 @@ class _CoffeeOrderListState extends State<CoffeeOrderList> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Type: ${order.type}",
+                        "Type: ${order.additionalOptions!["type"]}",
                         style: TextStyle(color: widget.textColor),
                       ),
                       Text(
-                        "Sugar Quantity: ${order.sugarQuantity}",
+                        "Sugar Quantity: ${order.additionalOptions!["sugar"]}",
                         style: TextStyle(color: widget.textColor),
                       ),
                       Text(
-                        "Milk Quantity: ${order.milkQuantity}",
+                        "Milk Quantity: ${order.additionalOptions!["milk"]}",
                         style: TextStyle(color: widget.textColor),
                       ),
                     ],
@@ -90,7 +88,7 @@ class _CoffeeOrderListState extends State<CoffeeOrderList> {
           ),
           ElevatedButton(
             onPressed: allOrdersCompleted() ? widget.onFinishOrder : null,
-            child: Text("Finish Order"),
+            child: const Text("Finish Order"),
           ),
         ],
       ),
