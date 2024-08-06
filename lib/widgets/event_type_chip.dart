@@ -8,6 +8,7 @@ class EventTypeChip extends StatefulWidget {
   final IconData icon;
   final String selectedEventType;
   final Function(String) onEventTypeChanged;
+  final String? firstSelected;
 
   const EventTypeChip({
     super.key,
@@ -16,6 +17,7 @@ class EventTypeChip extends StatefulWidget {
     required this.icon,
     required this.selectedEventType,
     required this.onEventTypeChanged,
+    this.firstSelected,
   });
 
   @override
@@ -38,7 +40,11 @@ class _EventTypeChipState extends State<EventTypeChip> {
       backgroundColor: widget.color,
       selectedColor: widget.color,
       onSelected: (bool selected) {
-        widget.onEventTypeChanged(selected ? widget.label : "MIX");
+        widget.onEventTypeChanged(selected
+            ? widget.label
+            : widget.firstSelected == null
+                ? "MIX"
+                : widget.firstSelected!);
       },
       selected: widget.selectedEventType == widget.label,
     );

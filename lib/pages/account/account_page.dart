@@ -20,10 +20,10 @@ class AccountPage extends StatefulWidget {
   _AccountPageState createState() => _AccountPageState();
 }
 
-final AuthController authController = Get.find<AuthController>();
-
 class _AccountPageState extends State<AccountPage> {
   bool _isInitialized = false;
+  final AuthController authController = Get.find<AuthController>();
+  final UserController userController = Get.find<UserController>();
 
   @override
   void initState() {
@@ -32,7 +32,6 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   Future<void> _showEditProfileDialog() async {
-    final UserController userController = Get.find<UserController>();
     final result = await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -57,7 +56,8 @@ class _AccountPageState extends State<AccountPage> {
       await Get.find<UserController>().getUserProfile();
       FetchMeModel? userData = Get.find<UserController>().user;
       print("User has logged in");
-      print("${userData!.name}/${userData.surname}/${userData.profileId}/${userData.groupId}");
+      print(
+          "${userData!.name}/${userData.surname}/${userData.profileId}/${userData.groupId}");
     }
     setState(() {
       _isInitialized = true;
@@ -114,7 +114,7 @@ class _AccountPageState extends State<AccountPage> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Get.find<AuthController>().clearSharedData();
+                      authController.clearSharedData();
                       Get.toNamed(RouteHelper.getSignInPage());
                     },
                     child: AccountWidget(

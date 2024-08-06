@@ -73,7 +73,6 @@ class JoinGroupWidget extends StatelessWidget {
           GestureDetector(
             onTap: () {
               login(controller);
-              Get.toNamed(RouteHelper.initial);
             },
             child: Container(
               width: Dimensions.screenWidth / 1.6,

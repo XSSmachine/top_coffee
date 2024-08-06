@@ -2,9 +2,8 @@ class AppConstants {
   static const String APP_NAME = "TopCoffee";
   static const int APP_VERSION = 1;
 //--------------------------------------------------------------
-  // home wifi - 192.168.178.42
-  // coin wifi - 192.168.77.105
-  static const String BASE_URL = "http://192.168.178.42:8080";
+
+  static const String BASE_URL = "http://192.168.77.105:8080";
   static const String HTTP_BASE_URL = "http://localhost:8080";
   static const String UPLOAD_URL = "/uploads/";
 //--------------------------------------------------------------

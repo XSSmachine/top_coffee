@@ -134,22 +134,6 @@ class ApiClient extends GetConnect implements GetxService {
 
     var request = http.MultipartRequest('PATCH', Uri.parse(uri));
 
-    // Add the request body as a JSON file
-    //var bodyJson = json.encode(body.toJson());
-    //var bodyBytes = utf8.encode(bodyJson);
-    /*var bodyFile = http.MultipartFile.fromString(
-      'firstName',
-      body.name,
-      filename: 'name.json',
-    );
-    request.files.add(bodyFile);
-    var surnameFile = http.MultipartFile.fromString(
-      'lastName',
-      body.surname,
-      filename: 'surname.json',
-    );
-    request.files.add(surnameFile);*/
-
     request.fields['firstName'] = body.name;
     request.fields['lastName'] = body.surname;
 

@@ -260,7 +260,7 @@ class TopAppbar extends StatelessWidget {
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return Center(
                       child: SizedBox(
-                    height: Dimensions.height45 * 3.5,
+                    height: Dimensions.height45 * 3.7,
                     child: Column(
                       children: [
                         SizedBox(

@@ -13,9 +13,6 @@ class OrderController extends GetxController implements GetxService {
 
   OrderController({required this.orderRepo});
 
-  //late List<OrderModel> _allOrders = <OrderModel>[].obs;
-  //List<OrderModel> get allOrders => _allOrders;
-
   final RxBool _isLoading = false.obs;
   final Rx<OrderGetModel?> _currentOrder = Rx<OrderGetModel?>(null);
   final RxList<MyOrder> _eventOrders = <MyOrder>[].obs;

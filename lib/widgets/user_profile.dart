@@ -24,12 +24,15 @@ class WordCustomCard extends StatefulWidget {
 }
 
 class _WordCustomCardState extends State<WordCustomCard> {
-  Future<Uint8List?>? _profilePhotoFuture;
-
   @override
   void initState() {
     super.initState();
-    _profilePhotoFuture = widget.userController.fetchProfilePhoto();
+    fetchProfilePicture();
+  }
+
+  Future<void> fetchProfilePicture() async {
+    await widget.userController.fetchProfilePhoto();
+    setState(() {});
   }
 
   @override

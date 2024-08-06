@@ -81,7 +81,7 @@ class AuthController extends GetxController implements GetxService {
     late ResponseModel responseModel;
     if (response.statusCode == 200) {
       responseModel = ResponseModel(true, "New group created successfully");
-      userProfile.value?.groupId = response.body['id'];
+      userProfile.value?.groupId = response.body['groupId'];
     } else {
       print("BAD ${response.statusCode}");
       responseModel = ResponseModel(false, response.statusText!);
@@ -100,7 +100,7 @@ class AuthController extends GetxController implements GetxService {
     late ResponseModel responseModel;
     if (response.statusCode == 200) {
       responseModel = ResponseModel(true, "User sucessfuly joined group");
-      userProfile.value?.groupId = response.body['id'];
+      userProfile.value?.groupId = response.body['groupId'];
       //saveGroupId(response.body['id']);
     } else {
       print("BAD ${response.statusCode}");
@@ -132,7 +132,7 @@ class AuthController extends GetxController implements GetxService {
     update(); // This notifies all listeners that the state has changed
   }
 
-  // This method can be used to get the token, fetching it if it's not already set
+  // This method can be used to get the token, fetching it if its not already set
   Future<String> getUserToken() async {
     if (_userToken.isEmpty) {
       await fetchAndSetUserToken();
@@ -140,7 +140,7 @@ class AuthController extends GetxController implements GetxService {
     return _userToken;
   }
 
-  // Call this method when you want to clear the token (e.g., on logout)
+  // Call this method when you want to clear the token (on logout)
   void clearUserToken() {
     _userToken = '';
     update();

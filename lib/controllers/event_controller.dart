@@ -33,58 +33,10 @@ class EventController extends GetxController implements GetxService {
 
   RxString selectedEventType = "MIX".obs;
 
-  //Method for fetching event details about users and orders they made
-/*  Future<Event> getEventDetails(String eventId) async {
-    _isLoading.value = true;
-    try {
-
-      final eventStatus = await eventRepo.getEventById(eventId);
-      final creatorName = await userRepo.getUserById(eventStatus.creator);
-      final orders = await orderRepo.getAllOrdersForEvent(eventId);
-      final allOrders = await orderRepo.getAllOrders();
-      List<Future<String>> participantNamesFutures = allOrders
-          .where((order) => eventStatus.orders.contains(order.id))
-          .map<Future<String>>((order) async {
-        UserModel user = await userRepo.getUserById(order.userId);
-        return "${user.name} ${user.surname}";
-      }).toList();
-      print(2.5);
-
-      // Wait for all futures to complete
-      List<String> participants = await Future.wait(participantNamesFutures);
-      print(3);
-      final event = Event(
-        id: eventStatus.id?? "ERROR",
-        creatorId: eventStatus.creator,
-          creatorName: "${creatorName.name} ${creatorName.surname}",
-        status: eventStatus.status??"ERROR",
-        startTime: calculateRemainingTimeInRoundedMinutes(eventStatus.startTIme!,eventStatus.pendingTime),
-        participants: participants,
-        orders: orders.map((order) => Order(
-          userId: order.id!,
-          coffeeType: order.type ?? "",
-          milkQuantity: order.milkQuantity ?? 0,
-          sugarQuantity: order.sugarQuantity ?? 0,
-          rating: null,
-        )).toList()
-
-      );
-
-      return event;
-    } catch (e) {
-      print('Error fetching event details: $e');
-      throw e;
-    } finally {
-      _isLoading.value = false;
-    }
-  }*/
-
   double calculateRemainingTimeInRoundedMinutes(String ISO,
       {Duration eventDuration = const Duration(hours: 1)}) {
     // Parse the start time
     DateTime startTime = DateTime.parse(ISO);
-
-    // Calculate the end time
 
     // Get the current time
     DateTime now = DateTime.now();
@@ -122,6 +74,7 @@ class EventController extends GetxController implements GetxService {
     return false; // Event creation failed
   }
 
+  //Method for changing event status into "COMPLETED"
   Future<bool?> updateEvent(String eventId, String status) async {
     _isLoading.value = true;
     try {
@@ -196,9 +149,6 @@ class EventController extends GetxController implements GetxService {
     }
   }
 
-  //Method for fetching all orders from single event
-  Future<void> fetchEventOrders(String eventId) async {}
-
   Future<EventModel> getEventById(String eventId) async {
     try {
       final orders = await eventRepo.getEventById(eventId);
@@ -224,8 +174,6 @@ class EventController extends GetxController implements GetxService {
           userProfileLastName: null);
     }
   }
-
-  //Method for changing event status into "COMPLETED"
 
   // Getting details for user who created the event
   Future<void> fetchEventCreator(String creatorId) async {

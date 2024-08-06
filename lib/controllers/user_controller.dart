@@ -53,6 +53,7 @@ class UserController extends GetxController implements GetxService {
         return bytes;
       } else if (response.statusCode == 404) {
         print('Profile photo not found');
+        profileImage.value = null;
         return null;
       } else {
         print(
@@ -120,6 +121,7 @@ class UserController extends GetxController implements GetxService {
         localList.add(UserModel.fromJson(element));
       });
       //localList.sort((a, b) => (b.score ?? 0).compareTo(a.score ?? 0));
+      _allUserList.clear();
       _allUserList.addAll(localList);
       update();
     } else {

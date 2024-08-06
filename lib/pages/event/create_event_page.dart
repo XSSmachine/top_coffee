@@ -111,41 +111,43 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 ),
               ),
               const SizedBox(height: 16),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    SizedBox(width: Dimensions.width10),
-                    EventTypeChip(
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  /*EventTypeChip(
                         label: "MIX",
                         color: AppColors.redChipColor,
                         icon: Icons.fastfood,
                         selectedEventType: _selectedEventType,
                         onEventTypeChanged: _updateSelectedEventType),
-                    const SizedBox(width: 8.0),
-                    EventTypeChip(
-                        label: "COFFEE",
-                        color: AppColors.orangeChipColor,
-                        icon: Icons.coffee,
-                        selectedEventType: _selectedEventType,
-                        onEventTypeChanged: _updateSelectedEventType),
-                    const SizedBox(width: 8.0),
-                    EventTypeChip(
-                        label: "FOOD",
-                        color: AppColors.greenChipColor,
-                        icon: Icons.restaurant,
-                        selectedEventType: _selectedEventType,
-                        onEventTypeChanged: _updateSelectedEventType),
-                    const SizedBox(width: 8.0),
-                    EventTypeChip(
-                        label: "BEVERAGE",
-                        color: AppColors.blueChipColor,
-                        icon: Icons.liquor,
-                        selectedEventType: _selectedEventType,
-                        onEventTypeChanged: _updateSelectedEventType),
-                    const SizedBox(width: 20.0),
-                  ],
-                ),
+                    const SizedBox(width: 8.0),*/
+                  EventTypeChip(
+                    label: "COFFEE",
+                    color: AppColors.orangeChipColor,
+                    icon: Icons.coffee,
+                    selectedEventType: _selectedEventType,
+                    onEventTypeChanged: _updateSelectedEventType,
+                    firstSelected: "FOOD",
+                  ),
+                  const SizedBox(width: 8.0),
+                  EventTypeChip(
+                    label: "FOOD",
+                    color: AppColors.greenChipColor,
+                    icon: Icons.restaurant,
+                    selectedEventType: _selectedEventType,
+                    onEventTypeChanged: _updateSelectedEventType,
+                    firstSelected: "FOOD",
+                  ),
+                  const SizedBox(width: 8.0),
+                  EventTypeChip(
+                    label: "BEVERAGE",
+                    color: AppColors.blueChipColor,
+                    icon: Icons.liquor,
+                    selectedEventType: _selectedEventType,
+                    onEventTypeChanged: _updateSelectedEventType,
+                    firstSelected: "FOOD",
+                  ),
+                ],
               ),
               SizedBox(height: Dimensions.height30),
               Padding(
