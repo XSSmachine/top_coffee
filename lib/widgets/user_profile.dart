@@ -41,6 +41,7 @@ class _WordCustomCardState extends State<WordCustomCard> {
       alignment: Alignment.topCenter,
       children: [
         Card(
+          color: Colors.white,
           margin: const EdgeInsets.only(top: 50),
           child: Container(
             padding: const EdgeInsets.all(20),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:team_coffee/controllers/event_controller.dart';
+import 'package:team_coffee/controllers/order_controller.dart';
 import 'package:team_coffee/models/fetch_me_model.dart';
 import 'package:team_coffee/widgets/user_profile.dart';
 import '../../controllers/auth_controller.dart';
@@ -24,6 +26,8 @@ class _AccountPageState extends State<AccountPage> {
   bool _isInitialized = false;
   final AuthController authController = Get.find<AuthController>();
   final UserController userController = Get.find<UserController>();
+  final EventController eventController = Get.find<EventController>();
+  final OrderController orderController = Get.find<OrderController>();
 
   @override
   void initState() {
@@ -80,7 +84,7 @@ class _AccountPageState extends State<AccountPage> {
   Widget _buildLoggedInView() {
     return Container(
       width: double.maxFinite,
-      margin: EdgeInsets.only(top: Dimensions.height30 * 2),
+      margin: EdgeInsets.only(top: Dimensions.height30 * 1),
       child: Column(
         children: [
           WordCustomCard(
@@ -115,6 +119,9 @@ class _AccountPageState extends State<AccountPage> {
                   GestureDetector(
                     onTap: () {
                       authController.clearSharedData();
+                      userController.resetAllValues();
+                      eventController.resetAllValues();
+                      orderController.resetAllValues();
                       Get.toNamed(RouteHelper.getSignInPage());
                     },
                     child: AccountWidget(

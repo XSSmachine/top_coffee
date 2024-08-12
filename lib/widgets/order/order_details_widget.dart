@@ -24,6 +24,22 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
   late Future<void> _orderFuture;
   final OrderController controller = Get.find<OrderController>();
 
+  String _formatAdditionalOptions(String? additionalOptions) {
+    if (additionalOptions == null || additionalOptions.isEmpty) {
+      return "• No additional options";
+    }
+
+    // Extract the content after "orderDetails:"
+    final match =
+        RegExp(r'orderDetails:\s*(.*?)\s*}').firstMatch(additionalOptions);
+    if (match != null && match.groupCount >= 1) {
+      return "• ${match.group(1)}";
+    }
+
+    // Fallback in case the format is different
+    return "• ${additionalOptions.replaceAll(RegExp(r'[{}]'), '').trim()}";
+  }
+
   @override
   void initState() {
     super.initState();
@@ -123,8 +139,9 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      controller.currentOrder!.additionalOptions.toString() ??
-                          "Null description",
+                      _formatAdditionalOptions(controller
+                          .currentOrder?.additionalOptions
+                          .toString()),
                       style: TextStyle(
                         color: Colors.white,
                       ),
@@ -149,7 +166,9 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                         child: Text(
                           _isCancelled
                               ? "CANCELLED"
-                              : controller.currentOrder!.status ?? "Null",
+                              : controller.currentOrder!.status!
+                                      .replaceAll("_", " ") ??
+                                  "Null",
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,

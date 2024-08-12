@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../controllers/auth_controller.dart';
 import '../../controllers/event_controller.dart';
 import 'dashboard.dart';
 
@@ -17,14 +18,21 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchInitialData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchInitialData();
+    });
   }
 
-  Future<void> _fetchInitialData() async {
-    await eventController
-        .fetchPendingEvents(eventController.selectedEventType.value);
-    await eventController
-        .fetchInProgressEvents(eventController.selectedEventType.value);
+  void _fetchInitialData() {
+    eventController
+        .fetchPendingEvents(eventController.selectedEventType.value)
+        .then((_) {
+      return eventController
+          .fetchInProgressEvents(eventController.selectedEventType.value);
+    }).catchError((error) {
+      // Handle any errors here
+      print('Error fetching initial data: $error');
+    });
   }
 
   void _updateSelectedEventType(String newType) {

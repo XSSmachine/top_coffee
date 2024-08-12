@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:team_coffee/base/show_custom_snackbar.dart';
+import 'package:team_coffee/controllers/notification_controller.dart';
 
 import '../data/repository/event_repo.dart';
 import '../data/repository/order_repo.dart';
@@ -33,6 +34,15 @@ class EventController extends GetxController implements GetxService {
 
   RxString selectedEventType = "MIX".obs;
 
+  void resetAllValues() {
+    _currentEvent.value = null;
+    _pendingEvents.clear();
+    _inProgressEvents.clear();
+    _currentEventOrders.clear();
+    selectedEventType.value = "MIX";
+    _isLoading.value = false;
+  }
+
   double calculateRemainingTimeInRoundedMinutes(String ISO,
       {Duration eventDuration = const Duration(hours: 1)}) {
     // Parse the start time
@@ -52,7 +62,8 @@ class EventController extends GetxController implements GetxService {
   }
 
   //Method for creating event
-  Future<bool?> createEvent(EventBody eventBody) async {
+  Future<bool?> createEvent(EventBody eventBody,
+      NotificationController notificationController) async {
     _isLoading.value = true;
     try {
       print(1);
@@ -61,6 +72,11 @@ class EventController extends GetxController implements GetxService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (response.body != null) {
           print(3);
+          Response response = await userRepo.getUserInfo();
+          await notificationController.sendGroupNotification(
+              response.body["groupId"],
+              eventBody.title,
+              'A new event has been created!');
           return true; // Event created successfully
         }
       } else if (response.statusCode == 400) {

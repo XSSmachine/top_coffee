@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:team_coffee/pages/event/all_events_screen.dart';
 import 'package:team_coffee/utils/colors.dart';
 import 'package:team_coffee/widgets/create_event_widget.dart';
 import 'package:team_coffee/widgets/timer/count_timer_widget.dart';
@@ -29,6 +30,19 @@ class TopAppbar extends StatelessWidget {
     required this.onEventTypeChanged,
     required this.eventController,
   });
+
+  String _getImagePath(String eventType) {
+    switch (eventType) {
+      case "FOOD":
+        return 'assets/image/burek.png';
+      case "COFFEE":
+        return 'assets/image/turska.png';
+      case "BEVERAGE":
+        return 'assets/image/pice.png';
+      default:
+        return 'assets/image/placeholder.jpg'; // Fallback image
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -228,23 +242,28 @@ class TopAppbar extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      // Handle "See more" tap
-                    },
-                    child: Row(
-                      children: [
-                        Text(
-                          "See more",
-                          style: TextStyle(
-                            fontSize: Dimensions.font16,
-                            color: Colors.blue,
+                  !eventController.pendingEvents.isEmpty
+                      ? GestureDetector(
+                          onTap: () {
+                            // Handle "See more" tap
+                            Get.to(EventScreen(
+                                eventController: eventController,
+                                isPending: true));
+                          },
+                          child: Row(
+                            children: [
+                              Text(
+                                "See more",
+                                style: TextStyle(
+                                  fontSize: Dimensions.font16,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                              const Icon(Icons.arrow_right, color: Colors.blue),
+                            ],
                           ),
-                        ),
-                        const Icon(Icons.arrow_right, color: Colors.blue),
-                      ],
-                    ),
-                  ),
+                        )
+                      : SizedBox.shrink(),
                 ],
               ),
             ),
@@ -325,8 +344,9 @@ class TopAppbar extends StatelessWidget {
                                         topRight: Radius.circular(
                                             Dimensions.radius15),
                                       ),
-                                      child: Image.network(
-                                        'https://via.placeholder.com/300x100',
+                                      child: Image.asset(
+                                        _getImagePath(
+                                            event.eventType ?? "FOOD"),
                                         height: Dimensions.height20 * 5,
                                         width: double.infinity,
                                         fit: BoxFit.cover,
@@ -463,6 +483,9 @@ class TopAppbar extends StatelessWidget {
                                 GestureDetector(
                                   onTap: () {
                                     // Handle "See more" tap
+                                    Get.to(EventScreen(
+                                        eventController: eventController,
+                                        isPending: false));
                                   },
                                   child: Row(
                                     children: [
@@ -533,8 +556,10 @@ class TopAppbar extends StatelessWidget {
                                                   topRight: Radius.circular(
                                                       Dimensions.radius15),
                                                 ),
-                                                child: Image.network(
-                                                  'https://via.placeholder.com/300x100',
+                                                child: Image.asset(
+                                                  _getImagePath(
+                                                      event.eventType ??
+                                                          "FOOD"),
                                                   height:
                                                       Dimensions.height20 * 5,
                                                   width: double.infinity,
@@ -845,8 +870,8 @@ class TopAppbar extends StatelessWidget {
                     topLeft: Radius.circular(Dimensions.radius15),
                     topRight: Radius.circular(Dimensions.radius15),
                   ),
-                  child: Image.network(
-                    'https://via.placeholder.com/300x100',
+                  child: Image.asset(
+                    _getImagePath(event.eventType ?? "FOOD"),
                     height: Dimensions.height20 * 5,
                     width: double.infinity,
                     fit: BoxFit.cover,

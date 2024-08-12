@@ -27,6 +27,19 @@ class EventDetailsScreen extends StatelessWidget {
     this.orderId,
   }) : super(key: key);
 
+  String _getImagePath(String eventType) {
+    switch (eventType) {
+      case "FOOD":
+        return 'assets/image/burek.png';
+      case "COFFEE":
+        return 'assets/image/turska.png';
+      case "BEVERAGE":
+        return 'assets/image/pice.png';
+      default:
+        return 'assets/image/placeholder.jpg'; // Fallback image
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     print(orderId.toString());
@@ -57,8 +70,8 @@ class EventDetailsScreen extends StatelessWidget {
                       Stack(
                         clipBehavior: Clip.none,
                         children: [
-                          Image.network(
-                            'https://via.placeholder.com/400x200',
+                          Image.asset(
+                            _getImagePath(event.eventType ?? "FOOD"),
                             width: double.infinity,
                             height: Dimensions.height20 * 10.5,
                             fit: BoxFit.cover,
@@ -82,19 +95,22 @@ class EventDetailsScreen extends StatelessWidget {
                                 ),
                                 child: Column(
                                   children: [
-                                    const Text("Time in progress: "),
-                                    page == "pending"
+                                    event.status == "PENDING"
+                                        ? const Text("Time pending: ")
+                                        : const Text("Time in progress: "),
+                                    event.status == "PENDING"
                                         ? CountdownTimer(
                                             initialMinutes: eventController
                                                 .calculateRemainingTimeInRoundedMinutes(
                                                     event.pendingUntil!),
                                             onTimerExpired: () {
                                               Get.back();
-                                            })
+                                            },
+                                          )
                                         : CountTimer(
                                             startTimeISO: event.pendingUntil!,
                                             size: Dimensions.font16,
-                                          ),
+                                          )
                                   ],
                                 )),
                           ),
@@ -199,7 +215,7 @@ class EventDetailsScreen extends StatelessWidget {
 
       return OrderDetailsWidget(
         orderId: orderId,
-        eventStatus: event.status!,
+        eventStatus: event.status!.replaceAll("_", " "),
       );
     } else {
       return Center(

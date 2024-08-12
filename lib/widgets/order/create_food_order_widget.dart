@@ -47,7 +47,8 @@ class _CoolTextFieldScreenState extends State<CoolTextFieldScreen> {
                 keyboardType: TextInputType.multiline,
                 maxLines: null,
                 decoration: InputDecoration(
-                  hintText: 'Write what you want...',
+                  hintText: ' - Pizza margarita\n   - bez origana'
+                      '\n   - više sira',
                   filled: true,
                   fillColor: Colors.grey[200],
                   border: OutlineInputBorder(

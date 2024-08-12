@@ -4,15 +4,17 @@ import 'package:team_coffee/models/group/create_group.dart';
 
 import '../../base/show_custom_snackbar.dart';
 import '../../controllers/auth_controller.dart';
+import '../../controllers/notification_controller.dart';
 import '../../routes/route_helper.dart';
 import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
 import '../app_text_field.dart';
 
 class CreateGroupWidget extends StatelessWidget {
+  final notificationController = Get.find<NotificationController>();
   final AuthController controller;
 
-  const CreateGroupWidget({super.key, required this.controller});
+  CreateGroupWidget({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +47,9 @@ class CreateGroupWidget extends StatelessWidget {
       } else {
         CreateGroup signUpBody = CreateGroup(
             name: name, password: password, description: description);
-        authController.createGroup(signUpBody).then((status) async {
+        authController
+            .createGroup(signUpBody, notificationController)
+            .then((status) async {
           if (status.isSuccess) {
             showCustomSnackBar(status.message,
                 isError: false,

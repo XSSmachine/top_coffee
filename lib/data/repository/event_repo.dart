@@ -53,7 +53,7 @@ class EventRepo {
   }
 
   Future<List<EventModel>> _getEventsBy(String status, String eventType) async {
-    const String url = '${AppConstants.GET_EVENT_URI}/search';
+    const String url = '${AppConstants.GET_EVENT_URI}/filter';
     final json = {
       "status": status,
       "eventType": eventType,

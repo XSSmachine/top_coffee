@@ -29,6 +29,15 @@ class OrderController extends GetxController implements GetxService {
   List<OrderModel> get activeOrders => _activeOrders;
   List<OrderModel> get completedOrders => _completedOrders;
 
+  void resetAllValues() {
+    _currentOrder.value = null;
+    _eventOrders.clear();
+    _allOrders.clear();
+    _activeOrders.clear();
+    _completedOrders.clear();
+    _isLoading.value = false;
+  }
+
   //Method for creating new order in db
   Future<ResponseModel> createOrder(OrderBody orderBody) async {
     _isLoading.value = true;

@@ -1,7 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:team_coffee/pages/auth/verify_email_page.dart';
+import 'package:get/get_core/src/get_main.dart';
+
 import '../../base/custom_loader.dart';
 import '../../base/show_custom_snackbar.dart';
 import '../../controllers/auth_controller.dart';
@@ -11,14 +12,11 @@ import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
 import '../../widgets/app_text_field.dart';
 
-/// This class displays sign up form
+class NameSurnamePage extends StatelessWidget {
+  NameSurnamePage({super.key});
 
-class SignUpPage extends StatelessWidget {
-  SignUpPage({super.key});
-
-  var emailController = TextEditingController();
-  var passwordController = TextEditingController();
-  var confirmPasswordController = TextEditingController();
+  var nameController = TextEditingController();
+  var surnameController = TextEditingController();
 
   var alreadyExists = true;
   var signUpImages = ["t.png", "f.png", "g.png"];
@@ -26,46 +24,17 @@ class SignUpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Future<void> registration(AuthController authController) async {
-      String confirmPassword = confirmPasswordController.text.trim();
-      String email = emailController.text.trim();
-      String password = passwordController.text.trim();
+      String name = nameController.text.trim();
+      String surname = surnameController.text.trim();
 
-      if (password != confirmPassword) {
-        showCustomSnackBar("Please make sure, both passwords are same.",
-            title: "Confirm password");
-      } else if (confirmPassword.isEmpty) {
-        showCustomSnackBar("Confirm your password please.",
-            title: "Confirm password");
-      }
-      /*else if (await Get.find<AuthController>()
-          .checkEmail(emailController.text.trim())) {
-        showCustomSnackBar("User email already exists", title: "Email address");
-      }*/
-      else if (!GetUtils.isEmail(email)) {
-        showCustomSnackBar("Type in a valid email address",
-            title: "Valid email address");
-      } else if (password.isEmpty) {
-        showCustomSnackBar("Type in your password", title: "Password");
-      } else if (password.length < 3) {
-        showCustomSnackBar("Password needs to be at least 3 characters long",
-            title: "Password");
+      if (name.isEmpty) {
+        showCustomSnackBar("Type in your first name", title: "First name");
+      } else if (surname.isEmpty) {
+        showCustomSnackBar("Type in your last name", title: "Last name");
       } else {
-        SignupBody signUpBody = SignupBody(
-          email: email,
-          password: password,
-        );
-        authController.registration(signUpBody).then((status) {
-          if (status.isSuccess) {
-            showCustomSnackBar("Successful registration",
-                isError: false,
-                title: "Success",
-                color: AppColors.mainBlueColor);
-            Get.offNamedUntil(
-                RouteHelper.getVerifyEmailPage(email), (route) => false);
-          } else {
-            showCustomSnackBar(status.message);
-          }
-        });
+        authController.userProfile.value?.name = name;
+        authController.userProfile.value?.surname = surname;
+        Get.toNamed(RouteHelper.getGroupPage());
       }
     }
 
@@ -99,34 +68,20 @@ class SignUpPage extends StatelessWidget {
                     SizedBox(
                       height: Dimensions.height20,
                     ),
-                    //your email
-                    AppTextField(
-                        textController: emailController,
-                        hintText: "Email",
-                        icon: Icons.email_outlined),
-                    SizedBox(
-                      height: Dimensions.height20,
-                    ),
-                    //your password
-                    AppTextField(
-                      textController: passwordController,
-                      hintText: "Password",
-                      icon: Icons.lock_outline,
-                      isObscure: true,
-                    ),
-                    SizedBox(
-                      height: Dimensions.height20,
-                    ),
-                    AppTextField(
-                      textController: confirmPasswordController,
-                      hintText: "Confirm Password",
-                      icon: Icons.lock_outline,
-                      isObscure: true,
-                    ),
-                    SizedBox(
-                      height: Dimensions.height20,
-                    ),
                     // your name
+                    AppTextField(
+                        textController: nameController,
+                        hintText: "Name",
+                        icon: Icons.person_outline),
+                    SizedBox(
+                      height: Dimensions.height20,
+                    ),
+                    //your phone
+                    AppTextField(
+                        textController: surnameController,
+                        hintText: "Surname",
+                        icon: Icons.person_rounded),
+                    SizedBox(height: Dimensions.height20 * 1.5),
 
                     GestureDetector(
                       onTap: () async {

@@ -4,15 +4,17 @@ import 'package:team_coffee/models/group/join_group.dart';
 
 import '../../base/show_custom_snackbar.dart';
 import '../../controllers/auth_controller.dart';
+import '../../controllers/notification_controller.dart';
 import '../../routes/route_helper.dart';
 import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
 import '../app_text_field.dart';
 
 class JoinGroupWidget extends StatelessWidget {
+  final notificationController = Get.find<NotificationController>();
   final AuthController controller;
 
-  const JoinGroupWidget({super.key, required this.controller});
+  JoinGroupWidget({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +34,8 @@ class JoinGroupWidget extends StatelessWidget {
             title: "Password");
       } else {
         authController
-            .joinGroup(JoinGroup(name: name, password: password))
+            .joinGroup(JoinGroup(name: name, password: password),
+                notificationController)
             .then((status) async {
           if (status.isSuccess) {
             showCustomSnackBar("Success joining your group",

@@ -45,7 +45,8 @@ class UserRepo {
 
   Future<Response> getGroupLeaderboard() async {
     print("leaderboard");
-    Response response = await apiClient.getData(AppConstants.LEADERBOARD);
+    Response response = await apiClient
+        .getData(AppConstants.LEADERBOARD + "?sortCondition=SCORE");
     print(response.body);
     return response;
   }

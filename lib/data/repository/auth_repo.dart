@@ -14,8 +14,12 @@ class AuthRepo {
   AuthRepo({required this.apiClient, required this.sharedPreferences});
 
   Future<Response> checkEmail(String email) async {
-    return await apiClient.postData(
-        "${AppConstants.USERS_URI}/check?email=$email", "");
+    return await apiClient
+        .getData("${AppConstants.USERS_URI}/verify?email=$email");
+  }
+
+  Future<Response> getUserIdByEmail(String email) async {
+    return await apiClient.getData("${AppConstants.USERS_URI}/id?email=$email");
   }
 
   Future<Response> fetchMe() async {

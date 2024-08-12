@@ -31,6 +31,15 @@ class UserController extends GetxController implements GetxService {
 
   Rx<Uint8List?> profileImage = Rx<Uint8List?>(null);
 
+  void resetAllValues() {
+    _allUserList.clear();
+    _userModel = null;
+    _user = null;
+    _isLoading = false;
+    profileImage.value = null;
+    update();
+  }
+
   //Getting userID from the token
   Future<String> getUserId(String token) async {
     Map<String, dynamic> userEntity;
@@ -120,7 +129,6 @@ class UserController extends GetxController implements GetxService {
       response.body.forEach((element) {
         localList.add(UserModel.fromJson(element));
       });
-      //localList.sort((a, b) => (b.score ?? 0).compareTo(a.score ?? 0));
       _allUserList.clear();
       _allUserList.addAll(localList);
       update();

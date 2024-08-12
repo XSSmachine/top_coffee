@@ -10,6 +10,7 @@ import '../../routes/route_helper.dart';
 import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
 import '../../widgets/app_text_field.dart';
+import 'name_surname_page.dart';
 
 /// This class displays log in form
 class SignInPage extends StatefulWidget {
@@ -100,8 +101,16 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
       } else {
         authController.login(email, password).then((status) {
           if (status.isSuccess) {
+            authController.getUserId();
             print("Success login");
             Get.toNamed(RouteHelper.getInitial());
+          } else if (status.message == "Email is not verified.") {
+            showCustomSnackBar(status.message);
+            Get.offNamedUntil(
+                RouteHelper.getVerifyEmailPage(email), (route) => false);
+          } else if (status.message == "User registration is not complete.") {
+            showCustomSnackBar(status.message);
+            Get.off(NameSurnamePage());
           } else {
             showCustomSnackBar(status.message);
           }

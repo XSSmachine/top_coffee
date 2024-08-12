@@ -1,7 +1,9 @@
 import 'package:get/get.dart';
+import 'package:team_coffee/pages/auth/verify_email_page.dart';
 import 'package:team_coffee/pages/detail/event_details_screen.dart';
 import 'package:team_coffee/pages/event/create_event_page.dart';
-import 'package:team_coffee/pages/orders/create_order_page.dart';
+import 'package:team_coffee/pages/orders/order_selector_screen.dart';
+import 'package:team_coffee/widgets/order/create_food_order_widget.dart';
 
 import '../pages/account/account_page.dart';
 import '../pages/auth/group_page.dart';
@@ -17,6 +19,7 @@ class RouteHelper {
   static const String groupPage = "/group";
   static const String signInPage = "/sign-in";
   static const String signUpPage = "/sign-up";
+  static const String verifyEmailPage = "/email";
 
   static const String initial = "/";
   static const String leaderboardPage = "/leaderboard";
@@ -36,6 +39,9 @@ class RouteHelper {
   static String getSignInPage() => signInPage;
 
   static String getSignUpPage() => signUpPage;
+
+  static String getVerifyEmailPage(String email) =>
+      '$verifyEmailPage?email=$email';
 
   static String getInitial() => initial;
 
@@ -64,6 +70,14 @@ class RouteHelper {
     GetPage(name: groupPage, page: () => const GroupPage()),
     GetPage(name: signInPage, page: () => const SignInPage()),
     GetPage(name: signUpPage, page: () => SignUpPage()),
+    GetPage(
+        name: verifyEmailPage,
+        page: () {
+          var email = Get.parameters['email'];
+          return VerifyEmailScreen(
+            email: email!,
+          );
+        }),
     GetPage(name: accountPage, page: () => const AccountPage()),
     //GetPage(name: orderPage, page: ()=>OrdersScreen()),
     GetPage(
@@ -71,7 +85,7 @@ class RouteHelper {
         page: () {
           var eventId = Get.parameters['eventId'];
           var eventType = Get.parameters['eventType'];
-          return CoolTextFieldScreen(
+          return OrderScreenSelector(
             eventType: eventType!,
             eventId: eventId!,
           );

@@ -14,10 +14,12 @@ import '../models/response_model.dart';
 import '../models/signup_body_model.dart';
 import '../models/user_profile_model.dart';
 import '../routes/route_helper.dart';
+import 'notification_controller.dart';
 
 class AuthController extends GetxController implements GetxService {
   final AuthRepo authRepo;
   final UserRepo userRepo;
+
   AuthController({required this.authRepo, required this.userRepo});
 
   bool _isLoading = false;
@@ -25,7 +27,7 @@ class AuthController extends GetxController implements GetxService {
 
   JwtModel? _userModel;
 
-  final String _groupId = '';
+  String _groupId = '';
   String get groupId => _groupId;
 
   String _userToken = '';
@@ -36,7 +38,7 @@ class AuthController extends GetxController implements GetxService {
   Future<bool> checkEmail(String email) async {
     Response response = await authRepo.checkEmail(email);
     if (response.statusCode == 200) {
-      return response.body;
+      return response.body['isVerified'];
     } else {
       print("BAD ${response.statusCode}");
       return true;
@@ -49,6 +51,7 @@ class AuthController extends GetxController implements GetxService {
     Response response = await authRepo.fetchMe();
     late ResponseModel responseModel;
     if (response.statusCode == 200) {
+      //await notificationController.subscribeToGroup(response.body['groupId']);
       responseModel = ResponseModel(true, jsonEncode(response.body));
       print(response.body.toString());
     } else if (response.statusCode == 400) {
@@ -74,7 +77,8 @@ class AuthController extends GetxController implements GetxService {
     return userId;
   }
 
-  Future<ResponseModel> createGroup(CreateGroup newGroup) async {
+  Future<ResponseModel> createGroup(CreateGroup newGroup,
+      NotificationController notificationController) async {
     _isLoading = true;
     update();
     Response response = await authRepo.createGroup(newGroup);
@@ -82,6 +86,7 @@ class AuthController extends GetxController implements GetxService {
     if (response.statusCode == 200) {
       responseModel = ResponseModel(true, "New group created successfully");
       userProfile.value?.groupId = response.body['groupId'];
+      await notificationController.subscribeToGroup(response.body['groupId']);
     } else {
       print("BAD ${response.statusCode}");
       responseModel = ResponseModel(false, response.statusText!);
@@ -91,7 +96,10 @@ class AuthController extends GetxController implements GetxService {
     return responseModel;
   }
 
-  Future<ResponseModel> joinGroup(JoinGroup group) async {
+  Future<ResponseModel> joinGroup(
+    JoinGroup group,
+    NotificationController notificationController,
+  ) async {
     _isLoading = true;
     update();
     print("ude tu");
@@ -101,6 +109,8 @@ class AuthController extends GetxController implements GetxService {
     if (response.statusCode == 200) {
       responseModel = ResponseModel(true, "User sucessfuly joined group");
       userProfile.value?.groupId = response.body['groupId'];
+
+      await notificationController.subscribeToGroup(response.body['groupId']);
       //saveGroupId(response.body['id']);
     } else {
       print("BAD ${response.statusCode}");
@@ -141,8 +151,10 @@ class AuthController extends GetxController implements GetxService {
   }
 
   // Call this method when you want to clear the token (on logout)
-  void clearUserToken() {
+  void clearUserAuthData() {
+    userProfile == Rx<UserProfileModel?>(null);
     _userToken = '';
+    _groupId = '';
     update();
   }
 
@@ -154,8 +166,8 @@ class AuthController extends GetxController implements GetxService {
     if (response.statusCode == 200) {
       responseModel = ResponseModel(true, response.body["userId"]);
       userProfile.value = UserProfileModel(
-        name: signUpBody.name,
-        surname: signUpBody.surname,
+        name: '',
+        surname: '',
         groupId: '',
         userId: response.body["userId"],
       );
@@ -177,13 +189,32 @@ class AuthController extends GetxController implements GetxService {
     if (response.statusCode == 200) {
       String token = response.body["accessToken"];
       //saving user token to shared pref
+      print("TOKEN IS: " + token);
       authRepo.saveUserToken(token);
-
-      //saving user id to shared pref
-      userEntity = await userRepo.getUserId(token);
-      String userId = userEntity["userId"];
+      await fetchAndSetUserToken();
 
       responseModel = ResponseModel(true, response.body["accessToken"]);
+    } else if (response.statusCode == 403) {
+      Response response = await authRepo.getUserIdByEmail(email);
+      userProfile.value = UserProfileModel(
+        name: '',
+        surname: '',
+        groupId: '',
+        userId: response.body["userId"],
+      );
+      //call method to add userId: response.body["userId"],
+      responseModel = ResponseModel(false, "Email is not verified.");
+    } else if (response.statusCode == 404) {
+      Response response = await authRepo.getUserIdByEmail(email);
+      userProfile.value = UserProfileModel(
+        name: '',
+        surname: '',
+        groupId: '',
+        userId: response.body["userId"],
+      );
+      //call method to add userId: response.body["userId"],
+      responseModel =
+          ResponseModel(false, "User registration is not complete.");
     } else {
       responseModel = ResponseModel(false, response.statusText!);
     }
@@ -197,6 +228,7 @@ class AuthController extends GetxController implements GetxService {
   }
 
   bool clearSharedData() {
+    clearUserAuthData();
     return authRepo.clearSharedData();
   }
 
@@ -216,6 +248,9 @@ class AuthController extends GetxController implements GetxService {
         responseModel = ResponseModel(false, response.statusCode.toString());
       }
     } else {
+      print("BAD CREATING PROFILE - userProfile data is missing");
+      print(
+          "Id ${userProfile.value?.userId}Name ${userProfile.value?.name}Surame ${userProfile.value?.surname}GroupId ${userProfile.value?.groupId}");
       responseModel = ResponseModel(false, "User profile data is missing");
     }
     _isLoading = false;

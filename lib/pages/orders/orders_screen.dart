@@ -1,16 +1,20 @@
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:team_coffee/controllers/event_controller.dart';
 import 'package:team_coffee/utils/dimensions.dart';
 import 'package:team_coffee/widgets/current_event_widget.dart';
+import 'package:team_coffee/widgets/event_type_chip.dart';
 
+import '../../base/no_data_page.dart';
 import '../../controllers/order_controller.dart';
 import '../../controllers/user_controller.dart';
 import '../../models/event_model.dart';
 import '../../models/order_model.dart';
 import '../../routes/route_helper.dart';
 import '../../utils/colors.dart';
+import '../../widgets/icon_and_text_widget.dart';
 
 /// This class displays all events that user placed order on and also will display current
 /// event which user created + all past completed events and orders
@@ -146,33 +150,37 @@ class _OrdersScreenState extends State<OrdersScreen> {
               onRefresh: _fetchOrders,
               child: GetBuilder<OrderController>(
                 builder: (orderController) {
-                  return ListView.builder(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    itemCount: isActive
-                        ? orderController.activeOrders.length
-                        : orderController.completedOrders.length,
-                    itemBuilder: (context, index) {
-                      final order = isActive
-                          ? orderController.activeOrders[index]
-                          : orderController.completedOrders[index];
-                      return OrderCard(
-                        status: order.status,
-                        time: order.createdAt.toString(),
-                        name: order.title,
-                        foodType: order.eventType,
-                        onTap: () {
-                          Get.toNamed(
-                            RouteHelper.getEventDetail(
-                              order.eventId,
-                              "orders",
-                              order.orderId,
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  );
+                  final orders = isActive
+                      ? orderController.activeOrders
+                      : orderController.completedOrders;
+                  return orders.isEmpty
+                      ? Center(
+                          child: NoDataPage(
+                          text: "There is no orders to display...",
+                        ))
+                      : ListView.builder(
+                          padding: EdgeInsets.zero,
+                          shrinkWrap: true,
+                          itemCount: orders.length,
+                          itemBuilder: (context, index) {
+                            final order = orders[index];
+                            return OrderCard(
+                              status: order.status,
+                              time: order.createdAt.toString(),
+                              name: order.title,
+                              foodType: order.eventType,
+                              onTap: () {
+                                Get.toNamed(
+                                  RouteHelper.getEventDetail(
+                                    order.eventId,
+                                    "orders",
+                                    order.orderId,
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        );
                 },
               ),
             ),
@@ -211,9 +219,24 @@ class OrderCard extends StatelessWidget {
     }
   }
 
+  String _getImagePath(String eventType) {
+    switch (eventType) {
+      case "FOOD":
+        return 'assets/image/burek.png';
+      case "COFFEE":
+        return 'assets/image/turska.png';
+      case "BEVERAGE":
+        return 'assets/image/pice.png';
+      default:
+        return 'assets/image/placeholder.jpg'; // Fallback image
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final value = _getProgressValue();
+    final _formatter = DateFormat('yyyy-MM-dd HH:mm');
+    ;
     return GestureDetector(
       onTap: onTap,
       child: Card(
@@ -281,7 +304,7 @@ class OrderCard extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.only(left: Dimensions.width20),
                   child: Text(
-                    status,
+                    status.replaceAll("_", " "),
                     style: const TextStyle(
                       fontSize: 18,
                     ),
@@ -289,16 +312,18 @@ class OrderCard extends StatelessWidget {
                 ),
                 const Divider(),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: Dimensions.width15,
+                      vertical: Dimensions.height10),
                   child: Row(
                     children: [
                       Container(
-                        width: 86, // Provide a width
-                        height: 86, // Provide a height
+                        width: Dimensions.height30 * 3.7,
+                        height: Dimensions.height30 * 3.7,
                         decoration: BoxDecoration(
                           color: AppColors.mainPurpleColor,
                           borderRadius:
-                              BorderRadius.circular(Dimensions.radius20),
+                              BorderRadius.circular(Dimensions.radius30),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.3),
@@ -307,12 +332,14 @@ class OrderCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Icon(
-                            Icons.fastfood,
-                            size: 70,
-                            color: Colors.white,
+                        child: ClipRRect(
+                          borderRadius:
+                              BorderRadius.circular(Dimensions.radius30),
+                          child: Image.asset(
+                            _getImagePath(foodType ?? "FOOD"),
+                            width: Dimensions.height30 * 3.5,
+                            height: Dimensions.height30 * 3.5,
+                            fit: BoxFit.cover,
                           ),
                         ),
                       ),
@@ -323,18 +350,19 @@ class OrderCard extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.timer_sharp,
-                                    color: Colors.green),
+                                const Icon(Icons.event, color: Colors.green),
                                 const SizedBox(width: 5),
-                                Flexible(child: Text(time)),
+                                Flexible(
+                                    child: Text(_formatter
+                                        .format(DateTime.parse(time)))),
                               ],
                             ),
                             SizedBox(
-                              height: Dimensions.height10 / 2,
+                              height: Dimensions.height10,
                             ),
                             Row(
                               children: [
-                                const Icon(Icons.person_search,
+                                const Icon(Icons.label_important_sharp,
                                     color: Colors.deepOrangeAccent),
                                 const SizedBox(width: 5),
                                 Flexible(child: Text(name)),
@@ -345,9 +373,59 @@ class OrderCard extends StatelessWidget {
                             ),
                             Row(
                               children: [
-                                const Icon(Icons.face, color: Colors.amber),
                                 const SizedBox(width: 5),
-                                Flexible(child: Text(foodType)),
+                                if (foodType == "COFFEE")
+                                  FilterChip(
+                                    label: const IconAndTextWidget(
+                                      icon: Icons.coffee,
+                                      text: "COFFEE",
+                                      iconColor: Colors.white,
+                                      isSmaller: true,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                      side: const BorderSide(
+                                          color: AppColors.orangeChipColor),
+                                    ),
+                                    backgroundColor: AppColors.orangeChipColor,
+                                    onSelected: (bool value) {},
+                                    selected: false,
+                                  )
+                                else if (foodType == "FOOD")
+                                  FilterChip(
+                                    label: const IconAndTextWidget(
+                                      icon: Icons.restaurant,
+                                      text: "FOOD",
+                                      iconColor: Colors.white,
+                                      isSmaller: true,
+                                    ),
+                                    backgroundColor: AppColors.greenChipColor,
+                                    onSelected: (bool value) {},
+                                    selected: false,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                      side: const BorderSide(
+                                          color: AppColors.greenChipColor),
+                                    ),
+                                  )
+                                else
+                                  FilterChip(
+                                    label: const IconAndTextWidget(
+                                      icon: Icons.liquor,
+                                      text: "BEVERAGES",
+                                      iconColor: Colors.white,
+                                      isSmaller: true,
+                                    ),
+                                    backgroundColor: AppColors.blueChipColor,
+                                    onSelected: (bool value) {},
+                                    selected: false,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                      side: const BorderSide(
+                                          color: AppColors.blueChipColor),
+                                    ),
+                                  ),
+                                const SizedBox(width: 8.0),
                               ],
                             ),
                           ],

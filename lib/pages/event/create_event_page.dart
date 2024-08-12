@@ -1,14 +1,19 @@
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:stomp_dart_client/stomp_dart_client.dart' as client;
+import 'package:stomp_dart_client/stomp_dart_client.dart';
+import 'package:team_coffee/base/show_custom_snackbar.dart';
+import 'package:team_coffee/controllers/notification_controller.dart';
 import 'package:team_coffee/controllers/user_controller.dart';
 import 'package:team_coffee/models/event_body_model.dart';
 import 'package:team_coffee/widgets/event_type_chip.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/event_controller.dart';
+import '../../utils/app_constants.dart';
 import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
-import '../../widgets/icon_and_text_widget.dart';
 
 /// This class displays a form for creating new event
 class CreateEventPage extends StatefulWidget {
@@ -19,8 +24,13 @@ class CreateEventPage extends StatefulWidget {
 }
 
 class _CreateEventPageState extends State<CreateEventPage> {
+  final String webSocketUrl = AppConstants.BASE_SOCKET_URL;
+  late client.StompClient _client;
+  List<dynamic> messages = List.empty();
   AuthController authController = Get.find<AuthController>();
   UserController userController = Get.find<UserController>();
+  NotificationController notificationController =
+      Get.find<NotificationController>();
   String selectedTime = "10 min";
   int pendingTime = 10;
   int selectedButtonIndex = 1;
@@ -34,6 +44,27 @@ class _CreateEventPageState extends State<CreateEventPage> {
     setState(() {
       _selectedEventType = newType;
     });
+  }
+
+  void onConnectCallback(StompFrame connectFrame) async {
+    String profileId = await userController.getProfileId();
+    _client.subscribe(
+        destination: '/topic/orders/${profileId}',
+        headers: {},
+        callback: (frame) {
+          print(frame.body);
+          showCustomSnackBar(frame.body ?? "Null message");
+          // Received a frame for this subscription
+          messages = jsonDecode(frame.body!).reversed.toList();
+        });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _client = client.StompClient(
+        config: StompConfig(url: webSocketUrl, onConnect: onConnectCallback));
+    _client.activate();
   }
 
   @override
@@ -94,13 +125,13 @@ class _CreateEventPageState extends State<CreateEventPage> {
             children: [
               Padding(
                 padding: EdgeInsets.only(
-                    left: Dimensions.height30,
-                    right: Dimensions.height30,
+                    left: Dimensions.width15,
+                    right: Dimensions.width15,
                     top: Dimensions.height30 * 0.8),
                 child: TextField(
                   controller: _titleController,
                   decoration: InputDecoration(
-                    hintText: 'Title',
+                    hintText: 'Pizza iz Gušti',
                     filled: true,
                     fillColor: Colors.grey[300],
                     border: OutlineInputBorder(
@@ -111,52 +142,60 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 ),
               ),
               const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  /*EventTypeChip(
-                        label: "MIX",
-                        color: AppColors.redChipColor,
-                        icon: Icons.fastfood,
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: Dimensions.width10),
+                child: SingleChildScrollView(
+                  physics: NeverScrollableScrollPhysics(),
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      /*EventTypeChip(
+                            label: "MIX",
+                            color: AppColors.redChipColor,
+                            icon: Icons.fastfood,
+                            selectedEventType: _selectedEventType,
+                            onEventTypeChanged: _updateSelectedEventType),
+                        const SizedBox(width: 8.0),*/
+                      EventTypeChip(
+                        label: "COFFEE",
+                        color: AppColors.orangeChipColor,
+                        icon: Icons.coffee,
                         selectedEventType: _selectedEventType,
-                        onEventTypeChanged: _updateSelectedEventType),
-                    const SizedBox(width: 8.0),*/
-                  EventTypeChip(
-                    label: "COFFEE",
-                    color: AppColors.orangeChipColor,
-                    icon: Icons.coffee,
-                    selectedEventType: _selectedEventType,
-                    onEventTypeChanged: _updateSelectedEventType,
-                    firstSelected: "FOOD",
+                        onEventTypeChanged: _updateSelectedEventType,
+                        firstSelected: "FOOD",
+                      ),
+                      SizedBox(width: Dimensions.width15 / 3),
+                      EventTypeChip(
+                        label: "FOOD",
+                        color: AppColors.greenChipColor,
+                        icon: Icons.restaurant,
+                        selectedEventType: _selectedEventType,
+                        onEventTypeChanged: _updateSelectedEventType,
+                        firstSelected: "FOOD",
+                      ),
+                      SizedBox(width: Dimensions.width15 / 3),
+                      EventTypeChip(
+                        label: "BEVERAGE",
+                        color: AppColors.blueChipColor,
+                        icon: Icons.liquor,
+                        selectedEventType: _selectedEventType,
+                        onEventTypeChanged: _updateSelectedEventType,
+                        firstSelected: "FOOD",
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 8.0),
-                  EventTypeChip(
-                    label: "FOOD",
-                    color: AppColors.greenChipColor,
-                    icon: Icons.restaurant,
-                    selectedEventType: _selectedEventType,
-                    onEventTypeChanged: _updateSelectedEventType,
-                    firstSelected: "FOOD",
-                  ),
-                  const SizedBox(width: 8.0),
-                  EventTypeChip(
-                    label: "BEVERAGE",
-                    color: AppColors.blueChipColor,
-                    icon: Icons.liquor,
-                    selectedEventType: _selectedEventType,
-                    onEventTypeChanged: _updateSelectedEventType,
-                    firstSelected: "FOOD",
-                  ),
-                ],
+                ),
               ),
               SizedBox(height: Dimensions.height30),
               Padding(
-                padding: const EdgeInsets.all(17.0),
+                padding: EdgeInsets.all(Dimensions.width15),
                 child: TextField(
                   maxLines: 5,
                   controller: _descriptionController,
                   decoration: InputDecoration(
-                    hintText: 'Description',
+                    hintText: ' - Pizza margarita\n - Pizza mješana'
+                        '\n - Sendvič piletina sir',
                     filled: true,
                     fillColor: Colors.grey[300],
                     border: OutlineInputBorder(
@@ -167,13 +206,16 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 ),
               ),
               SizedBox(height: Dimensions.height45),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildTimeButton('5 min', 0),
-                  _buildTimeButton('10 min', 1),
-                  _buildTimeButton('15 min', 2),
-                ],
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: Dimensions.width15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildTimeButton('5 min', 0),
+                    _buildTimeButton('10 min', 1),
+                    _buildTimeButton('15 min', 2),
+                  ],
+                ),
               ),
               SizedBox(height: Dimensions.height30),
               Row(
@@ -211,15 +253,15 @@ class _CreateEventPageState extends State<CreateEventPage> {
                     if (title.isNotEmpty && description.isNotEmpty) {
                       print("PROFIL ID $profileId");
                       await Get.find<EventController>().createEvent(
-                        EventBody(
-                          //creatorId: profileId ,
-                          time: pendingTime,
-                          title: title,
-                          description: description,
-                          eventType: eventType,
-                          //groupId: groupId,
-                        ),
-                      );
+                          EventBody(
+                            //creatorId: profileId ,
+                            time: pendingTime,
+                            title: title,
+                            description: description,
+                            eventType: eventType,
+                            //groupId: groupId,
+                          ),
+                          notificationController);
                       Get.back();
                       // Optionally, you can add a success message or navigation here
                     } else {
@@ -275,7 +317,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
         });
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        padding: EdgeInsets.symmetric(
+            vertical: Dimensions.height20, horizontal: Dimensions.height20),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.mainBlueMediumColor : Colors.grey[300],
           borderRadius: BorderRadius.circular(Dimensions.radius15 * 0.8),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:team_coffee/controllers/auth_controller.dart';
 import 'package:team_coffee/controllers/event_controller.dart';
+import 'package:team_coffee/models/response_model.dart';
 import 'package:team_coffee/pages/auth/sign_in_page.dart';
 import 'package:team_coffee/pages/home/home_page.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -92,6 +93,7 @@ class _SplashScreenState extends State<SplashScreen>
     _animationController.forward().then((_) async {
       // Check internet connectivity
       var connectivityResult = await (Connectivity().checkConnectivity());
+      //auth.clearSharedData();
       if (connectivityResult == ConnectivityResult.none) {
         _navigateToErrorPage("No internet connection");
         return;

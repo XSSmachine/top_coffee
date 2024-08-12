@@ -59,7 +59,9 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
   }
 
   Future<void> _updateProfile() async {
-    if (_firstNameController.text.isEmpty || _lastNameController.text.isEmpty) {
+    if (_firstNameController.text.isEmpty ||
+        _lastNameController.text.isEmpty ||
+        _imageFile == null) {
       Get.snackbar('Error', 'First name and last name cannot be empty');
       return;
     }
@@ -67,7 +69,6 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
     UpdateProfileModel updatedData = UpdateProfileModel(
       name: _firstNameController.text,
       surname: _lastNameController.text,
-      // Add other fields as necessary
     );
 
     ResponseModel response = await widget.userController
@@ -75,7 +76,7 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
 
     if (response.isSuccess) {
       Get.back(result: true);
-      widget.userController.fetchProfilePhoto();
+      await widget.userController.fetchProfilePhoto();
       Get.snackbar('Success', 'Profile updated successfully');
     } else {
       Get.snackbar('Error', 'Failed to update profile: ${response.message}');
