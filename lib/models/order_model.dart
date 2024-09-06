@@ -1,14 +1,15 @@
-
 class OrderModel {
   String eventId;
   String orderId;
   String? userProfileId;
-  String title;
+  String? title;
   String? description;
-  String groupId;
+  String? groupId;
   String status;
   String eventType;
   DateTime createdAt;
+  int? rating;
+  Map<String, dynamic>? additionalOptions;
 
   OrderModel({
     required this.eventId,
@@ -20,6 +21,8 @@ class OrderModel {
     required this.status,
     required this.eventType,
     required this.createdAt,
+    required this.rating,
+    required this.additionalOptions,
   });
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
@@ -33,6 +36,8 @@ class OrderModel {
       status: json['status'],
       eventType: json['eventType'],
       createdAt: DateTime.parse(json['createdAt']),
+      additionalOptions: json["additionalOptions"] ?? "",
+      rating: json['rating'],
     );
   }
 
@@ -47,6 +52,8 @@ class OrderModel {
       'status': status,
       'eventType': eventType,
       'createdAt': createdAt.toIso8601String(),
+      'additionalOptions': additionalOptions,
+      'rating': rating
     };
   }
 }

@@ -9,6 +9,7 @@ import '../../models/signup_body_model.dart';
 import '../../routes/route_helper.dart';
 import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
+import '../../utils/string_resources.dart';
 import '../../widgets/app_text_field.dart';
 
 /// This class displays sign up form
@@ -21,7 +22,7 @@ class SignUpPage extends StatelessWidget {
   var confirmPasswordController = TextEditingController();
 
   var alreadyExists = true;
-  var signUpImages = ["t.png", "f.png", "g.png"];
+  //var signUpImages = ["t.png", "f.png", "g.png"];
 
   @override
   Widget build(BuildContext context) {
@@ -31,24 +32,23 @@ class SignUpPage extends StatelessWidget {
       String password = passwordController.text.trim();
 
       if (password != confirmPassword) {
-        showCustomSnackBar("Please make sure, both passwords are same.",
-            title: "Confirm password");
+        showCustomSnackBar(AppStrings.sameConfirmPass.tr,
+            title: AppStrings.confirmPass.tr);
       } else if (confirmPassword.isEmpty) {
-        showCustomSnackBar("Confirm your password please.",
-            title: "Confirm password");
-      }
-      /*else if (await Get.find<AuthController>()
-          .checkEmail(emailController.text.trim())) {
-        showCustomSnackBar("User email already exists", title: "Email address");
-      }*/
-      else if (!GetUtils.isEmail(email)) {
-        showCustomSnackBar("Type in a valid email address",
-            title: "Valid email address");
+        showCustomSnackBar(AppStrings.confirmPass.tr,
+            title: AppStrings.confirmPass.tr);
+      } else if (email.isEmpty) {
+        showCustomSnackBar(AppStrings.typeInEmail.tr,
+            title: AppStrings.email.tr);
+      } else if (!GetUtils.isEmail(email)) {
+        showCustomSnackBar(AppStrings.typeInEmail.tr,
+            title: "${AppStrings.valid.tr} ${AppStrings.email}");
       } else if (password.isEmpty) {
-        showCustomSnackBar("Type in your password", title: "Password");
+        showCustomSnackBar(AppStrings.typeInPassword.tr,
+            title: AppStrings.pass.tr);
       } else if (password.length < 3) {
-        showCustomSnackBar("Password needs to be at least 3 characters long",
-            title: "Password");
+        showCustomSnackBar(AppStrings.passWarningMsg.tr,
+            title: AppStrings.pass.tr);
       } else {
         SignupBody signUpBody = SignupBody(
           email: email,
@@ -56,9 +56,9 @@ class SignUpPage extends StatelessWidget {
         );
         authController.registration(signUpBody).then((status) {
           if (status.isSuccess) {
-            showCustomSnackBar("Successful registration",
+            showCustomSnackBar(AppStrings.successRegistration.tr,
                 isError: false,
-                title: "Success",
+                title: AppStrings.successMsg.tr,
                 color: AppColors.mainBlueColor);
             Get.offNamedUntil(
                 RouteHelper.getVerifyEmailPage(email), (route) => false);
@@ -86,11 +86,11 @@ class SignUpPage extends StatelessWidget {
                       child: Center(
                         child: CircleAvatar(
                           backgroundColor: Colors.white,
-                          radius: 130,
+                          radius: Dimensions.radius20 * 6.5,
                           child: Image.asset(
                             "assets/image/chef_register.png",
-                            width: 330,
-                            height: 330,
+                            width: Dimensions.width10 * 33,
+                            height: Dimensions.width10 * 33,
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -102,7 +102,7 @@ class SignUpPage extends StatelessWidget {
                     //your email
                     AppTextField(
                         textController: emailController,
-                        hintText: "Email",
+                        hintText: AppStrings.email.tr,
                         icon: Icons.email_outlined),
                     SizedBox(
                       height: Dimensions.height20,
@@ -110,7 +110,7 @@ class SignUpPage extends StatelessWidget {
                     //your password
                     AppTextField(
                       textController: passwordController,
-                      hintText: "Password",
+                      hintText: AppStrings.pass.tr,
                       icon: Icons.lock_outline,
                       isObscure: true,
                     ),
@@ -119,7 +119,7 @@ class SignUpPage extends StatelessWidget {
                     ),
                     AppTextField(
                       textController: confirmPasswordController,
-                      hintText: "Confirm Password",
+                      hintText: AppStrings.confirmPass.tr,
                       icon: Icons.lock_outline,
                       isObscure: true,
                     ),
@@ -149,7 +149,7 @@ class SignUpPage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
-                                "SIGN UP",
+                                AppStrings.signUpBold,
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: Dimensions.font16),
@@ -184,14 +184,14 @@ class SignUpPage extends StatelessWidget {
                         text: TextSpan(
                             recognizer: TapGestureRecognizer()
                               ..onTap = () => Get.back(),
-                            text: "Have an account already?",
+                            text: AppStrings.confirmQuestionAccount.tr,
                             style: TextStyle(
                                 color: Colors.grey[500],
                                 fontSize: Dimensions.font20))),
                     SizedBox(
                       height: Dimensions.screenHeight * 0.05,
                     ),
-                    RichText(
+                    /*RichText(
                         //clickable text
                         text: TextSpan(
                             recognizer: TapGestureRecognizer()
@@ -211,7 +211,7 @@ class SignUpPage extends StatelessWidget {
                                       "assets/image/${signUpImages[index]}"),
                                 ),
                               )),
-                    )
+                    )*/
                   ],
                 ),
               )

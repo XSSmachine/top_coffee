@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:team_coffee/base/no_data_page.dart';
 import 'package:team_coffee/controllers/event_controller.dart';
 import 'package:team_coffee/controllers/order_controller.dart';
 import 'package:team_coffee/utils/colors.dart';
+import 'package:team_coffee/utils/string_resources.dart';
 
 import '../../models/my_orders_model.dart';
 
@@ -18,47 +20,53 @@ class AllOrdersScreen extends StatefulWidget {
 
 List<MyOrder> orders = [];
 
-void _finishEvent(EventController eventController, String eventId) {
-  print("called finishEvent");
-  bool allChecked = orders.every((order) => order.isChecked ?? false);
-
-  if (!allChecked) {
-    showDialog(
-      context: Get.context!,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Are you sure?'),
-          content: const Text('Are you sure you want to finish the event?'),
-          actions: [
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Finish'),
-              onPressed: () {
-                // Handle the finish event logic here
-                eventController.updateEvent(eventId, "COMPLETED");
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  } else {
-    // Handle the finish event logic here
-    eventController.updateEvent(eventId, "COMPLETED");
-    Get.back();
-  }
-}
-
 class _AllOrdersScreenState extends State<AllOrdersScreen> {
   OrderController orderController = Get.find<OrderController>();
   EventController eventController = Get.find<EventController>();
   List<MyOrder> orders = []; // Move orders list here
+
+  void _finishEvent(EventController eventController, String eventId) {
+    bool allChecked = orders.every((order) => order.isChecked ?? false);
+
+    if (!allChecked) {
+      showDialog(
+        context: Get.context!,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(AppStrings.youSure.tr),
+            content: Text(AppStrings.youSureEvent.tr),
+            actions: [
+              TextButton(
+                child: Text(AppStrings.cancel.tr),
+                onPressed: () {
+                  Get.find<EventController>().getActiveEvent2().then((action) {
+                    Navigator.of(context).pop();
+                  });
+                },
+              ),
+              TextButton(
+                child: Text(AppStrings.finish.tr),
+                onPressed: () {
+                  // Handle the finish event logic here
+                  eventController.updateEvent(eventId, "COMPLETED");
+                  Get.find<EventController>().getActiveEvent2().then((action) {
+                    Navigator.of(context).pop();
+                  });
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      // Handle the finish event logic here
+      eventController.updateEvent(eventId, "COMPLETED").then((action) {
+        Get.find<EventController>().getActiveEvent2().then((action) {
+          Navigator.pop(context);
+        });
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -83,7 +91,7 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Orders'),
+        title: Text(AppStrings.ordersFilter.tr),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -97,8 +105,9 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
       ),
       body: orders.isEmpty
           ? Center(
-              child:
-                  CircularProgressIndicator()) // Show loading indicator while fetching
+              child: NoDataPage(
+                  text: AppStrings
+                      .noOrders.tr)) // Show loading indicator while fetching
           : ListView.builder(
               itemCount: orders.length,
               itemBuilder: (context, index) {
@@ -130,7 +139,9 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             textStyle: const TextStyle(fontSize: 18),
           ),
-          child: const Text('FINISH'),
+          child: orders.isEmpty
+              ? const Text(AppStrings.cancelEvent)
+              : const Text(AppStrings.finishBold),
         ),
       ),
     );

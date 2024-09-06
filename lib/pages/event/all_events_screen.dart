@@ -7,6 +7,7 @@ import '../../controllers/event_controller.dart';
 import '../../models/event_model.dart';
 import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
+import '../../utils/string_resources.dart';
 import '../../widgets/create_event_widget.dart';
 
 class EventScreen extends StatelessWidget {
@@ -36,17 +37,18 @@ class EventScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Events'),
+        title: Text(AppStrings.eventsTitle.tr),
       ),
       body: FutureBuilder<List<EventModel>>(
         future: isPending
-            ? eventController.fetchPendingEvents("MIX")
-            : eventController.fetchInProgressEvents("MIX"),
+            ? eventController.fetchPendingEvents("ALL")
+            : eventController.fetchInProgressEvents("ALL"),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(
+                child: Text('${AppStrings.errorMsg.tr}: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
               child: SizedBox(
@@ -54,8 +56,6 @@ class EventScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     SizedBox(height: Dimensions.height10),
-                    const Text("Hmm looks empty here..."),
-                    SizedBox(height: Dimensions.height15),
                     const Center(child: CreateEventWidget())
                   ],
                 ),
@@ -86,7 +86,7 @@ class EventScreen extends StatelessWidget {
                           BoxShadow(
                             color: Colors.grey.withOpacity(0.5),
                             spreadRadius: 2,
-                            blurRadius: 5,
+                            blurRadius: Dimensions.radius15 / 3,
                             offset: const Offset(0, 3),
                           ),
                         ],
@@ -122,7 +122,7 @@ class EventScreen extends StatelessWidget {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   Text(
-                                    'By ${event.userProfileFirstName} ${event.userProfileLastName}',
+                                    '${AppStrings.authorTitle.tr} ${event.userProfileFirstName} ${event.userProfileLastName}',
                                     style: TextStyle(
                                       color: Colors.grey,
                                       fontSize: Dimensions.font20 * 0.6,

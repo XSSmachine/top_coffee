@@ -26,6 +26,10 @@ class AuthRepo {
     return await apiClient.getData(AppConstants.FETCH_ME_URI);
   }
 
+  Future<Response> getAllGroups() async {
+    return await apiClient.getData(AppConstants.ALL_GROUPS_URI);
+  }
+
   /// Methods for managing groups
   Future<Response> createGroup(CreateGroup newGroup) async {
     return await apiClient.postData(
@@ -71,13 +75,28 @@ class AuthRepo {
 
   /// Methods for managing userToken which i get after logging in
   Future<String> getUserToken() async {
-    return sharedPreferences.getString(AppConstants.TOKEN) ?? "None";
+    return await sharedPreferences.getString(AppConstants.TOKEN) ?? "None";
   }
 
   Future<bool> saveUserToken(String token) async {
     apiClient.token = token;
-    apiClient.updateHeader(token);
+    // final groupId = await getGroupId();
+    // apiClient.updateHeader(token, groupId);
     return await sharedPreferences.setString(AppConstants.TOKEN, token);
+  }
+
+  /// Methods for managing userToken which i get after logging in
+  Future<String> getGroupId() async {
+    return await sharedPreferences.getString(AppConstants.ACTIVE_GROUP) ??
+        "None";
+  }
+
+  Future<bool> saveGroupId(String groupId) async {
+    apiClient.groupId = groupId;
+    final token = await getUserToken();
+    apiClient.updateHeader(token, groupId);
+    return await sharedPreferences.setString(
+        AppConstants.ACTIVE_GROUP, groupId);
   }
 
   /// Helper methods
@@ -85,7 +104,9 @@ class AuthRepo {
   bool clearSharedData() {
     sharedPreferences.remove(AppConstants.TOKEN);
     apiClient.token = '';
-    apiClient.updateHeader('');
+    sharedPreferences.remove(AppConstants.ACTIVE_GROUP);
+    apiClient.groupId = '';
+    apiClient.updateHeader('', '');
     return true;
   }
 }

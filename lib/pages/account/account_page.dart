@@ -9,10 +9,10 @@ import '../../controllers/user_controller.dart';
 import '../../routes/route_helper.dart';
 import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
-import '../../widgets/account_widget.dart';
-import '../../widgets/app_icon.dart';
+import '../../utils/string_resources.dart';
 import '../../widgets/big_text.dart';
 import '../../widgets/edit_profile_widget.dart';
+import '../group/edit_group_screen.dart';
 
 /// This class displays user profile
 class AccountPage extends StatefulWidget {
@@ -47,9 +47,9 @@ class _AccountPageState extends State<AccountPage> {
     );
 
     if (result == true) {
-      // Profile updated successfully, refresh the user data
       await userController.getUserProfile();
-      setState(() {}); // Rebuild the widget to reflect changes
+      await userController.fetchProfilePhoto(); // Add this line
+      setState(() {});
     }
   }
 
@@ -61,7 +61,7 @@ class _AccountPageState extends State<AccountPage> {
       FetchMeModel? userData = Get.find<UserController>().user;
       print("User has logged in");
       print(
-          "${userData!.name}/${userData.surname}/${userData.profileId}/${userData.groupId}");
+          "${userData!.firstName}/${userData.lastName}/${userData.userProfileId}/${userData.groupMembershipData}");
     }
     setState(() {
       _isInitialized = true;
@@ -84,64 +84,187 @@ class _AccountPageState extends State<AccountPage> {
   Widget _buildLoggedInView() {
     return Container(
       width: double.maxFinite,
-      margin: EdgeInsets.only(top: Dimensions.height30 * 1),
       child: Column(
         children: [
-          WordCustomCard(
-            user: Get.find<UserController>().user!,
-            userController: Get.find<UserController>(),
-            onEditProfile: _showEditProfileDialog,
-          ),
-          const SizedBox(
-            height: 20,
-          ),
           Expanded(
             child: SingleChildScrollView(
+              physics: ClampingScrollPhysics(),
               child: Column(
                 children: [
-                  SizedBox(
-                    height: Dimensions.height20,
+                  WordCustomCard(
+                    user: Get.find<UserController>().user!,
+                    userController: Get.find<UserController>(),
+                    onEditProfile: _showEditProfileDialog,
                   ),
-                  AccountWidget(
-                      appIcon: AppIcon(
-                        icon: Icons.message_outlined,
-                        backgroungColor: AppColors.titleColor,
-                        iconColor: Colors.white,
-                        iconSize: Dimensions.height10 * 2.5,
-                        size: Dimensions.height10 * 5,
-                      ),
-                      bigText: BigText(
-                        text: "Messages",
-                      )),
                   SizedBox(
-                    height: Dimensions.height20,
+                    height: Dimensions.height10,
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      authController.clearSharedData();
-                      userController.resetAllValues();
-                      eventController.resetAllValues();
-                      orderController.resetAllValues();
-                      Get.toNamed(RouteHelper.getSignInPage());
-                    },
-                    child: AccountWidget(
-                        appIcon: AppIcon(
-                          icon: Icons.logout,
-                          backgroungColor: Colors.black,
-                          iconColor: Colors.white,
-                          iconSize: Dimensions.height10 * 2.5,
-                          size: Dimensions.height10 * 5,
+                  Card(
+                    margin: EdgeInsets.all(Dimensions.width10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(Dimensions.radius15),
+                    ),
+                    child: Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius:
+                              BorderRadius.circular(Dimensions.radius15),
+                          child: Image.asset(
+                            'assets/image/group_eating.jpg',
+                            fit: BoxFit.cover,
+                            opacity: const AlwaysStoppedAnimation(0.5),
+                            height: Dimensions.height20 * 8,
+                            width: double.infinity,
+                          ),
                         ),
-                        bigText: BigText(
-                          text: "Logout",
-                        )),
+                        Positioned(
+                          top: Dimensions.height10,
+                          left: Dimensions.width10,
+                          right: Dimensions.width10,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      AppStrings.inviteFriends.tr,
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: Dimensions.font20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  Icon(Icons.arrow_forward,
+                                      color: Colors.black),
+                                ],
+                              ),
+                              SizedBox(height: Dimensions.height10),
+                              Text(
+                                AppStrings.inviteFriendsDesc.tr,
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: Dimensions.font16),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  Container(),
+                  // Clickable rows
+                  _buildClickableRow(
+                      Icons.notifications, AppStrings.notifications.tr, () {
+                    Get.toNamed(RouteHelper.notificationListPage);
+                  }),
+                  _buildClickableRow(
+                      Icons.support, AppStrings.support.tr, () {}),
+                  _buildClickableRow(
+                      Icons.groups_rounded, AppStrings.editGroup.tr, () async {
+                    Get.to(GroupScreen(
+                      groupId: await authController.getGroupId(),
+                    ));
+                  }),
+                  // Second card
+                  Card(
+                    margin: EdgeInsets.all(Dimensions.width10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(Dimensions.radius15),
+                    ),
+                    child: Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius:
+                              BorderRadius.circular(Dimensions.radius15),
+                          child: Image.asset(
+                            'assets/image/food_table.jpg', // Replace with your image
+                            fit: BoxFit.cover,
+                            height: Dimensions.height20 * 6,
+                            width: double.infinity,
+                          ),
+                        ),
+                        Positioned(
+                          top: Dimensions.height10,
+                          left: Dimensions.width10,
+                          right: Dimensions.width10,
+                          child: Text(
+                            AppStrings.appMoto.tr,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: Dimensions.font16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(
+                    height: Dimensions.height10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: Dimensions.width15,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          authController.clearSharedData();
+                          userController.resetAllValues();
+                          eventController.resetAllValues();
+                          orderController.resetAllValues();
+                          Get.toNamed(RouteHelper.getSignInPage());
+                        },
+                        child: Text(
+                          AppStrings.logout.tr,
+                          style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: Dimensions.font16 * 0.8),
+                        ),
+                      ),
+                      SizedBox(
+                        width: Dimensions.width15 * 6,
+                      ),
+                      Text(
+                        "${AppStrings.version.tr} 2.0.0",
+                        style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: Dimensions.font16 * 0.8),
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: Dimensions.height20 * 2,
+                  )
                 ],
               ),
             ),
           )
         ],
+      ),
+    );
+  }
+
+  Widget _buildClickableRow(IconData icon, String text, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: Dimensions.height10,
+          horizontal: Dimensions.width15,
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: Dimensions.iconSize24),
+            SizedBox(width: Dimensions.width15),
+            Text(text, style: TextStyle(fontSize: Dimensions.font16)),
+          ],
+        ),
       ),
     );
   }

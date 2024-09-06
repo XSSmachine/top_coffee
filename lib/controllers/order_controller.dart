@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:get/get.dart';
 import '../data/repository/order_repo.dart';
+import '../models/monthly_summary.dart';
 import '../models/my_orders_model.dart';
 import '../models/order_body_model.dart';
 import '../models/order_get_model.dart';
@@ -20,6 +21,7 @@ class OrderController extends GetxController implements GetxService {
   final RxList<OrderModel> _allOrders = <OrderModel>[].obs;
   final RxList<OrderModel> _activeOrders = <OrderModel>[].obs;
   final RxList<OrderModel> _completedOrders = <OrderModel>[].obs;
+  final RxList<OrderModel> _cancelledOrders = <OrderModel>[].obs;
 
   bool get isLoading => _isLoading.value;
   OrderGetModel? get currentOrder => _currentOrder.value;
@@ -28,6 +30,7 @@ class OrderController extends GetxController implements GetxService {
   List<OrderModel> get allOrders => _allOrders;
   List<OrderModel> get activeOrders => _activeOrders;
   List<OrderModel> get completedOrders => _completedOrders;
+  List<OrderModel> get cancelledOrders => _cancelledOrders;
 
   void resetAllValues() {
     _currentOrder.value = null;
@@ -98,21 +101,6 @@ class OrderController extends GetxController implements GetxService {
     }
   }
 
-  //Getting all orders in the db
-  Future<List<OrderModel>> getAllOrders() async {
-    _isLoading.value = true;
-    try {
-      //final List<OrderModel>orders = await orderRepo.getAllOrders();
-      //_allOrders.assignAll(orders);
-      return allOrders;
-    } catch (e) {
-      print('Error fetching orders for event: $e');
-      return allOrders;
-    } finally {
-      _isLoading.value = false;
-    }
-  }
-
   Future<List<OrderModel>> getAllMyOrdersByStatus(bool isActive) async {
     _isLoading.value = true;
     try {
@@ -142,6 +130,8 @@ class OrderController extends GetxController implements GetxService {
     _isLoading.value = true;
     try {
       final order = await orderRepo.getSingleOrder(orderId);
+      print("STATUS " + order.status!);
+      print("RATING " + order.rating.toString());
       _currentOrder.value = order;
     } catch (e) {
       print('Error fetching single order: $e');
@@ -175,7 +165,85 @@ class OrderController extends GetxController implements GetxService {
     }
   }
 
-//Patch method for defining order rating
+  Future<List<OrderModel>> getFilteredOrders({
+    int? page,
+    int? size,
+    String? status,
+    String? rating,
+    String? type,
+    String? search,
+  }) async {
+    try {
+      _isLoading.value = true;
+      print("page" +
+          page.toString() +
+          " size " +
+          size.toString() +
+          " rating " +
+          rating.toString() +
+          " type " +
+          type.toString() +
+          "search " +
+          search.toString());
+      final List<OrderModel> newOrders = await orderRepo.getFilteredOrders(
+        page: page,
+        size: size,
+        status: status,
+        rating: rating,
+        type: type,
+        search: search,
+      );
+      print(2.1);
+      if (page == 0) {
+        _allOrders.clear();
+      }
+      print(2.2);
+      _allOrders.addAll(newOrders);
+      print("GETTING ALL ORDERS" + newOrders.length.toString());
+      print(2.3);
+      return newOrders;
+    } catch (e) {
+      print(2.4);
+      print('Error fetching orders: $e');
+      return [];
+    } finally {
+      _isLoading.value = false;
+    }
+  }
 
-  //Accessing orderID from shared prefs
+  List<OrderModel> filterOrdersByStatus(List<String> statuses) {
+    return _allOrders
+        .where((order) => statuses.contains(order.status))
+        .toList();
+  }
+
+  void clearOrders() {
+    _allOrders.clear();
+    _activeOrders.clear();
+    _completedOrders.clear();
+    _cancelledOrders.clear();
+  }
+
+  Future<List<MonthlySummary>> fetchOrdersStatistics() async {
+    final response = await orderRepo.fetchOrdersStats();
+    if (response.isNotEmpty) {
+      return response;
+    } else {
+      throw Exception('Failed to get orders statistic data');
+    }
+  }
+
+  Future<List<dynamic>> fetchOrderPieData() async {
+    try {
+      final response = await orderRepo.fetchOrderPieData();
+      if (response.statusCode == 200) {
+        return response.body;
+      } else {
+        throw Exception('Failed to load data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
+      throw Exception('Failed to fetch event data: $e');
+    }
+  }
 }

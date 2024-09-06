@@ -9,6 +9,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
   file_selector_windows
   firebase_core
+  flutter_timezone
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

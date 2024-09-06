@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class NoDataPage extends StatelessWidget {
   final String text;
   final String imgPath;
+  final double size;
   const NoDataPage(
       {super.key,
       required this.text,
-      this.imgPath = "assets/image/empty_box.png"});
+      this.imgPath = "assets/image/empty_box.png",
+      this.size = 200});
 
   @override
   Widget build(BuildContext context) {
@@ -16,8 +18,8 @@ class NoDataPage extends StatelessWidget {
       children: [
         Image.asset(
           imgPath,
-          height: MediaQuery.of(context).size.height * 0.22,
-          width: MediaQuery.of(context).size.height * 0.22,
+          height: size,
+          width: size,
         ),
         SizedBox(
           height: MediaQuery.of(context).size.height * 0.03,

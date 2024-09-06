@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import '../../utils/dimensions.dart';
+import '../../utils/string_resources.dart';
 import '../splash/splash_page.dart';
 
 class ErrorPage extends StatelessWidget {
@@ -10,19 +13,20 @@ class ErrorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Error')),
+      appBar: AppBar(title: Text(AppStrings.errorMsg.tr)),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.red),
-            SizedBox(height: 16),
+            Icon(Icons.error_outline,
+                size: Dimensions.font20 * 3.2, color: Colors.red),
+            SizedBox(height: Dimensions.height15),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18),
+              style: TextStyle(fontSize: Dimensions.font16 * 1.1),
             ),
-            SizedBox(height: 24),
+            SizedBox(height: Dimensions.height20 * 1.2),
             ElevatedButton(
               onPressed: () {
                 // Restart the app or navigate back to the splash screen
@@ -31,7 +35,7 @@ class ErrorPage extends StatelessWidget {
                   (Route<dynamic> route) => false,
                 );
               },
-              child: Text('Try Again'),
+              child: Text(AppStrings.tryAgainMsg.tr),
             ),
           ],
         ),

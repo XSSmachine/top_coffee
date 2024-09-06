@@ -42,6 +42,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-/team_coffee/firebase.json
-/team_coffee/lib/firebase_options.dart
-/team_coffee/lib/controllers/notification_controller.dart
+**/firebase.json
+**/lib/firebase_options.dart
+**/lib/controllers/notification_controller.dart

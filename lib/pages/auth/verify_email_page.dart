@@ -8,6 +8,8 @@ import 'package:get/get.dart';
 import 'package:team_coffee/pages/auth/name_surname_page.dart';
 
 import '../../controllers/auth_controller.dart';
+import '../../utils/dimensions.dart';
+import '../../utils/string_resources.dart';
 
 class VerifyEmailScreen extends StatefulWidget {
   final String email;
@@ -35,7 +37,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
         flags: <int>[Flag.FLAG_ACTIVITY_NEW_TASK],
       );
       intent.launch().catchError((e) {
-        print("Error opening email app: $e");
+        print("${AppStrings.emailIntentErrorMsg.tr} $e");
       });
     }
   }
@@ -66,11 +68,11 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               future: _isEmailVerified,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Text('Checking email status...');
+                  return Text(AppStrings.emailCheckingStatus.tr);
                 }
                 return Text(snapshot.data == true
-                    ? 'Email is verified'
-                    : 'Verify Your Email');
+                    ? AppStrings.emailVerifiedMsg.tr
+                    : AppStrings.emailWarningMsg.tr);
               },
             ),
             automaticallyImplyLeading: false,
@@ -83,7 +85,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 height: MediaQuery.of(context).size.height,
                 child: Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: EdgeInsets.all(Dimensions.height15),
                     child: FutureBuilder<bool>(
                       future: _isEmailVerified,
                       builder: (context, snapshot) {
@@ -97,46 +99,46 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                           children: [
                             Icon(
                               Icons.email,
-                              size: 80,
+                              size: Dimensions.height20 * 4,
                               color: Theme.of(context).primaryColor,
                             ),
-                            SizedBox(height: 24),
+                            SizedBox(height: Dimensions.height20 * 1.2),
                             Text(
                               isVerified
-                                  ? 'Email is verified'
-                                  : 'Verify Your Email',
+                                  ? AppStrings.emailVerifiedMsg.tr
+                                  : AppStrings.emailWarningMsg.tr,
                               style: Theme.of(context).textTheme.headlineMedium,
                             ),
-                            SizedBox(height: 16),
+                            SizedBox(height: Dimensions.height15),
                             if (!isVerified)
                               Text(
-                                'We\'ve sent a verification email to:',
+                                AppStrings.emailSentTo.tr,
                                 textAlign: TextAlign.center,
                               ),
-                            SizedBox(height: 8),
+                            SizedBox(height: Dimensions.height15 / 2),
                             Text(
                               widget.email,
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            SizedBox(height: 24),
+                            SizedBox(height: Dimensions.height20 * 1.2),
                             Text(
                               isVerified
-                                  ? 'Please continue your registration.'
-                                  : 'Please check your email and click on the verification link to complete your registration.',
+                                  ? AppStrings.continueRegistration.tr
+                                  : AppStrings.checkEmail.tr,
                               textAlign: TextAlign.center,
                             ),
-                            SizedBox(height: 32),
+                            SizedBox(height: Dimensions.height20 * 1.6),
                             if (!isVerified)
                               ElevatedButton(
                                 onPressed: _openEmailApp,
-                                child: Text('Open Email App'),
+                                child: Text(AppStrings.openEmail.tr),
                               ),
-                            SizedBox(height: 32),
+                            SizedBox(height: Dimensions.height20 * 1.6),
                             if (isVerified)
                               ElevatedButton(
                                 onPressed: () =>
                                     _continueRegistration(controller),
-                                child: Text('Finish your registration'),
+                                child: Text(AppStrings.finishRegistration.tr),
                               ),
                           ],
                         );

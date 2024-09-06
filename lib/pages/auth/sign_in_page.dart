@@ -1,14 +1,17 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:team_coffee/controllers/event_controller.dart';
 import 'package:team_coffee/pages/auth/sign_up_page.dart';
 
 import '../../base/custom_loader.dart';
 import '../../base/show_custom_snackbar.dart';
 import '../../controllers/auth_controller.dart';
+import '../../models/filter_model.dart';
 import '../../routes/route_helper.dart';
 import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
+import '../../utils/string_resources.dart';
 import '../../widgets/app_text_field.dart';
 import 'name_surname_page.dart';
 
@@ -21,6 +24,7 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
+  EventController eventController = Get.find<EventController>();
   late AnimationController _donutsController;
   late AnimationController _friesController;
   late AnimationController _kafaController;
@@ -88,28 +92,36 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
       String password = passwordController.text.trim();
 
       if (email.isEmpty) {
-        showCustomSnackBar("Type in your email address",
-            title: "Email address");
+        showCustomSnackBar(AppStrings.typeInEmail.tr,
+            title: AppStrings.email.tr);
       } else if (!GetUtils.isEmail(email)) {
-        showCustomSnackBar("Type in a valid email address",
-            title: "Valid email address");
+        showCustomSnackBar(AppStrings.typeInEmail.tr,
+            title: "${AppStrings.valid.tr} ${AppStrings.email}");
       } else if (password.isEmpty) {
-        showCustomSnackBar("Type in your password", title: "Password");
+        showCustomSnackBar(AppStrings.typeInPassword.tr,
+            title: AppStrings.pass.tr);
       } else if (password.length < 3) {
-        showCustomSnackBar("Password needs to be at least 3 characters long",
-            title: "Name");
+        showCustomSnackBar(AppStrings.passWarningMsg.tr,
+            title: AppStrings.pass.tr);
       } else {
         authController.login(email, password).then((status) {
           if (status.isSuccess) {
             authController.getUserId();
-            print("Success login");
-            Get.toNamed(RouteHelper.getInitial());
+            eventController.eventsStream(
+                "ALL",
+                0,
+                11,
+                '',
+                EventFilters(
+                    eventType: "ALL", status: ['PENDING'], timeFilter: ''));
+            print(AppStrings.successMsg.tr);
+            Get.toNamed(RouteHelper.getGroupListPage());
           } else if (status.message == "Email is not verified.") {
-            showCustomSnackBar(status.message);
+            showCustomSnackBar(AppStrings.emailWarningMsg.tr);
             Get.offNamedUntil(
                 RouteHelper.getVerifyEmailPage(email), (route) => false);
           } else if (status.message == "User registration is not complete.") {
-            showCustomSnackBar(status.message);
+            showCustomSnackBar(AppStrings.userWarningMsg.tr);
             Get.off(NameSurnamePage());
           } else {
             showCustomSnackBar(status.message);
@@ -137,7 +149,7 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
                         child: Stack(
                           children: [
                             Positioned(
-                              top: -40,
+                              top: -Dimensions.height10 * 4,
                               right: Dimensions.height30 * 6,
                               child: AnimatedBuilder(
                                 animation: _donutsAnimation,
@@ -152,11 +164,11 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
                                 },
                                 child: CircleAvatar(
                                   backgroundColor: Colors.white,
-                                  radius: 130,
+                                  radius: Dimensions.radius20 * 6.5,
                                   child: Image.asset(
                                     "assets/image/donuts.png",
-                                    width: 330,
-                                    height: 330,
+                                    width: Dimensions.width10 * 33,
+                                    height: Dimensions.width10 * 33,
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -178,11 +190,11 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
                                 },
                                 child: CircleAvatar(
                                   backgroundColor: Colors.white,
-                                  radius: 80,
+                                  radius: Dimensions.radius20 * 4,
                                   child: Image.asset(
                                     "assets/image/kafa.png",
-                                    width: 150,
-                                    height: 150,
+                                    width: Dimensions.width10 * 15,
+                                    height: Dimensions.width10 * 15,
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -204,11 +216,11 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
                                 },
                                 child: CircleAvatar(
                                   backgroundColor: Colors.white,
-                                  radius: 70,
+                                  radius: Dimensions.radius20 * 3.5,
                                   child: Image.asset(
                                     "assets/image/fries.png",
-                                    width: 180,
-                                    height: 180,
+                                    width: Dimensions.width10 * 18,
+                                    height: Dimensions.width10 * 18,
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -240,14 +252,14 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
                             ),
                             Positioned(
                               top: Dimensions.height45 * 7.1,
-                              right: Dimensions.height30 * 9,
+                              right: Dimensions.height30 * 7.5,
                               child: Container(
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(
                                         Dimensions.radius20),
                                     color: Colors.white),
                                 child: Text(
-                                  "Sign in",
+                                  AppStrings.signIn.tr,
                                   style: TextStyle(
                                     fontSize: Dimensions.font20 * 1.5,
                                     fontWeight: FontWeight.bold,
@@ -263,14 +275,14 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
                       //your email
                       AppTextField(
                         textController: emailController,
-                        hintText: "Email",
+                        hintText: AppStrings.email.tr,
                         icon: Icons.email_outlined,
                       ),
                       SizedBox(height: Dimensions.height20),
                       //your password
                       AppTextField(
                         textController: passwordController,
-                        hintText: "Password",
+                        hintText: AppStrings.pass.tr,
                         icon: Icons.lock_outline,
                         isObscure: true,
                       ),
@@ -292,7 +304,7 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
                               width: Dimensions.width10 * 0.80,
                             ),
                             Text(
-                              "Remember me",
+                              AppStrings.rememberMe.tr,
                               style: TextStyle(
                                   fontSize: Dimensions.font16 * 0.90,
                                   fontWeight: FontWeight.w400),
@@ -303,7 +315,7 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
                                 // Navigate to forgot password page
                               },
                               child: Text(
-                                "Forgot password?",
+                                AppStrings.forgotPass.tr,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: Dimensions.font16 * 0.85,
@@ -330,7 +342,7 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
-                                "SIGN IN",
+                                AppStrings.signInBold.tr,
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: Dimensions.font16,
@@ -358,7 +370,7 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
                       SizedBox(height: Dimensions.screenHeight * 0.05),
                       RichText(
                           text: TextSpan(
-                        text: "Don't have an account? ",
+                        text: "${AppStrings.noAccountQuestion.tr} ",
                         style: TextStyle(
                           color: Colors.grey[500],
                           fontSize: Dimensions.font20,
@@ -370,7 +382,7 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
                                     () => SignUpPage(),
                                     transition: Transition.fade,
                                   ),
-                            text: "Sign Up",
+                            text: AppStrings.signUp.tr,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: AppColors.mainBlackColor,

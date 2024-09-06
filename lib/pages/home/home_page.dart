@@ -7,7 +7,9 @@ import 'package:team_coffee/pages/home/home_screen.dart';
 import 'package:team_coffee/pages/leaderboard/leaderborad_page.dart';
 import 'package:team_coffee/pages/orders/orders_screen.dart';
 import 'package:team_coffee/routes/route_helper.dart';
+import '../../controllers/auth_controller.dart';
 import '../../utils/colors.dart';
+import '../../utils/string_resources.dart';
 import '../account/account_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -22,12 +24,6 @@ class _HomePageState extends State<HomePage> {
 
   late PersistentTabController _controller;
 
-  List pages = [
-    Container(child: const Center(child: Text("Next page"))),
-    Container(child: const Center(child: Text("Next next page"))),
-    Container(child: const Center(child: Text("Next next next page"))),
-  ];
-
   void onTapNav(int index) {
     //used to trigger ui state
     setState(() {
@@ -38,7 +34,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    //Get.find<AuthController>().clearSharedData();
+    //Get.find<AuthController>().handleUnauthorizedAccess();
     _controller = PersistentTabController(initialIndex: 0);
   }
 
@@ -56,13 +52,13 @@ class _HomePageState extends State<HomePage> {
     return [
       PersistentBottomNavBarItem(
         icon: const Icon(CupertinoIcons.compass_fill),
-        title: ("Explore"),
+        title: (AppStrings.exploreBottomNavBar.tr),
         activeColorPrimary: AppColors.mainPurpleColor,
         inactiveColorPrimary: AppColors.mainColor,
       ),
       PersistentBottomNavBarItem(
         icon: const Icon(Icons.rule_rounded),
-        title: ("My activities"),
+        title: (AppStrings.myActivitiesBottomNavBar.tr),
         activeColorPrimary: AppColors.mainPurpleColor,
         inactiveColorPrimary: AppColors.mainColor,
       ),
@@ -72,7 +68,7 @@ class _HomePageState extends State<HomePage> {
           Icons.add,
           color: Colors.white,
         ),
-        title: ("Add"),
+        title: (AppStrings.addBottomNavBar.tr),
         activeColorPrimary: AppColors.mainPurpleColor,
         inactiveColorPrimary: AppColors.mainBlackColor,
         onPressed: (context) {
@@ -81,13 +77,13 @@ class _HomePageState extends State<HomePage> {
       ),
       PersistentBottomNavBarItem(
         icon: const Icon(Icons.emoji_events),
-        title: ("Leaderboard"),
+        title: (AppStrings.leaderBottomNavBar.tr),
         activeColorPrimary: AppColors.mainPurpleColor,
         inactiveColorPrimary: AppColors.mainColor,
       ),
       PersistentBottomNavBarItem(
         icon: const Icon(CupertinoIcons.person_fill),
-        title: ("Me"),
+        title: (AppStrings.meBottomNavBar.tr),
         activeColorPrimary: AppColors.mainPurpleColor,
         inactiveColorPrimary: AppColors.mainColor,
       ),

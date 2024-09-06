@@ -3,12 +3,17 @@ import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:team_coffee/controllers/event_controller.dart';
+import 'package:team_coffee/controllers/order_controller.dart';
+import 'package:team_coffee/controllers/user_controller.dart';
 import 'package:team_coffee/models/group/join_group.dart';
 import 'package:http/http.dart' as http;
 import 'package:team_coffee/pages/auth/sign_in_page.dart';
 import '../data/repository/auth_repo.dart';
 import '../data/repository/user_repo.dart';
 import '../models/group/create_group.dart';
+import '../models/group/user_data.dart';
+import '../models/group_data.dart';
 import '../models/jwt_model.dart';
 import '../models/response_model.dart';
 import '../models/signup_body_model.dart';
@@ -23,18 +28,26 @@ class AuthController extends GetxController implements GetxService {
   AuthController({required this.authRepo, required this.userRepo});
 
   bool _isLoading = false;
+
   bool get isLoading => _isLoading;
 
-  JwtModel? _userModel;
+  UserData? _userData;
+  UserData? get userData => _userData;
+
+  List<Group>? _groupData;
+  List<Group>? get groupData => _groupData;
 
   String _groupId = '';
+
   String get groupId => _groupId;
 
   String _userToken = '';
+
   String get userToken => _userToken;
 
   Rx<UserProfileModel?> userProfile = Rx<UserProfileModel?>(null);
 
+  /// Checks if user email is verified
   Future<bool> checkEmail(String email) async {
     Response response = await authRepo.checkEmail(email);
     if (response.statusCode == 200) {
@@ -45,22 +58,16 @@ class AuthController extends GetxController implements GetxService {
     }
   }
 
+  /// Fetches current user data
   Future<ResponseModel> fetchMe() async {
     _isLoading = true;
     update();
     Response response = await authRepo.fetchMe();
     late ResponseModel responseModel;
     if (response.statusCode == 200) {
-      //await notificationController.subscribeToGroup(response.body['groupId']);
       responseModel = ResponseModel(true, jsonEncode(response.body));
-      print(response.body.toString());
     } else if (response.statusCode == 400) {
-      clearSharedData();
-      GetPage(
-          name: RouteHelper.signInPage,
-          page: () {
-            return const SignInPage();
-          });
+      await handleUnauthorizedAccess();
       responseModel = ResponseModel(false, response.statusText!);
     } else {
       responseModel = ResponseModel(false, response.statusText!);
@@ -70,8 +77,114 @@ class AuthController extends GetxController implements GetxService {
     return responseModel;
   }
 
+  Future<void> fetchMeData() async {
+    try {
+      _isLoading = true;
+
+      Response response = await authRepo.fetchMe();
+
+      if (response.statusCode == 200) {
+        _userData = UserData.fromJson(response.body);
+      } else if (response.statusCode == 400) {
+        await handleUnauthorizedAccess();
+        throw Exception('Unauthorized access');
+      } else {
+        throw Exception('Failed to fetch user data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching user data: $e');
+      rethrow;
+    } finally {
+      _isLoading = false;
+      update();
+    }
+  }
+
+  Future<List<Group>> fetchAllGroups() async {
+    try {
+      _isLoading = true;
+
+      Response response = await authRepo.getAllGroups();
+
+      if (response.statusCode == 200) {
+        // Parse the response body as a List<dynamic>
+        List<dynamic> jsonList = response.body;
+
+        // Convert each item in the list to a Group object
+        List<Group> groups =
+            jsonList.map((json) => Group.fromJson(json)).toList();
+
+        // Store the groups in _groupData if needed
+        _groupData = groups;
+
+        return groups;
+      } else if (response.statusCode == 400) {
+        await handleUnauthorizedAccess();
+        throw Exception('Unauthorized access');
+      } else {
+        throw Exception(
+            'Failed to fetch all group data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching all group data: $e');
+      rethrow;
+    } finally {
+      _isLoading = false;
+      update();
+    }
+  }
+
+  Future<void> handleUnauthorizedAccess() async {
+    final userController = Get.find<UserController>();
+    final eventController = Get.find<EventController>();
+    final orderController = Get.find<OrderController>();
+
+    userController.resetAllValues();
+    eventController.resetAllValues();
+    orderController.resetAllValues();
+
+    await clearSharedData();
+
+    GetPage(
+        name: RouteHelper.signInPage,
+        page: () {
+          return const SignInPage();
+        });
+  }
+
+  Future<String> fetchMeGroupId() async {
+    _isLoading = true;
+    update();
+    Response response = await authRepo.fetchMe();
+    String groupId = "";
+
+    if (response.statusCode == 200) {
+      try {
+        // Extract the groupId
+        groupId = response.body['groupId'];
+      } catch (e) {
+        print('Error parsing response: $e');
+      }
+    } else if (response.statusCode == 400) {
+      Get.find<UserController>().resetAllValues();
+      Get.find<EventController>().resetAllValues();
+      Get.find<OrderController>().resetAllValues();
+      clearSharedData();
+      GetPage(
+        name: RouteHelper.signInPage,
+        page: () {
+          return const SignInPage();
+        },
+      );
+    }
+
+    _isLoading = false;
+    update();
+    return groupId;
+  }
+
   String getUserId() {
-    print(_userToken);
+    print("USER TOKEN _> " + _userToken);
     Map<String, dynamic> decodedToken = JwtDecoder.decode(_userToken);
     String userId = decodedToken["userId"];
     return userId;
@@ -109,9 +222,7 @@ class AuthController extends GetxController implements GetxService {
     if (response.statusCode == 200) {
       responseModel = ResponseModel(true, "User sucessfuly joined group");
       userProfile.value?.groupId = response.body['groupId'];
-
       await notificationController.subscribeToGroup(response.body['groupId']);
-      //saveGroupId(response.body['id']);
     } else {
       print("BAD ${response.statusCode}");
       responseModel = ResponseModel(false, response.statusText!);
@@ -125,6 +236,7 @@ class AuthController extends GetxController implements GetxService {
     _isLoading = true;
     update();
     Response response = await authRepo.getGroup(groupId);
+
     late ResponseModel responseModel;
     if (response.statusCode == 200) {
       responseModel = ResponseModel(true, response.body);
@@ -135,6 +247,21 @@ class AuthController extends GetxController implements GetxService {
     _isLoading = false;
     update();
     return responseModel;
+  }
+
+  Future<String> getGroupName(String groupId) async {
+    _isLoading = true;
+    update();
+    Response response = await authRepo.getGroup(groupId);
+    late String groupName;
+    if (response.statusCode == 200) {
+      groupName = response.body["name"];
+    } else {
+      groupName = response.statusCode.toString();
+    }
+    _isLoading = false;
+    update();
+    return groupName;
   }
 
   Future<void> fetchAndSetUserToken() async {
@@ -148,6 +275,23 @@ class AuthController extends GetxController implements GetxService {
       await fetchAndSetUserToken();
     }
     return _userToken;
+  }
+
+  Future<void> fetchAndSetGroupId() async {
+    _groupId = await authRepo.getGroupId();
+    update(); // This notifies all listeners that the state has changed
+  }
+
+  // This method can be used to get the token, fetching it if its not already set
+  Future<String> getGroupId() async {
+    if (_groupId.isEmpty) {
+      await fetchAndSetGroupId();
+    }
+    return _groupId;
+  }
+
+  Future<void> saveGroupId(String groupId) async {
+    await authRepo.saveGroupId(groupId);
   }
 
   // Call this method when you want to clear the token (on logout)
@@ -190,6 +334,7 @@ class AuthController extends GetxController implements GetxService {
       String token = response.body["accessToken"];
       //saving user token to shared pref
       print("TOKEN IS: " + token);
+      _userToken = token.trim();
       authRepo.saveUserToken(token);
       await fetchAndSetUserToken();
 
@@ -249,8 +394,6 @@ class AuthController extends GetxController implements GetxService {
       }
     } else {
       print("BAD CREATING PROFILE - userProfile data is missing");
-      print(
-          "Id ${userProfile.value?.userId}Name ${userProfile.value?.name}Surame ${userProfile.value?.surname}GroupId ${userProfile.value?.groupId}");
       responseModel = ResponseModel(false, "User profile data is missing");
     }
     _isLoading = false;

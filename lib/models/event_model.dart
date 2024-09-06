@@ -1,4 +1,3 @@
-
 class EventModel {
   late String? _eventId;
   late String? _groupId;
@@ -7,6 +6,7 @@ class EventModel {
   late String _userProfileLastName;
   late String? _createdAt;
   late String? _pendingUntil;
+  late String? _photoUrl;
   late String? _title;
   late String? _description;
   late String? _status;
@@ -20,6 +20,7 @@ class EventModel {
     required userProfileLastName,
     pendingUntil,
     createdAt,
+    photoUrl,
     status,
     title,
     description,
@@ -32,6 +33,7 @@ class EventModel {
     _userProfileLastName = userProfileLastName;
     _pendingUntil = pendingUntil;
     _createdAt = createdAt;
+    _photoUrl = photoUrl;
     _status = status;
     _title = title;
     _description = description;
@@ -44,6 +46,7 @@ class EventModel {
   String get userProfileFirstName => _userProfileFirstName;
   String get userProfileLastName => _userProfileLastName;
   String? get pendingUntil => _pendingUntil;
+  String? get photoUrl => _photoUrl;
   String? get createdAt => _createdAt;
   String? get status => _status;
   String? get title => _title;
@@ -57,6 +60,7 @@ class EventModel {
     _userProfileFirstName = json["userProfileFirstName"] ?? "";
     _userProfileLastName = json["userProfileLastName"] ?? "";
     _pendingUntil = json["pendingUntil"] ?? "";
+    _photoUrl = json["photoUrl"] ?? "";
     _createdAt = json["createdAt"] ?? "";
     _status = json["status"] ?? "";
     _eventType = json["eventType"];
@@ -72,6 +76,7 @@ class EventModel {
     data['userProfileFirstName'] = _userProfileFirstName;
     data['userProfileLastName'] = _userProfileLastName;
     data['pendingUntil'] = _pendingUntil;
+    data['photoUrl'] = _photoUrl;
     data['createdAt'] = _createdAt;
     data['eventType'] = _eventType;
     data['title'] = _title;

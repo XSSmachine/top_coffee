@@ -6,10 +6,12 @@ import 'package:team_coffee/widgets/group/create_group_widget.dart';
 import 'package:team_coffee/widgets/group/join_group_widget.dart';
 import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
+import '../../utils/string_resources.dart';
 
 /// This class displays 2 forms for joining or creating new group
 class GroupPage extends StatefulWidget {
-  const GroupPage({super.key});
+  final String page;
+  const GroupPage({super.key, required this.page});
 
   @override
   _GroupPageState createState() => _GroupPageState();
@@ -97,7 +99,7 @@ class _GroupPageState extends State<GroupPage> with TickerProviderStateMixin {
               child: Stack(
                 children: [
                   Positioned(
-                    top: -40,
+                    top: -Dimensions.height10 * 4,
                     right: Dimensions.height30 * 6,
                     child: AnimatedBuilder(
                       animation: _donutsAnimation,
@@ -112,11 +114,11 @@ class _GroupPageState extends State<GroupPage> with TickerProviderStateMixin {
                       },
                       child: CircleAvatar(
                         backgroundColor: Colors.white,
-                        radius: 130,
+                        radius: Dimensions.radius20 * 6.5,
                         child: Image.asset(
                           "assets/image/donuts.png",
-                          width: 330,
-                          height: 330,
+                          width: Dimensions.width10 * 33,
+                          height: Dimensions.width10 * 33,
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -198,6 +200,39 @@ class _GroupPageState extends State<GroupPage> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
+                  if (widget.page != 'register')
+                    Positioned(
+                      top: Dimensions.height45,
+                      left: Dimensions.width20,
+                      child: Container(
+                        width: Dimensions.iconSize24 *
+                            1.5, // Adjust size as needed
+                        height: Dimensions.iconSize24 *
+                            1.5, // Adjust size as needed
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.8),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              spreadRadius: 1,
+                              blurRadius: 3,
+                              offset: Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        child: IconButton(
+                          color: Colors.black,
+                          iconSize: Dimensions.iconSize24,
+                          padding: EdgeInsets.zero, // Remove default padding
+                          onPressed: () {
+                            print("pressed");
+                            Get.back();
+                          },
+                          icon: Icon(Icons.arrow_back),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -232,28 +267,32 @@ class _GroupPageState extends State<GroupPage> with TickerProviderStateMixin {
                       AppColors.mainBlueColor,
                       AppColors.candyPurpleColor,
                     ],
-                    selectedTextStyle:
-                        textTheme.bodyMedium?.copyWith(fontSize: 15.0),
-                    unselectedTextStyle:
-                        textTheme.bodyMedium?.copyWith(fontSize: 13.0),
+                    selectedTextStyle: textTheme.bodyMedium
+                        ?.copyWith(fontSize: Dimensions.font16),
+                    unselectedTextStyle: textTheme.bodyMedium
+                        ?.copyWith(fontSize: Dimensions.font16 * 0.8),
                     tabs: [
                       Text(
-                        'Join Group',
+                        AppStrings.joinGroup.tr,
                         style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            fontSize: Dimensions.font16 - 2),
+                            fontSize: Dimensions.font16 * 0.93),
                       ),
                       Text(
-                        'Create Group',
+                        AppStrings.createGroup.tr,
                         style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            fontSize: Dimensions.font16 - 2),
+                            fontSize: Dimensions.font16 * 0.93),
                       ),
                     ],
                     children: [
-                      JoinGroupWidget(controller: controller),
+                      JoinGroupWidget(
+                        controller: controller,
+                        page: widget.page,
+                      ),
                       CreateGroupWidget(
                         controller: controller,
+                        page: widget.page,
                       )
                     ],
                   ),

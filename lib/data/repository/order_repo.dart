@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:team_coffee/models/my_orders_model.dart';
 import 'package:team_coffee/models/order_body_model.dart';
+import '../../models/monthly_summary.dart';
 import '../../models/order_get_model.dart';
 import '../../models/order_model.dart';
 import '../../utils/app_constants.dart';
@@ -15,7 +16,12 @@ class OrderRepo {
 
   OrderRepo({required this.apiClient, required this.sharedPreferences});
 
-  // Get all orders for an event
+  final Map<String, String> labelTranslations = {
+    'SVE': 'ALL',
+    'KAVA': 'COFFEE',
+    'HRANA': 'FOOD',
+    'PIĆE': 'BEVERAGE',
+  };
 
   // Create new order and add it to event
   Future<Response> createOrder(OrderBody orderBody) async {
@@ -132,6 +138,67 @@ class OrderRepo {
       return orders;
     } catch (e) {
       throw Exception('Failed to get all orders: $e');
+    }
+  }
+
+  Future<List<OrderModel>> getFilteredOrders(
+      {int? page,
+      int? size,
+      String? status,
+      String? rating,
+      String? type,
+      String? search}) async {
+    try {
+      print('${labelTranslations[type] ?? type}');
+      final response = await apiClient.getData(
+          "${AppConstants.ALL_ORDERS_URI}/all?page=$page&size=$size&rating=$rating&status=$status&search=$search&eventType=${labelTranslations[type] ?? type}");
+      if (response.body == null) {
+        throw Exception('No data received');
+      }
+
+      List<dynamic> orderList;
+      if (response.body is List) {
+        print("lista");
+        orderList = response.body;
+      } else if (response.body is Map) {
+        print("mapa");
+        // Extract the list of orders from the JSON object
+        print(response.body.toString());
+        orderList = response.body[""] ?? [];
+      } else {
+        throw Exception('Unexpected response format');
+      }
+
+      List<OrderModel> orders =
+          orderList.map((orderJson) => OrderModel.fromJson(orderJson)).toList();
+      return orders;
+    } catch (e) {
+      throw Exception('Failed to get all orders: $e');
+    }
+  }
+
+  Future<List<MonthlySummary>> fetchOrdersStats() async {
+    final response =
+        await apiClient.getData("${AppConstants.MONTHLY_STATS}/orders");
+    if (response.statusCode == 200) {
+      List<dynamic> jsonData = response.body;
+      return jsonData.map((data) => MonthlySummary.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to load orders stats data');
+    }
+  }
+
+  Future<Response> fetchOrderPieData() async {
+    try {
+      final response = await apiClient.getData(AppConstants.ORDERS_STATS);
+      if (response.statusCode == 200) {
+        return response;
+      } else {
+        throw Exception('Failed to load data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
+      throw Exception('Failed to fetch order data: $e');
     }
   }
 }

@@ -1,10 +1,13 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
 import '../../base/show_custom_snackbar.dart';
+import '../../controllers/event_controller.dart';
 import '../../controllers/order_controller.dart';
+import '../../models/filter_model.dart';
 import '../../models/order_body_model.dart';
 import '../../routes/route_helper.dart';
 import '../../utils/colors.dart';
@@ -29,6 +32,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
   int _sugarAmount = 1;
   int _milkAmount = 1;
   late TextEditingController _textController;
+  EventController eventController = Get.find<EventController>();
 
   final List<String> _coffeeTypes = [
     'Latte',
@@ -54,40 +58,64 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: Text(
-          'Coffee Order',
-          style: TextStyle(color: Colors.white),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(Dimensions.height20 * 3),
+        child: AppBar(
+          backgroundColor: AppColors.mainBlueMediumColor,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(Dimensions.radius20),
+            ),
+          ),
+          title: Text(
+            'Coffee Order',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: Dimensions.font20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          centerTitle: true,
         ),
-        backgroundColor: AppColors.mainBlueColor,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.symmetric(
+            horizontal: Dimensions.width10, vertical: Dimensions.height15),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              margin: EdgeInsets.all(Dimensions.width15),
+              margin: EdgeInsets.symmetric(
+                  horizontal: Dimensions.width10,
+                  vertical: Dimensions.height15),
               width: double.infinity,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30),
-              ),
+                  borderRadius: BorderRadius.circular(Dimensions.radius30),
+                  border:
+                      Border.all(width: 2, color: AppColors.candyPurpleColor)),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: EdgeInsets.symmetric(
+                    horizontal: Dimensions.width15,
+                    vertical: Dimensions.height10 / 2),
                 child: DropdownButton2<String>(
                   isExpanded: true,
                   underline: SizedBox(),
                   value: _selectedCoffee,
                   iconStyleData: const IconStyleData(
                     icon: Icon(
-                      Icons.arrow_forward_ios_outlined,
+                      CupertinoIcons.chevron_down,
                     ),
                   ),
                   dropdownStyleData: DropdownStyleData(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: Dimensions.width10,
+                          vertical: Dimensions.height10 / 2),
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
+                          borderRadius:
+                              BorderRadius.circular(Dimensions.radius30),
                           border: Border.all(
-                              width: 2, color: AppColors.mainBlueDarkColor))),
+                              width: 2, color: AppColors.candyPurpleColor))),
                   items: _coffeeTypes.map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
@@ -105,51 +133,71 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
-            _buildSelectorRow('Sugar', Icons.cake, _sugarAmount, (newValue) {
+            SizedBox(height: Dimensions.height20),
+            _buildSelectorRow(
+                'Sugar',
+                ImageIcon(
+                  AssetImage("assets/image/honey-01.png"),
+                  color: AppColors.mainBlueDarkColor,
+                ),
+                _sugarAmount, (newValue) {
               setState(() {
                 _sugarAmount = newValue;
               });
             }),
-            SizedBox(height: 20),
-            _buildSelectorRow('Milk', Icons.local_drink, _milkAmount,
-                (newValue) {
+            SizedBox(height: Dimensions.height20),
+            _buildSelectorRow(
+                'Milk',
+                ImageIcon(
+                  AssetImage("assets/image/milk-bottle.png"),
+                  color: AppColors.mainBlueDarkColor,
+                ),
+                _milkAmount, (newValue) {
               setState(() {
                 _milkAmount = newValue;
               });
             }),
-            SizedBox(height: 20),
+            SizedBox(height: Dimensions.height20),
             Padding(
-              padding: EdgeInsets.all(Dimensions.width15),
+              padding: EdgeInsets.all(Dimensions.width10),
               child: TextField(
                 maxLines: 5,
                 controller: _textController,
                 decoration: InputDecoration(
-                  hintText: ' - Pizza margarita\n - Pizza mješana'
-                      '\n - Sendvič piletina sir',
+                  hintText: ' - Bez laktoze\n - S ledom'
+                      '\n - Tona šećera',
                   filled: true,
                   fillColor: Colors.grey[300],
-                  border: OutlineInputBorder(
+                  focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(Dimensions.radius20),
-                    borderSide: BorderSide.none,
+                    borderSide:
+                        BorderSide(color: AppColors.candyPurpleColor, width: 3),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(Dimensions.radius20),
+                    borderSide:
+                        BorderSide(color: AppColors.candyPurpleColor, width: 3),
                   ),
                 ),
               ),
             ),
             const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _submitOrder,
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: AppColors.mainBlueColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: Dimensions.width10),
+              child: ElevatedButton(
+                onPressed: _submitOrder,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: AppColors.mainBlueMediumColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(Dimensions.radius30),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
                 ),
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-              ),
-              child: const Text(
-                'Submit',
-                style: TextStyle(fontSize: 18.0),
+                child: const Text(
+                  'Submit',
+                  style: TextStyle(fontSize: 18.0, color: Colors.white),
+                ),
               ),
             ),
           ],
@@ -159,51 +207,73 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
   }
 
   Widget _buildSelectorRow(
-      String label, IconData icon, int value, ValueChanged<int> onChanged) {
-    return Container(
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20), color: Colors.deepPurple),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Icon(icon, color: Colors.white),
-                SizedBox(width: 10),
-                Text(
-                  label,
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                ),
-              ],
+      String label, ImageIcon icon, int value, ValueChanged<int> onChanged) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: Dimensions.width10),
+      child: Stack(
+        children: [
+          // First container (label and icon)
+          Container(
+            height: Dimensions.height15 * 3.8,
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.candyPurpleColor, width: 2),
+              borderRadius: BorderRadius.circular(Dimensions.radius30),
             ),
-            Row(
-              children: [
-                IconButton(
-                  icon: Icon(Icons.remove, color: Colors.white),
-                  onPressed: () {
-                    if (value > 0) {
-                      onChanged(value - 1);
-                    }
-                  },
-                ),
-                Text(
-                  value.toString(),
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                ),
-                IconButton(
-                  icon: Icon(Icons.add, color: Colors.white),
-                  onPressed: () {
-                    if (value < 5) {
-                      onChanged(value + 1);
-                    }
-                  },
-                ),
-              ],
+            child: Padding(
+              padding: EdgeInsets.only(
+                  left: Dimensions.width15, right: Dimensions.width20 * 5),
+              child: Row(
+                children: [
+                  icon,
+                  SizedBox(width: 10),
+                  Text(
+                    label,
+                    style: TextStyle(
+                        color: AppColors.mainBlueDarkColor, fontSize: 18),
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+
+          // Second container (value selector)
+          Positioned(
+            right: 0,
+            child: Container(
+              height: Dimensions.height15 * 3.8,
+              width: Dimensions.width20 * 6.5,
+              decoration: BoxDecoration(
+                color: AppColors.candyPurpleColor,
+                borderRadius: BorderRadius.circular(Dimensions.radius30),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.remove, color: Colors.white),
+                    onPressed: () {
+                      if (value > 0) {
+                        onChanged(value - 1);
+                      }
+                    },
+                  ),
+                  Text(
+                    value.toString(),
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.add, color: Colors.white),
+                    onPressed: () {
+                      if (value < 5) {
+                        onChanged(value + 1);
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -217,16 +287,24 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
       'coffee': _selectedCoffee,
       'sugar': _sugarAmount,
       'milk': _milkAmount,
-      'additionalInstructions': enteredText,
+      'description': enteredText,
     };
 
     widget.orderController
         .createOrder(OrderBody(
       eventId: widget.eventId,
-      additionalOptions: {"orderDetails": orderDetails},
+      additionalOptions: orderDetails,
     ))
         .then((status) {
       if (status.isSuccess) {
+        eventController.eventsStream(
+            "ALL",
+            0,
+            11,
+            '',
+            EventFilters(
+                eventType: "ALL", status: ['PENDING'], timeFilter: ''));
+        ;
         print("Success order creation");
         showCustomSnackBar("Successfully created an order",
             isError: false,

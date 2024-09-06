@@ -8,6 +8,7 @@ import '../../controllers/order_controller.dart';
 import '../../models/event_model.dart';
 import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
+import '../../utils/string_resources.dart';
 import '../../widgets/order/order_details_widget.dart';
 import '../../widgets/timer/countdown_timer_widget.dart';
 
@@ -44,159 +45,188 @@ class EventDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     print(orderId.toString());
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Event Details'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Get.back();
-          },
-        ),
-      ),
       body: FutureBuilder<EventModel>(
         future: eventController.getEventById(eventId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(
+                child: Text('${AppStrings.errorMsg}: ${snapshot.error}'));
           } else if (snapshot.hasData) {
             final event = snapshot.data!;
-            return Column(
+            return Stack(
               children: [
-                Expanded(
-                  child: ListView(
-                    children: [
-                      Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Image.asset(
-                            _getImagePath(event.eventType ?? "FOOD"),
-                            width: double.infinity,
-                            height: Dimensions.height20 * 10.5,
-                            fit: BoxFit.cover,
-                          ),
-                          Positioned(
-                            top: Dimensions.height30 * 5.7,
-                            left: Dimensions.width20 * 6.2,
-                            child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Colors.black26,
-                                      blurRadius: 10,
-                                      offset: Offset(0, 5),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  children: [
-                                    event.status == "PENDING"
-                                        ? const Text("Time pending: ")
-                                        : const Text("Time in progress: "),
-                                    event.status == "PENDING"
-                                        ? CountdownTimer(
-                                            initialMinutes: eventController
-                                                .calculateRemainingTimeInRoundedMinutes(
-                                                    event.pendingUntil!),
-                                            onTimerExpired: () {
-                                              Get.back();
-                                            },
-                                          )
-                                        : CountTimer(
-                                            startTimeISO: event.pendingUntil!,
-                                            size: Dimensions.font16,
-                                          )
-                                  ],
-                                )),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: Dimensions.height10,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(Dimensions.width15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  event.title ?? 'No Title',
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
+                Column(
+                  children: [
+                    Expanded(
+                        child: Stack(
+                      children: [
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          child: Hero(
+                            tag: UniqueKey(),
+                            child: Image.asset(
+                              _getImagePath(event.eventType ?? "FOOD"),
+                              width: double.infinity,
+                              height: MediaQuery.of(context).size.height * 0.4,
+                              fit: BoxFit.cover,
                             ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                const CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                    'https://via.placeholder.com/50x50',
+                          ),
+                        ),
+                        // Scrollable content
+                        SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              // Padding to account for the image height
+                              SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.4 -
+                                          30),
+                              // Timer container
+                              Center(
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: Dimensions.width15,
+                                    vertical: Dimensions.height15 / 2,
                                   ),
-                                  radius: 20,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black26,
+                                        blurRadius: Dimensions.radius20 / 2,
+                                        offset: Offset(0, 5),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      event.status == "PENDING"
+                                          ? Text(AppStrings.timePending.tr)
+                                          : Text(AppStrings.timeInProgress.tr),
+                                      event.status == "PENDING"
+                                          ? CountdownTimer(
+                                              initialMinutes: eventController
+                                                  .calculateRemainingTimeInRoundedMinutes(
+                                                      event.pendingUntil!),
+                                              onTimerExpired: () {
+                                                Get.back();
+                                              },
+                                            )
+                                          : CountTimer(
+                                              startTimeISO: event.pendingUntil!,
+                                              size: Dimensions.font16,
+                                            )
+                                    ],
+                                  ),
                                 ),
-                                const SizedBox(width: 8),
-                                Column(
+                              ),
+
+                              SizedBox(
+                                height: Dimensions.height10,
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(Dimensions.width15),
+                                child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          event.title ?? 'No Title',
+                                          style: TextStyle(
+                                            fontSize: Dimensions.font26 * 0.85,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: Dimensions.height15 / 2),
+                                    Row(
+                                      children: [
+                                        CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                            event.photoUrl ??
+                                                'https://via.placeholder.com/50x50',
+                                          ),
+                                          radius: Dimensions.radius20,
+                                        ),
+                                        SizedBox(
+                                            width: Dimensions.height15 / 2),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '${event.userProfileFirstName} ${event.userProfileLastName}',
+                                              style: TextStyle(
+                                                fontSize: Dimensions.font16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              AppStrings.organizer.tr,
+                                              style: TextStyle(
+                                                fontSize:
+                                                    Dimensions.font16 * 0.85,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: Dimensions.height15),
                                     Text(
-                                      '${event.userProfileFirstName} ${event.userProfileLastName}',
-                                      style: const TextStyle(
-                                        fontSize: 16,
+                                      AppStrings.aboutEvent.tr,
+                                      style: TextStyle(
+                                        fontSize: Dimensions.font16 * 1.1,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    const Text(
-                                      'Organizer',
+                                    SizedBox(height: Dimensions.height15 / 2),
+                                    Text(
+                                      event.description ?? "Short description",
                                       style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey,
+                                        fontSize: Dimensions.font16,
                                       ),
                                     ),
+                                    SizedBox(height: Dimensions.height15),
                                   ],
                                 ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              'About Event',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              event.description ?? "Short description",
-                              style: const TextStyle(
-                                fontSize: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                          ],
+                            ],
+                          ),
                         ),
+                        SafeArea(
+                          child: Padding(
+                            padding: EdgeInsets.all(Dimensions.height10),
+                            child: IconButton(
+                              icon: Icon(Icons.arrow_back, color: Colors.white),
+                              onPressed: () {
+                                Get.back();
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    )),
+                    Padding(
+                      padding: EdgeInsets.all(Dimensions.height30),
+                      child: _buildBottomButton(
+                        context,
+                        orderId,
+                        page,
+                        event,
                       ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(Dimensions.height30),
-                  child: _buildBottomButton(
-                    context,
-                    orderId,
-                    page,
-                    event,
-                  ),
+                    )
+                  ],
                 )
+                // Fixed image at the top
               ],
             );
           } else {
@@ -230,7 +260,9 @@ class EventDetailsScreen extends StatelessWidget {
             }
           },
           style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+            padding: EdgeInsets.symmetric(
+                horizontal: Dimensions.width15 * 1.1,
+                vertical: Dimensions.height15),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),
             ),
@@ -241,12 +273,12 @@ class EventDetailsScreen extends StatelessWidget {
             children: [
               Text(
                 _getButtonText(page),
-                style: const TextStyle(
-                  fontSize: 16,
+                style: TextStyle(
+                  fontSize: Dimensions.font16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: Dimensions.width15 / 2),
               const Icon(Icons.arrow_forward),
             ],
           ),
@@ -257,11 +289,11 @@ class EventDetailsScreen extends StatelessWidget {
 
   String _getButtonText(String page) {
     if (page == "in_progress") {
-      return "CONTACT ORGANIZER";
+      return AppStrings.contactOrganizer.tr;
     } else if (page == "pending") {
-      return "MAKE AN ORDER";
+      return AppStrings.makeOrder.tr;
     } else {
-      return "MAKE AN ORDER"; // Default text
+      return AppStrings.makeOrder.tr; // Default text
     }
   }
 }

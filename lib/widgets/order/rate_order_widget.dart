@@ -11,7 +11,7 @@ class RateOrderWidget extends StatefulWidget {
 }
 
 class _RateOrderWidgetState extends State<RateOrderWidget> {
-  double _rating = 0;
+  double _rating = 3;
 
   @override
   Widget build(BuildContext context) {

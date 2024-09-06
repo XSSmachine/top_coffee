@@ -5,9 +5,11 @@ import 'package:team_coffee/controllers/auth_controller.dart';
 import 'package:team_coffee/controllers/event_controller.dart';
 import 'package:team_coffee/models/response_model.dart';
 import 'package:team_coffee/pages/auth/sign_in_page.dart';
+import 'package:team_coffee/pages/group/group_list_screen.dart';
 import 'package:team_coffee/pages/home/home_page.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
+import '../../models/filter_model.dart';
 import '../../utils/dimensions.dart';
 import '../error/error_page.dart';
 
@@ -85,7 +87,8 @@ class _SplashScreenState extends State<SplashScreen>
         await player.resume();
       }
     });
-
+    _eventController.eventsStream("ALL", 0, 11, '',
+        EventFilters(eventType: "ALL", status: ['PENDING'], timeFilter: ''));
     _startAnimation();
   }
 
@@ -101,9 +104,16 @@ class _SplashScreenState extends State<SplashScreen>
 
       if (auth.userLoggedIn()) {
         try {
-          await _eventController.fetchPendingEvents("MIX");
-          await _eventController.fetchInProgressEvents("MIX");
-          _navigateToHomePage();
+          // await _eventController.fetchPendingEvents("MIX");
+          // await _eventController.fetchInProgressEvents("MIX");
+          auth.getGroupId().then((value) {
+            print("GROUP ID -> " + value);
+            if (value == "None") {
+              _navigateToGroupListPage();
+            } else {
+              _navigateToHomePage();
+            }
+          });
         } catch (e) {
           _navigateToErrorPage(
               "Failed to fetch events. Please try again later.");
@@ -125,6 +135,13 @@ class _SplashScreenState extends State<SplashScreen>
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const HomePage()),
+    );
+  }
+
+  void _navigateToGroupListPage() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => GroupListScreen()),
     );
   }
 

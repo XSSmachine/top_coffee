@@ -34,7 +34,7 @@ Future<void> init() async {
 
   // Controllers
   Get.put(ResponseNotificationController());
-  Get.put(NotificationController());
+  Get.put(NotificationController(apiClient: Get.find()));
   Get.put(AuthController(authRepo: Get.find(), userRepo: Get.find()));
   Get.put(UserController(userRepo: Get.find()));
   Get.put(EventController(

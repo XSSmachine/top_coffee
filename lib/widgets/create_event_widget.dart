@@ -15,7 +15,7 @@ class CreateEventWidget extends StatelessWidget {
         Get.toNamed(RouteHelper.eventCreatePage);
       },
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: Dimensions.height15),
+        margin: EdgeInsets.symmetric(horizontal: Dimensions.height20),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(Dimensions.radius20),
           color: Colors.white,

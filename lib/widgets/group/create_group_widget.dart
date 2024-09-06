@@ -11,10 +11,12 @@ import '../../utils/dimensions.dart';
 import '../app_text_field.dart';
 
 class CreateGroupWidget extends StatelessWidget {
-  final notificationController = Get.find<NotificationController>();
+  final NotificationController notificationController =
+      Get.find<NotificationController>();
   final AuthController controller;
+  final String page;
 
-  CreateGroupWidget({super.key, required this.controller});
+  CreateGroupWidget({super.key, required this.controller, required this.page});
 
   @override
   Widget build(BuildContext context) {
@@ -55,8 +57,13 @@ class CreateGroupWidget extends StatelessWidget {
                 isError: false,
                 title: "Success",
                 color: AppColors.mainBlueColor);
-            await controller.createUserProfile();
-            Get.toNamed(RouteHelper.getSignInPage());
+
+            if (page == "register") {
+              await controller.createUserProfile();
+              Get.toNamed(RouteHelper.getSignInPage());
+            } else {
+              Get.back();
+            }
           } else {
             print("ERROR ${status.message}");
             showCustomSnackBar(status.message);

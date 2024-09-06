@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:team_coffee/utils/dimensions.dart';
@@ -24,20 +26,29 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
   late Future<void> _orderFuture;
   final OrderController controller = Get.find<OrderController>();
 
-  String _formatAdditionalOptions(String? additionalOptions) {
+  String _formatAdditionalOptions(Map<String, dynamic> additionalOptions) {
     if (additionalOptions == null || additionalOptions.isEmpty) {
       return "• No additional options";
     }
 
-    // Extract the content after "orderDetails:"
-    final match =
-        RegExp(r'orderDetails:\s*(.*?)\s*}').firstMatch(additionalOptions);
-    if (match != null && match.groupCount >= 1) {
-      return "• ${match.group(1)}";
-    }
+    try {
+      // Parse the string as a JSON object
+      //final Map<String, dynamic> options = json.decode(additionalOptions);
 
-    // Fallback in case the format is different
-    return "• ${additionalOptions.replaceAll(RegExp(r'[{}]'), '').trim()}";
+      List<String> formattedOptions = [];
+
+      additionalOptions.forEach((key, value) {
+        if (value != null && value.toString().isNotEmpty) {
+          formattedOptions.add("• $key: $value");
+        }
+      });
+
+      return formattedOptions.join('\n');
+    } catch (e) {
+      // Handle parsing errors
+      print("Error parsing additional options: $e");
+      return "• Error: Unable to parse additional options";
+    }
   }
 
   @override
@@ -104,8 +115,9 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                                 ),
                                 child: const Text('CANCEL'),
                               )
-                            : controller.currentOrder!.status != "READY" &&
-                                    widget.eventStatus == "COMPLETED"
+                            : controller.currentOrder!.status == "COMPLETED" &&
+                                    widget.eventStatus == "COMPLETED" &&
+                                    controller.currentOrder!.rating == 0
                                 ? ElevatedButton(
                                     onPressed: () {
                                       showDialog(
@@ -134,14 +146,31 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                                       style: TextStyle(color: Colors.black87),
                                     ),
                                   )
-                                : SizedBox.shrink()
+                                : controller.currentOrder!.status ==
+                                            "COMPLETED" &&
+                                        widget.eventStatus == "COMPLETED" &&
+                                        controller.currentOrder!.rating != 0
+                                    ? Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: List.generate(5, (index) {
+                                          return Icon(
+                                            Icons.star,
+                                            color: index <
+                                                    controller
+                                                        .currentOrder!.rating!
+                                                ? Colors.amber
+                                                : Colors.grey,
+                                            size: 24,
+                                          );
+                                        }),
+                                      )
+                                    : SizedBox.shrink()
                       ],
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      _formatAdditionalOptions(controller
-                          .currentOrder?.additionalOptions
-                          .toString()),
+                      _formatAdditionalOptions(
+                          controller.currentOrder!.additionalOptions!),
                       style: TextStyle(
                         color: Colors.white,
                       ),

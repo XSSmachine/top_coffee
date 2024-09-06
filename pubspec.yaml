@@ -30,21 +30,23 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  flutter_localizations:
+    sdk: flutter
   get: ^4.1.4
   dots_indicator: ^2.0.0
   persistent_bottom_nav_bar: ^5.0.2
   flutter_rating_bar: ^4.0.1
   shared_preferences: ^2.0.15
-  intl: ^0.17.0
+  intl: ^0.19.0
   jwt_decoder: ^2.0.1
-  firebase_admin: ^0.2.0
+  firebase_admin: any
   android_intent_plus: ^5.1.0
+  pull_to_refresh: ^2.0.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
-  lottie: any
+  lottie: ^3.0.0
   animated_toggle_switch: ^0.8.2
   tab_container: ^3.5.3
   audioplayers: ^6.0.0
@@ -55,13 +57,20 @@ dependencies:
   firebase_core: ^3.3.0
   firebase_messaging: ^15.0.4
   firebase_analytics: ^11.2.1
-  flutter_local_notifications: ^17.2.1+2
+  flutter_local_notifications: ^17.2.2
   cloud_firestore: ^5.2.1
   googleapis: any
   googleapis_auth: any
   dropdown_button2: ^2.3.9
   stomp_dart_client: ^2.0.0
   app_links: ^6.1.4
+  flutter_staggered_animations: ^1.1.1
+  flutter_staggered_grid_view: ^0.4.0
+  device_info_plus: ^10.1.2
+  flutter_timezone: ^2.1.0
+  flutter_launcher_icons: ^0.13.1
+  fl_chart: ^0.68.0
+  toggle_switch: ^2.3.0
 
 
 dev_dependencies:
@@ -124,3 +133,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: "AppIcon"
+  image_path: "assets/icons/icon1.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true

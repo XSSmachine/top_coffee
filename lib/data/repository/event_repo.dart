@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:team_coffee/models/event_body_model.dart';
 import 'package:get/get.dart';
 import '../../models/event_model.dart';
+import '../../models/filter_model.dart';
+import '../../models/monthly_summary.dart';
 import '../../utils/app_constants.dart';
 import '../api/api_client.dart';
 
@@ -12,6 +14,13 @@ class EventRepo {
   final SharedPreferences sharedPreferences;
 
   EventRepo({required this.sharedPreferences, required this.apiClient});
+
+  final Map<String, String> labelTranslations = {
+    'SVE': 'ALL',
+    'KAVA': 'COFFEE',
+    'HRANA': 'FOOD',
+    'PIĆE': 'BEVERAGE',
+  };
 
   // Create event and save event id in shared pref
   Future<Response> createEvent(EventBody eventBody) async {
@@ -56,7 +65,7 @@ class EventRepo {
     const String url = '${AppConstants.GET_EVENT_URI}/filter';
     final json = {
       "status": status,
-      "eventType": eventType,
+      "eventType": labelTranslations[eventType] ?? eventType,
     };
     final response = await apiClient.postData(url, json);
 
@@ -83,14 +92,69 @@ class EventRepo {
     }
   }
 
-  Future<EventModel> getMyActiveEvent() async {
+  Future<EventModel?> getMyActiveEvent() async {
     try {
       final response =
           await apiClient.getData('${AppConstants.GET_EVENT_URI}/active');
-      //final orderData = json.decode(response.body);
-      return EventModel.fromJson(response.body);
+
+      if (response.statusCode == 200) {
+        return EventModel.fromJson(response.body);
+      } else if (response.statusCode == 404) {
+        // No active event found
+        print('No active event found');
+        return null;
+      } else {
+        // Handle other status codes
+        throw Exception('Failed to get active event: ${response.statusCode}');
+      }
     } catch (e) {
-      throw Exception('Failed to get order: $e');
+      print('Error getting active event: $e');
+      throw Exception('Failed to get active event: $e');
+    }
+  }
+
+  Future<List<MonthlySummary>> fetchEventsStats() async {
+    final response =
+        await apiClient.getData("${AppConstants.MONTHLY_STATS}/events");
+    if (response.statusCode == 200) {
+      List<dynamic> jsonData = response.body;
+      return jsonData.map((data) => MonthlySummary.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to load events stats data');
+    }
+  }
+
+  Future<Response> fetchEventPieData() async {
+    try {
+      final response = await apiClient.getData(AppConstants.EVENTS_STATS);
+      if (response.statusCode == 200) {
+        return response;
+      } else {
+        throw Exception('Failed to load data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
+      throw Exception('Failed to fetch event data: $e');
+    }
+  }
+
+  Future<Response> getFilteredEvents(
+      int page, int size, String search, EventFilters filters) async {
+    print(
+        "FETCHING FILTERED EVENTS _________ $page ---- $size---- $search ----${filters.eventType} ----- ${filters.status} ---- ${filters.timeFilter}");
+    try {
+      final response = await apiClient.postData(
+          '${AppConstants.GET_EVENT_URI}/filter?page=$page&size=$size&search=',
+          filters.toMap());
+      if (response.statusCode == 200) {
+        return response;
+      } else {
+        throw Exception(
+            'Failed to load data from filters: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching data from filters: $e');
+      throw Exception('Failed to fetch filtered event data: $e');
     }
   }
 }

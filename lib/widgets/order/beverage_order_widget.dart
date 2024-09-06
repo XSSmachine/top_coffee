@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../base/show_custom_snackbar.dart';
+import '../../controllers/event_controller.dart';
 import '../../controllers/order_controller.dart';
+import '../../models/filter_model.dart';
 import '../../models/order_body_model.dart';
 import '../../routes/route_helper.dart';
 import '../../utils/colors.dart';
+import '../../utils/dimensions.dart';
 
 class BeverageOrderScreen extends StatefulWidget {
   final String eventId;
@@ -21,6 +24,7 @@ class BeverageOrderScreen extends StatefulWidget {
 }
 
 class _BeverageOrderScreenState extends State<BeverageOrderScreen> {
+  EventController eventController = Get.find<EventController>();
   final List<Map<String, dynamic>> beverages = [
     {'name': 'Beer', 'icon': Icons.sports_bar, 'color': Colors.amber},
     {'name': 'Wine', 'icon': Icons.wine_bar, 'color': Colors.redAccent},
@@ -46,19 +50,32 @@ class _BeverageOrderScreenState extends State<BeverageOrderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Beverage Order'),
-        backgroundColor: Colors.teal,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(Dimensions.height20 * 3),
+        child: AppBar(
+          backgroundColor: AppColors.mainBlueColor,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(Dimensions.radius20),
+            ),
+          ),
+          title: Text(
+            'Beverage Order',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: Dimensions.font20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          centerTitle: true,
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              'Select your beverages:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
             SizedBox(height: 16),
             Expanded(
               child: GridView.builder(
@@ -80,25 +97,37 @@ class _BeverageOrderScreenState extends State<BeverageOrderScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
-            TextField(
-              controller: _additionalInfoController,
-              maxLines: 3,
-              decoration: InputDecoration(
-                hintText: 'E.g., Ice, no sugar, etc.',
-                border: OutlineInputBorder(),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: Dimensions.width10),
+              child: TextField(
+                maxLines: 5,
+                controller: _additionalInfoController,
+                decoration: InputDecoration(
+                  hintText: ' - Sok od bazge\n - Kanta leda'
+                      '\n - Pina colada',
+                  filled: true,
+                  fillColor: Colors.grey[300],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(Dimensions.radius20),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
               ),
             ),
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: _submitOrder,
-              child: Text('Submit Order'),
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
                 backgroundColor: AppColors.mainBlueColor,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
+                  borderRadius: BorderRadius.circular(Dimensions.radius30),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
+              ),
+              child: const Text(
+                'Submit',
+                style: TextStyle(fontSize: 18.0, color: Colors.white),
               ),
             ),
           ],
@@ -178,17 +207,24 @@ class _BeverageOrderScreenState extends State<BeverageOrderScreen> {
     }
 
     Map<String, dynamic> orderDetails = {
-      'beverages': selectedBeverages.toList(),
+      'description': selectedBeverages.toList(),
       'additionalInfo': _additionalInfoController.text,
     };
 
     widget.orderController
         .createOrder(OrderBody(
       eventId: widget.eventId,
-      additionalOptions: {"orderDetails": orderDetails},
+      additionalOptions: orderDetails,
     ))
         .then((status) {
       if (status.isSuccess) {
+        eventController.eventsStream(
+            "ALL",
+            0,
+            11,
+            '',
+            EventFilters(
+                eventType: "ALL", status: ['PENDING'], timeFilter: ''));
         showCustomSnackBar(
           "Successfully created an order",
           isError: false,

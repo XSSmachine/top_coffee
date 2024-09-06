@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-
 import '../controllers/user_controller.dart';
 import '../models/fetch_me_model.dart';
 import '../models/response_model.dart';
 import '../models/update_profile_model.dart';
+import '../routes/route_helper.dart';
+import '../utils/colors.dart';
+import '../utils/dimensions.dart';
+import '../utils/string_resources.dart';
 
 class CustomAlertDialog extends StatefulWidget {
   final FetchMeModel initialData;
@@ -35,9 +38,11 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
   void initState() {
     super.initState();
     _profilePhotoFuture = widget.userController.fetchProfilePhoto();
-    _firstNameController = TextEditingController(text: widget.initialData.name);
+    _firstNameController =
+        TextEditingController(text: widget.initialData.firstName);
     _lastNameController =
-        TextEditingController(text: widget.initialData.surname);
+        TextEditingController(text: widget.initialData.lastName);
+    setState(() {});
   }
 
   @override
@@ -49,7 +54,9 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
 
   selectFile() async {
     XFile? file = await ImagePicker().pickImage(
-        source: ImageSource.gallery, maxHeight: 1800, maxWidth: 1800);
+        source: ImageSource.gallery,
+        maxHeight: Dimensions.height10 * 180,
+        maxWidth: Dimensions.width10 * 180);
 
     if (file != null) {
       setState(() {
@@ -59,10 +66,8 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
   }
 
   Future<void> _updateProfile() async {
-    if (_firstNameController.text.isEmpty ||
-        _lastNameController.text.isEmpty ||
-        _imageFile == null) {
-      Get.snackbar('Error', 'First name and last name cannot be empty');
+    if (_firstNameController.text.isEmpty || _lastNameController.text.isEmpty) {
+      Get.snackbar(AppStrings.errorMsg, AppStrings.errorMsgEmptyName.tr);
       return;
     }
 
@@ -75,42 +80,32 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
         .editUserProfile(updatedData, imageFile: _imageFile);
 
     if (response.isSuccess) {
-      Get.back(result: true);
+      await widget.userController.getUserProfile();
       await widget.userController.fetchProfilePhoto();
-      Get.snackbar('Success', 'Profile updated successfully');
+      Get.back(result: true);
+      Get.snackbar(
+          AppStrings.successMsg.tr, AppStrings.successUpdateProfile.tr);
     } else {
-      Get.snackbar('Error', 'Failed to update profile: ${response.message}');
+      Get.snackbar(AppStrings.errorMsg.tr,
+          ' ${AppStrings.errorMsgFailUpdateProfile.tr}+" "+${response.message}');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Update Profile'),
+      title: Text(AppStrings.updateProfile.tr),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(
-              controller: _firstNameController,
-              decoration: const InputDecoration(labelText: 'First Name'),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: _lastNameController,
-              decoration: const InputDecoration(labelText: 'Last Name'),
-            ),
-            const SizedBox(height: 20),
             GestureDetector(
               onTap: () async {
                 await selectFile();
               },
               child: Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                ),
+                width: Dimensions.width20 * 5,
+                height: Dimensions.height20 * 5,
                 child: _imageFile != null
                     ? Image.file(_imageFile!, fit: BoxFit.cover)
                     : widget.initialData.profileUri != null
@@ -124,20 +119,22 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
                                   child: CircularProgressIndicator(),
                                 );
                               } else if (snapshot.hasError) {
-                                return const CircleAvatar(
-                                  radius: 80,
-                                  child: Icon(Icons.error, size: 80),
+                                return CircleAvatar(
+                                  radius: Dimensions.radius20 * 4,
+                                  child: Icon(Icons.error,
+                                      size: Dimensions.iconSize24 * 4),
                                 );
                               } else if (snapshot.hasData &&
                                   snapshot.data != null) {
                                 return CircleAvatar(
-                                  radius: 80,
+                                  radius: Dimensions.radius20 * 4,
                                   backgroundImage: MemoryImage(snapshot.data!),
                                 );
                               } else {
-                                return const CircleAvatar(
-                                  radius: 80,
-                                  child: Icon(Icons.person, size: 80),
+                                return CircleAvatar(
+                                  radius: Dimensions.radius20 * 4,
+                                  child: Icon(Icons.person,
+                                      size: Dimensions.iconSize24 * 4),
                                 );
                               }
                             },
@@ -145,17 +142,38 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
                         : const Icon(Icons.add_a_photo),
               ),
             ),
+            SizedBox(height: Dimensions.height10),
+            TextField(
+              controller: _firstNameController,
+              decoration: InputDecoration(labelText: AppStrings.firstName.tr),
+            ),
+            SizedBox(height: Dimensions.height10),
+            TextField(
+              controller: _lastNameController,
+              decoration: InputDecoration(labelText: AppStrings.lastName.tr),
+            ),
+            SizedBox(height: Dimensions.height15),
+            Text(AppStrings.or.tr),
+            SizedBox(height: Dimensions.height10),
+            GestureDetector(
+                onTap: () {
+                  Get.toNamed(RouteHelper.changePassPage);
+                },
+                child: Text(
+                  AppStrings.changeYourPass.tr,
+                  style: TextStyle(color: AppColors.mainBlueDarkColor),
+                ))
           ],
         ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(AppStrings.cancel.tr),
         ),
         TextButton(
           onPressed: _updateProfile,
-          child: const Text('Update'),
+          child: Text(AppStrings.update.tr),
         ),
       ],
     );

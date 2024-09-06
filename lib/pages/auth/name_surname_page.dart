@@ -6,10 +6,10 @@ import 'package:get/get_core/src/get_main.dart';
 import '../../base/custom_loader.dart';
 import '../../base/show_custom_snackbar.dart';
 import '../../controllers/auth_controller.dart';
-import '../../models/signup_body_model.dart';
 import '../../routes/route_helper.dart';
 import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
+import '../../utils/string_resources.dart';
 import '../../widgets/app_text_field.dart';
 
 class NameSurnamePage extends StatelessWidget {
@@ -28,13 +28,15 @@ class NameSurnamePage extends StatelessWidget {
       String surname = surnameController.text.trim();
 
       if (name.isEmpty) {
-        showCustomSnackBar("Type in your first name", title: "First name");
+        showCustomSnackBar(AppStrings.typeInFirstName.tr,
+            title: AppStrings.firstName.tr);
       } else if (surname.isEmpty) {
-        showCustomSnackBar("Type in your last name", title: "Last name");
+        showCustomSnackBar(AppStrings.typeInLastName.tr,
+            title: AppStrings.lastName.tr);
       } else {
         authController.userProfile.value?.name = name;
         authController.userProfile.value?.surname = surname;
-        Get.toNamed(RouteHelper.getGroupPage());
+        Get.toNamed(RouteHelper.getGroupPage('register'));
       }
     }
 
@@ -55,11 +57,11 @@ class NameSurnamePage extends StatelessWidget {
                       child: Center(
                         child: CircleAvatar(
                           backgroundColor: Colors.white,
-                          radius: 130,
+                          radius: Dimensions.radius20 * 6.5,
                           child: Image.asset(
                             "assets/image/chef_register.png",
-                            width: 330,
-                            height: 330,
+                            width: Dimensions.width10 * 33,
+                            height: Dimensions.width10 * 33,
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -71,7 +73,7 @@ class NameSurnamePage extends StatelessWidget {
                     // your name
                     AppTextField(
                         textController: nameController,
-                        hintText: "Name",
+                        hintText: AppStrings.firstName.tr,
                         icon: Icons.person_outline),
                     SizedBox(
                       height: Dimensions.height20,
@@ -79,7 +81,7 @@ class NameSurnamePage extends StatelessWidget {
                     //your phone
                     AppTextField(
                         textController: surnameController,
-                        hintText: "Surname",
+                        hintText: AppStrings.lastName.tr,
                         icon: Icons.person_rounded),
                     SizedBox(height: Dimensions.height20 * 1.5),
 
@@ -104,7 +106,7 @@ class NameSurnamePage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
-                                "SIGN UP",
+                                AppStrings.signUp.tr,
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: Dimensions.font16),
@@ -139,7 +141,7 @@ class NameSurnamePage extends StatelessWidget {
                         text: TextSpan(
                             recognizer: TapGestureRecognizer()
                               ..onTap = () => Get.back(),
-                            text: "Have an account already?",
+                            text: AppStrings.confirmQuestionAccount.tr,
                             style: TextStyle(
                                 color: Colors.grey[500],
                                 fontSize: Dimensions.font20))),
@@ -151,7 +153,7 @@ class NameSurnamePage extends StatelessWidget {
                         text: TextSpan(
                             recognizer: TapGestureRecognizer()
                               ..onTap = () => Get.back(),
-                            text: "Use one of the following methods",
+                            text: AppStrings.differentMethods.tr,
                             style: TextStyle(
                                 color: Colors.grey[500],
                                 fontSize: Dimensions.font16))),

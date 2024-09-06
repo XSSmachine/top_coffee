@@ -13,8 +13,9 @@ import '../app_text_field.dart';
 class JoinGroupWidget extends StatelessWidget {
   final notificationController = Get.find<NotificationController>();
   final AuthController controller;
+  final String page;
 
-  JoinGroupWidget({super.key, required this.controller});
+  JoinGroupWidget({super.key, required this.controller, required this.page});
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +43,14 @@ class JoinGroupWidget extends StatelessWidget {
                 isError: false,
                 title: "Success",
                 color: AppColors.mainBlueColor);
-            await controller.createUserProfile();
-            Get.toNamed(RouteHelper.getSignInPage());
+            print("PAGE -> " + page);
+            if (page == "register") {
+              await controller.createUserProfile();
+              Get.toNamed(RouteHelper.getSignInPage());
+            } else {
+              print("PAGE -> " + page);
+              Get.back();
+            }
           } else {
             showCustomSnackBar(status.message);
           }
@@ -118,7 +125,6 @@ class JoinGroupWidget extends StatelessWidget {
               ),
             ),
           ),
-          // your name
         ],
       ),
     );
