@@ -15,11 +15,20 @@ import '../models/event_model.dart';
 import '../models/monthly_summary.dart';
 import '../models/order_get_model.dart';
 import '../utils/string_resources.dart';
+import 'group_controller.dart';
 
 class EventController extends GetxController implements GetxService {
   final EventRepo eventRepo;
   final OrderRepo orderRepo;
   final UserRepo userRepo;
+
+  final Rx<bool> _hasMorePending = false.obs;
+  final Rx<bool> _hasMoreInProgress = false.obs;
+  final Rx<bool> _hasMoreCompleted = false.obs;
+
+  bool get hasMorePending => _hasMorePending.value;
+  bool get hasMoreInProgress => _hasMorePending.value;
+  bool get hasMoreCompleted => _hasMorePending.value;
 
   EventController({
     required this.eventRepo,
@@ -27,10 +36,43 @@ class EventController extends GetxController implements GetxService {
     required this.userRepo,
   });
 
+  final GroupController _groupController = Get.find<GroupController>();
+
+  @override
+  void onInit() {
+    super.onInit();
+    ever(
+        _groupController.currentGroupId,
+        (_) async => await fetchFilteredEvents(
+              page: 0,
+              size: pageSize,
+              search: '',
+              filters: EventFilters(
+                  eventType: selectedEventType.value,
+                  status: selectedEventStatus.value,
+                  timeFilter: selectedTimeFilter.value),
+            ));
+  }
+
   RxString selectedEventType = "ALL".obs;
-  RxString selectedTimeFilter = "".obs;
+  RxString selectedTimeFilter = "THIS_WEEK".obs;
   RxList<String> selectedEventStatus = ["PENDING"].obs;
-  final int pageSize = 10;
+  final int pageSize = 11;
+
+  final StreamController<List<EventModel>> _pendingEventsController =
+      StreamController<List<EventModel>>.broadcast();
+  final StreamController<List<EventModel>> _inProgressEventsController =
+      StreamController<List<EventModel>>.broadcast();
+  final StreamController<List<EventModel>> _completedEventsController =
+      StreamController<List<EventModel>>.broadcast();
+
+  // Expose streams
+  Stream<List<EventModel>> get pendingEventsStream =>
+      _pendingEventsController.stream;
+  Stream<List<EventModel>> get inProgressEventsStream =>
+      _inProgressEventsController.stream;
+  Stream<List<EventModel>> get completedEventsStream =>
+      _completedEventsController.stream;
 
   final Rx<bool> _isLoading = false.obs;
   final Rx<EventModel?> _currentEvent = Rx<EventModel?>(null);
@@ -38,6 +80,10 @@ class EventController extends GetxController implements GetxService {
   final RxList<EventModel> _inProgressEvents = <EventModel>[].obs;
   final RxList<EventModel> _completedEvents = <EventModel>[].obs;
   final RxList<OrderGetModel> _currentEventOrders = <OrderGetModel>[].obs;
+  final RxList<EventModel> _allEventList = <EventModel>[].obs;
+  final RxList<EventModel> _pendingEventList = <EventModel>[].obs;
+  final RxList<EventModel> _inProgressEventList = <EventModel>[].obs;
+  final RxList<EventModel> _completedEventList = <EventModel>[].obs;
 
   bool get isLoading => _isLoading.value;
   EventModel? get currentEvent => _currentEvent.value;
@@ -45,6 +91,10 @@ class EventController extends GetxController implements GetxService {
   List<EventModel> get inProgressEvents => _inProgressEvents;
   List<EventModel> get completedEvents => _completedEvents;
   List<OrderGetModel> get currentEventOrders => _currentEventOrders;
+  List<EventModel> get allEventList => _allEventList;
+  List<EventModel> get pendingEventList => _pendingEventList;
+  List<EventModel> get inProgressEventList => _inProgressEventList;
+  List<EventModel> get completedEventList => _completedEventList;
 
   final _currentEventStream = StreamController<EventModel?>.broadcast();
   Stream<EventModel?> get currentEventStream => _currentEventStream.stream;
@@ -116,6 +166,162 @@ class EventController extends GetxController implements GetxService {
   //   update();
   // }
 
+  Future<void> fetchPendingEvents({
+    required int page,
+    required int size,
+    required String search,
+    required EventFilters filters,
+  }) async {
+    try {
+      final response = await eventRepo.getFilteredEvents(
+        page,
+        size,
+        search,
+        filters.copyWith(status: ['PENDING']),
+      );
+      if (response.statusCode == 200) {
+        List<EventModel> events = (response.body as List<dynamic>)
+            .map((event) => EventModel.fromJson(event as Map<String, dynamic>))
+            .toList();
+        if (page == 0) {
+          _pendingEvents.value = events;
+        } else {
+          _pendingEvents.addAll(events);
+        }
+        _pendingEventsController.add(_pendingEvents);
+      } else {
+        throw Exception('Failed to load pending events');
+      }
+    } catch (e) {
+      print('Error fetching pending events: $e');
+    }
+  }
+
+  Future<void> fetchInProgressEvents({
+    required int page,
+    required int size,
+    required String search,
+    required EventFilters filters,
+  }) async {
+    try {
+      final response = await eventRepo.getFilteredEvents(
+        page,
+        size,
+        search,
+        filters.copyWith(status: ['IN_PROGRESS']),
+      );
+      if (response.statusCode == 200) {
+        List<EventModel> events = (response.body as List<dynamic>)
+            .map((event) => EventModel.fromJson(event as Map<String, dynamic>))
+            .toList();
+        if (page == 0) {
+          _inProgressEvents.value = events;
+        } else {
+          _inProgressEvents.addAll(events);
+        }
+        _inProgressEventsController.add(_inProgressEvents);
+      } else {
+        throw Exception('Failed to load in-progress events');
+      }
+    } catch (e) {
+      print('Error fetching in-progress events: $e');
+    }
+  }
+
+  Future<void> fetchCompletedEvents({
+    required int page,
+    required int size,
+    required String search,
+    required EventFilters filters,
+  }) async {
+    try {
+      final response = await eventRepo.getFilteredEvents(
+        page,
+        size,
+        search,
+        filters.copyWith(status: ['COMPLETED']),
+      );
+      if (response.statusCode == 200) {
+        List<EventModel> events = (response.body as List<dynamic>)
+            .map((event) => EventModel.fromJson(event as Map<String, dynamic>))
+            .toList();
+        if (events.isNotEmpty) {
+          if (page == 0) {
+            print("Completed event title" + events.first.title!);
+            _completedEvents.value = events;
+          } else {
+            _completedEvents.addAll(events);
+          }
+          _completedEventsController.add(_completedEvents);
+        } else {
+          print('No completed events found');
+        }
+      } else {
+        throw Exception('Failed to load completed events');
+      }
+    } catch (e) {
+      print('Error fetching completed events: $e');
+    }
+  }
+
+  void clearAllEvents() {
+    _pendingEventList.clear();
+    _inProgressEventList.clear();
+    _completedEventList.clear();
+  }
+
+  Future<List<EventModel>> getAllFilteredEvents({
+    required int page,
+    required int size,
+    required String status,
+    required String type,
+    String? search,
+  }) async {
+    try {
+      _isLoading.value = true;
+
+      Response response = await eventRepo.getFilteredEvents(
+          page,
+          size,
+          search ?? '',
+          EventFilters(
+              eventType: 'ALL', status: [status], timeFilter: 'THIS_WEEK'));
+      List<EventModel> newEvents = (response.body as List<dynamic>)
+          .map((event) => EventModel.fromJson(event as Map<String, dynamic>))
+          .toList();
+      print(2.1);
+      if (page == 0) {
+        if (status == "PENDING") {
+          _pendingEventList.clear();
+        } else if (status == "IN_PROGRESS") {
+          _inProgressEventList.clear();
+        } else if (status == "COMPLETED") {
+          _completedEventList.clear();
+        }
+        _allEventList.clear();
+      }
+      print(2.2);
+      if (status == "PENDING") {
+        _pendingEventList.addAll(newEvents);
+      } else if (status == "IN_PROGRESS") {
+        _inProgressEventList.addAll(newEvents);
+      } else if (status == "COMPLETED") {
+        _completedEventList.addAll(newEvents);
+      }
+      _allEventList.addAll(newEvents);
+      print("GETTING ALL ORDERS" + newEvents.length.toString());
+      print(2.3);
+      return newEvents;
+    } catch (e) {
+      print(2.4);
+      print('Error fetching orders: $e');
+      return [];
+    } finally {
+      _isLoading.value = false;
+    }
+  }
+
+  // Updated fetchFilteredEvents method
   Future<void> fetchFilteredEvents({
     required int page,
     required int size,
@@ -123,171 +329,55 @@ class EventController extends GetxController implements GetxService {
     required EventFilters filters,
   }) async {
     try {
-      print(
-          'FETCHING FILTERED EVENTS _________ $page ---- $size----  ----${filters.status} ----- [${filters.status.join(", ")}] ---- ${filters.timeFilter}');
-      print('LOADING HERE!');
-
-      List<EventModel> newPendingEvents = [];
-      List<EventModel> newInProgressEvents = [];
-      List<EventModel> newCompletedEvents = [];
-
-      if (filters.status.isEmpty) {
-        filters = filters.copyWith(status: ['PENDING']);
+      if (filters.status.contains('PENDING') || filters.status.isEmpty) {
+        await fetchPendingEvents(
+            page: page, size: size, search: search, filters: filters);
       }
-
-      for (String status in filters.status) {
-        await _fetchEventsForStatus(
-          status: status,
-          page: page,
-          size: size,
-          search: search,
-          filters: filters,
-          newPendingEvents: newPendingEvents,
-          newInProgressEvents: newInProgressEvents,
-          newCompletedEvents: newCompletedEvents,
-        );
+      if (filters.status.contains('IN_PROGRESS') || filters.status.isEmpty) {
+        await fetchInProgressEvents(
+            page: page, size: size, search: search, filters: filters);
       }
-
-      // Update the state based on pagination
-      if (page == 0) {
-        // Replace all events if it's the first page
-        _pendingEvents.value = newPendingEvents;
-        _inProgressEvents.value = newInProgressEvents;
-        _completedEvents.value = newCompletedEvents;
-      } else {
-        // Append new events if it's not the first page
-        _pendingEvents.addAll(newPendingEvents);
-        _inProgressEvents.addAll(newInProgressEvents);
-        _completedEvents.addAll(newCompletedEvents);
+      if (filters.status.contains('COMPLETED') || filters.status.isEmpty) {
+        await fetchCompletedEvents(
+            page: page, size: size, search: search, filters: filters);
       }
-
-      print(
-          'Fetched events: Pending: ${_pendingEvents.length}, In Progress: ${_inProgressEvents.length}, Completed: ${_completedEvents.length}');
-
-      _emitUpdatedEvents();
     } catch (e) {
       print('Error fetching filtered events: $e');
-      // You might want to show an error message to the user here
     }
   }
 
-  Future<void> _fetchEventsForStatus({
-    required String status,
-    required int page,
-    required int size,
-    required String search,
-    required EventFilters filters,
-    required List<EventModel> newPendingEvents,
-    required List<EventModel> newInProgressEvents,
-    required List<EventModel> newCompletedEvents,
-  }) async {
-    try {
-      final response = await eventRepo.getFilteredEvents(
-        page,
-        size,
-        search,
-        filters,
-      );
-      if (response.statusCode == 200) {
-        print(response.body.toString());
-        List<EventModel> events = (response.body as List<dynamic>)
-            .map((event) => EventModel.fromJson(event as Map<String, dynamic>))
-            .toList();
-        switch (status) {
-          case 'PENDING':
-            for (EventModel event in events) {
-              print("TITLEEEE  " + event.title!);
-            }
-            newPendingEvents.addAll(events);
-            break;
-          case 'IN_PROGRESS':
-            newInProgressEvents.addAll(events);
-            break;
-          case 'COMPLETED':
-            newCompletedEvents.addAll(events);
-            break;
-          default:
-            print('Unexpected status: $status');
-        }
-        print('Fetched ${events.length} events for status: $status');
-      } else {
-        throw Exception('Failed to load events for status: $status');
-      }
-    } catch (e) {
-      print('Error fetching events for status $status: $e');
-    }
-  }
-
-  final Map<String, StreamController<List<EventModel>>> _streamControllers = {
-    'PENDING': StreamController<List<EventModel>>.broadcast(),
-    'IN_PROGRESS': StreamController<List<EventModel>>.broadcast(),
-    'COMPLETED': StreamController<List<EventModel>>.broadcast(),
-  };
-
-  Stream<List<EventModel>> eventsStream(
-      String status, int page, int size, String search, EventFilters filters) {
-    if (!_streamControllers.containsKey(status)) {
-      _streamControllers[status] =
-          StreamController<List<EventModel>>.broadcast();
-    }
-
-    // Initial fetch
-    _fetchAndEmit(page, size, search, filters);
-
-    // Close the controller when the stream is no longer listened to
-    _streamControllers[status]!.onCancel = () {
-      _streamControllers[status]?.close();
-      _streamControllers.remove(status);
-    };
-
-    return _streamControllers[status]!.stream;
-  }
-
-  Future<void> _fetchAndEmit(
-      int page, int size, String search, EventFilters filters) async {
-    try {
-      await fetchFilteredEvents(
-          page: page, size: size, search: search, filters: filters);
-      _emitUpdatedEvents();
-    } catch (e) {
-      print('Error fetching and emitting events: $e');
-      // You might want to emit an error to the streams here
-    }
-  }
-
-  void _emitUpdatedEvents() {
-    if (_streamControllers.containsKey('PENDING') &&
-        !_streamControllers['PENDING']!.isClosed) {
-      _streamControllers['PENDING']!.add(_pendingEvents);
-      print('Emitted ${_pendingEvents.length} pending events');
-    }
-    if (_streamControllers.containsKey('IN_PROGRESS') &&
-        !_streamControllers['IN_PROGRESS']!.isClosed) {
-      _streamControllers['IN_PROGRESS']!.add(_inProgressEvents);
-      print('Emitted ${_inProgressEvents.length} in-progress events');
-    }
-    if (_streamControllers.containsKey('COMPLETED') &&
-        !_streamControllers['COMPLETED']!.isClosed) {
-      _streamControllers['COMPLETED']!.add(_completedEvents);
-      print('Emitted ${_completedEvents.length} completed events');
-    }
-  }
-
+  // Method to handle WebSocket messages
   void onWebSocketMessage(
-      int page, int size, String search, EventFilters filters) {
-    _fetchAndEmit(page, size, search, filters);
+      String status, int page, int size, String search, EventFilters filters) {
+    switch (status) {
+      case 'PENDING':
+        fetchPendingEvents(
+            page: page, size: size, search: search, filters: filters);
+        break;
+      case 'IN_PROGRESS':
+        fetchInProgressEvents(
+            page: page, size: size, search: search, filters: filters);
+        break;
+      case 'COMPLETED':
+        fetchCompletedEvents(
+            page: page, size: size, search: search, filters: filters);
+        break;
+      default:
+        fetchFilteredEvents(
+            page: page, size: size, search: search, filters: filters);
+    }
   }
 
   @override
   void onClose() {
-    for (var controller in _streamControllers.values) {
-      controller.close();
-    }
+    _pendingEventsController.close();
+    _inProgressEventsController.close();
+    _completedEventsController.close();
     super.onClose();
   }
 
   //Getting pending events
-  Future<List<EventModel>> fetchPendingEvents(String eventType) async {
+  Future<List<EventModel>> fetchPendingEvents2(String eventType) async {
     _isLoading.value = true;
     try {
       final events = await eventRepo.getPendingEvents(eventType);
@@ -304,7 +394,7 @@ class EventController extends GetxController implements GetxService {
   }
 
   //Getting in_progress events
-  Future<List<EventModel>> fetchInProgressEvents(String eventType) async {
+  Future<List<EventModel>> fetchInProgressEvents2(String eventType) async {
     _isLoading.value = true;
     try {
       final events = await eventRepo.getInProgressEvents(eventType);

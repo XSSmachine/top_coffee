@@ -10,6 +10,7 @@ import 'controllers/notification_controller.dart';
 import 'data/api/firebase_api.dart';
 import 'helper/deeplink_handler.dart';
 import 'helper/dependencies.dart' as dependencies;
+import 'package:uni_links/uni_links.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,15 +18,34 @@ Future<void> main() async {
   await FirebaseApi().initNotifications();
   await dependencies.init();
   await Get.find<NotificationController>().requestPermission();
-  //final AppLinksDeepLink _appLinksDeepLink = AppLinksDeepLink.instance;
-  //await _appLinksDeepLink.initDeepLinks();
+
+  final AppLinksDeepLink _appLinksDeepLink = AppLinksDeepLink.instance;
+  _appLinksDeepLink.onInit();
+  await _appLinksDeepLink.initDeepLinks();
 
   await Get.find<AuthController>().fetchMe();
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initUniLinks();
+  }
+
+  void initUniLinks() async {
+    String? initialLink = await getInitialLink();
+    // Handle the initial link, e.g., by navigating to a specific screen
+  }
 
   // This widget is the root of your application.
   @override

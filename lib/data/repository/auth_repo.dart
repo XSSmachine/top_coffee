@@ -36,9 +36,31 @@ class AuthRepo {
         "${AppConstants.GROUP_URI}/create", newGroup.toJson());
   }
 
+  Future<Response> joinGroupViaInvitation(String code) async {
+    try {
+      final response =
+          await apiClient.getData(AppConstants.JOIN_GROUP_URI + code);
+      if (response.statusCode == 200) {
+        return response;
+      } else {
+        throw Exception(
+            'Failed to join group via invitation: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error joining group via invitation: $e');
+      throw Exception('Failed to join group via invitation: $e');
+    }
+  }
+
   Future<Response> joinGroup(JoinGroup group) async {
     return await apiClient.postData(
         "${AppConstants.GROUP_URI}/join", group.toJson());
+  }
+
+  Future<Response> generateInviteLink(String userProfileId) async {
+    return await apiClient.postData(
+        "${AppConstants.GROUP_URI}/sendInvitation?invitedBy=$userProfileId",
+        "");
   }
 
   Future<Response> getGroup(String groupId) async {

@@ -1,22 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:team_coffee/controllers/event_controller.dart';
 import '../../controllers/auth_controller.dart';
-import '../../models/group/group_membership.dart';
+import '../../models/filter_model.dart';
 import '../../models/group_data.dart';
 import '../../routes/route_helper.dart';
 import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
 
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:lottie/lottie.dart';
-import '../../controllers/auth_controller.dart';
-import '../../models/group/group_membership.dart';
-import '../../routes/route_helper.dart';
-import '../../utils/colors.dart';
-import '../../utils/dimensions.dart';
 import '../../utils/string_resources.dart';
 
 class GroupListScreen extends StatefulWidget {
@@ -26,6 +19,7 @@ class GroupListScreen extends StatefulWidget {
 
 class _GroupListScreenState extends State<GroupListScreen> {
   final AuthController authController = Get.find<AuthController>();
+  final EventController eventController = Get.find<EventController>();
   final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
   String? selectedGroupId;
@@ -256,6 +250,20 @@ class _GroupListScreenState extends State<GroupListScreen> {
                                         await controller
                                             .saveGroupId(selectedGroupId!);
                                         await controller.fetchAndSetGroupId();
+                                        await eventController
+                                            .fetchFilteredEvents(
+                                          page: 0,
+                                          size: eventController.pageSize,
+                                          search: '',
+                                          filters: EventFilters(
+                                            eventType: eventController
+                                                .selectedEventType.value,
+                                            status: eventController
+                                                .selectedEventStatus.value,
+                                            timeFilter: eventController
+                                                .selectedTimeFilter.value,
+                                          ),
+                                        );
                                         Get.toNamed(RouteHelper.getInitial());
                                       } catch (e) {
                                         Get.snackbar('Error',

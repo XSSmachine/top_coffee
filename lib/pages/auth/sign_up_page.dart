@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:team_coffee/pages/auth/sign_in_page.dart';
 import 'package:team_coffee/pages/auth/verify_email_page.dart';
 import '../../base/custom_loader.dart';
 import '../../base/show_custom_snackbar.dart';
@@ -183,7 +184,15 @@ class SignUpPage extends StatelessWidget {
                         //clickable text
                         text: TextSpan(
                             recognizer: TapGestureRecognizer()
-                              ..onTap = () => Get.back(),
+                              ..onTap = () {
+                                if (Get.previousRoute.isNotEmpty) {
+                                  Get.back();
+                                } else {
+                                  // Handle the case when there's no previous route
+                                  Get.offAll(() =>
+                                      SignInPage()); // Replace with your login page
+                                }
+                              },
                             text: AppStrings.confirmQuestionAccount.tr,
                             style: TextStyle(
                                 color: Colors.grey[500],

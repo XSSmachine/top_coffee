@@ -28,6 +28,23 @@ class UserRepo {
     return await apiClient.getData(AppConstants.FETCH_ME_URI);
   }
 
+  Future<Response> kickUserByUserProfileId(String userProfileId) async {
+    return await apiClient.deleteData(
+        AppConstants.KICK_GROUP_URI + "?userProfileId=$userProfileId");
+  }
+
+  Future<Response> promoteUserByUserProfileId(
+      String userProfileId, String role) async {
+    print(
+      AppConstants.PROMOTE_GROUP_URI +
+          "?userProfileId=$userProfileId&role=$role",
+    );
+    return await apiClient.postData(
+        AppConstants.PROMOTE_GROUP_URI +
+            "?userProfileId=$userProfileId&role=$role",
+        "");
+  }
+
   Future<Response> getGroupById(String id) async {
     return await apiClient.getData(AppConstants.GROUP_URI + '/$id');
   }

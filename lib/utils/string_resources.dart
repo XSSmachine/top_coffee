@@ -60,10 +60,17 @@ class AppStrings {
   static const String finish = 'Finish';
 
   static const String inviteFriends = 'Invite your friends';
+  static const String viewMyOrders = 'View My Orders';
+  static const String Attendees = "attendees";
+  static const String createEventWidget = 'Get some snacks for the team!';
+  static const String shareMealsTogether = 'Share your meals together';
+  static const String emptyPendingEventText = "Hmm looks empty here";
+  static const String madeByText = "By";
   static const String inviteFriendsDesc =
       'Send invite to your friends or collagues to share good food and pleasant moments together.';
   static const String notifications = 'Notifications';
   static const String noNotifications = 'No notifications';
+  static const String noRatings = 'No active ratings';
   static const String support = 'Support';
   static const String editGroup = 'Edit Group';
   static const String appMoto =
@@ -83,6 +90,7 @@ class AppStrings {
   static const String differentMethods = "Use one of the following methods";
 
   static const String joinGroup = 'Join Group';
+  static const String followLink = "by following this link";
   static const String createGroup = 'Create Group';
 
   static const String timePending = "Time pending:";
@@ -108,7 +116,9 @@ class AppStrings {
   static const String fillInAllFields = 'Please fill in all fields';
   static const String createTitle = 'CREATE';
   static const String searchTitle = 'Search';
+  static const String searchAppBarTitle = 'Search ';
   static const String searchOrdersTitle = 'Search orders';
+  static const String searchEventsTitle = 'Search events';
   static const String filtersTitle = "Filters";
   static const String activeEventsTitle = "Active events";
   static const String seeMoreTitle = "See more";
@@ -126,6 +136,10 @@ class AppStrings {
 
   static const String leaderboardTitle = 'Leaderboard';
   static const String ordersFilter = 'Orders';
+  static const String capsOrders = 'ORDERS';
+  static const String capsEvents = 'EVENTS';
+  static const String capsRating = 'RATING';
+  static const String inviteBtn = 'POZOVI';
   static const String scoreFilter = 'Score';
   static const String loadMore = 'Load More';
   static const String unranked = 'UNRANKED';
@@ -143,6 +157,7 @@ class AppStrings {
   static const String profileStats = 'Profile Statistics';
   static const String monthlyStats = 'Monthly Statistics';
   static const String noData = 'No Data';
+  static const String Date = 'Date';
   static const String byStatus = 'By Status';
   static const String byType = 'By Type';
   static const String changePassText = 'Change your password';

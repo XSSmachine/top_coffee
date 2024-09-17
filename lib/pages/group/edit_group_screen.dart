@@ -4,7 +4,6 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:team_coffee/models/group/group_member.dart';
 import 'dart:io';
-
 import '../../controllers/user_controller.dart';
 import '../../models/response_model.dart';
 import '../../models/update_group_model.dart';
@@ -37,8 +36,12 @@ class _GroupScreenState extends State<GroupScreen> {
     super.initState();
     nameController.text = groupName;
     descriptionController.text = groupDescription;
-    _fetchGroupDetails();
-    _fetchGroupMembers();
+
+    Future.microtask(() async {
+      await _fetchGroupDetails();
+      await _fetchGroupMembers();
+      if (mounted) setState(() {});
+    });
   }
 
   Future<void> _fetchGroupDetails() async {
@@ -280,10 +283,6 @@ class _GroupScreenState extends State<GroupScreen> {
     if (_imageFile != null) {
       await _uploadGroupImage();
     }
-
-    // ScaffoldMessenger.of(context).showSnackBar(
-    //   SnackBar(content: Text('Changes saved successfully')),
-    // );
   }
 
   Future<void> _uploadGroupImage() async {
@@ -329,32 +328,16 @@ class _GroupScreenState extends State<GroupScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Edit Role for ${user.firstName}'),
-          content: DropdownButton<String>(
-            value: newRole,
-            items: user.roles.map((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-            onChanged: (String? newValue) {
-              if (newValue != null) {
-                setState(() {
-                  newRole = newValue;
-                });
-              }
-            },
-          ),
+          title: Text('Promote ${user.firstName} to Admin? '),
           actions: [
             TextButton(
-              child: Text('Cancel'),
+              child: Text('No'),
               onPressed: () => Navigator.pop(context),
             ),
             TextButton(
-              child: Text('Save'),
+              child: Text('Yes'),
               onPressed: () {
-                _updateUserRole(user, newRole);
+                _updateUserRole(user, "ADMIN");
                 Navigator.pop(context);
               },
             ),
@@ -365,14 +348,11 @@ class _GroupScreenState extends State<GroupScreen> {
   }
 
   Future<void> _updateUserRole(GroupMember user, String newRole) async {
-    // TODO: Implement API call to update user role
     print('Updating role for ${user.firstName} to $newRole');
-
-    // Example of how you might call an API
-    // await apiService.updateUserRole(user.id!, newRole);
+    await userController.promoteUserFromGroup(user.userProfileId, newRole);
 
     setState(() {
-      user.roles[0] = newRole;
+      user.roles.add(newRole);
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -382,14 +362,11 @@ class _GroupScreenState extends State<GroupScreen> {
 
 // Method to kick a user from the group
   Future<void> _kickUser(GroupMember user) async {
-    // TODO: Implement API call to remove user from group
     print('Kicking user: ${user.firstName}');
-
-    // Example of how you might call an API
-    // await apiService.removeUserFromGroup(widget.groupId!, user.id!);
+    await userController.kickUserFromGroup(user.userProfileId);
 
     setState(() {
-      // member.remove(user);
+      userController.groupMembers.remove(user);
     });
 
     ScaffoldMessenger.of(context).showSnackBar(

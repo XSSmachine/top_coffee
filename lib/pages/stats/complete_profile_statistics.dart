@@ -22,10 +22,10 @@ class _CompleteProfileStatisticsState extends State<CompleteProfileStatistics> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.candyPurpleColor,
+      backgroundColor: AppColors.mainBlueDarkColor,
       appBar: AppBar(
         title: Text(AppStrings.profileStats.tr),
-        backgroundColor: AppColors.candyPurpleColor,
+        backgroundColor: AppColors.mainBlueDarkColor,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),

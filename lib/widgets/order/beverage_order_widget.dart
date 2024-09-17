@@ -218,13 +218,13 @@ class _BeverageOrderScreenState extends State<BeverageOrderScreen> {
     ))
         .then((status) {
       if (status.isSuccess) {
-        eventController.eventsStream(
-            "ALL",
-            0,
-            11,
-            '',
-            EventFilters(
-                eventType: "ALL", status: ['PENDING'], timeFilter: ''));
+        // eventController.eventsStream(
+        //     "ALL",
+        //     0,
+        //     11,
+        //     '',
+        //     EventFilters(
+        //         eventType: "ALL", status: ['PENDING'], timeFilter: ''));
         showCustomSnackBar(
           "Successfully created an order",
           isError: false,

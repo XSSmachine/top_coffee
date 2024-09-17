@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:team_coffee/pages/auth/sign_in_page.dart';
 import '../data/repository/auth_repo.dart';
 import '../data/repository/user_repo.dart';
+import '../helper/deeplink_handler.dart';
 import '../models/group/create_group.dart';
 import '../models/group/user_data.dart';
 import '../models/group_data.dart';
@@ -30,6 +31,8 @@ class AuthController extends GetxController implements GetxService {
   bool _isLoading = false;
 
   bool get isLoading => _isLoading;
+
+  String? pendingGroupCode;
 
   UserData? _userData;
   UserData? get userData => _userData;
@@ -232,6 +235,52 @@ class AuthController extends GetxController implements GetxService {
     return responseModel;
   }
 
+  Future<Group?> joinGroupViaInvitation(
+      String groupCode, NotificationController notificationController) async {
+    try {
+      _isLoading = true;
+      update();
+
+      print("Joining group via invitation");
+      Response response = await authRepo.joinGroupViaInvitation(groupCode);
+      print("RESPONSE BODY ----->>>>>  ${response.body}");
+
+      if (response.statusCode == 200) {
+        final groupData = response.body;
+        final groupId = groupData['groupId'];
+        final name = groupData['name'];
+        final description = groupData['description'];
+        final imageUrl = groupData['photoUrl'];
+
+        userProfile.value?.groupId = groupId;
+        await notificationController.subscribeToGroup(groupId);
+
+        //Get.snackbar('Success', 'Successfully joined the group');
+
+        return Group(
+            groupId: groupId,
+            name: name,
+            description: description,
+            photoUrl: imageUrl);
+      } else {
+        throw Exception(
+          'Failed to join group. Status code: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      print("Error joining group: $e");
+      if (e is Exception) {
+        Get.snackbar('Error', e.toString() ?? 'Failed to join group');
+      } else {
+        Get.snackbar('Error', 'An unexpected error occurred');
+      }
+      return null;
+    } finally {
+      _isLoading = false;
+      update();
+    }
+  }
+
   Future<ResponseModel> getGroup(String groupId) async {
     _isLoading = true;
     update();
@@ -315,6 +364,7 @@ class AuthController extends GetxController implements GetxService {
         groupId: '',
         userId: response.body["userId"],
       );
+      AppLinksDeepLink.instance.checkPendingGroupJoin();
       print(response.body.toString());
     } else {
       responseModel = ResponseModel(false, response.statusText!);
@@ -337,7 +387,7 @@ class AuthController extends GetxController implements GetxService {
       _userToken = token.trim();
       authRepo.saveUserToken(token);
       await fetchAndSetUserToken();
-
+      AppLinksDeepLink.instance.checkPendingGroupJoin();
       responseModel = ResponseModel(true, response.body["accessToken"]);
     } else if (response.statusCode == 403) {
       Response response = await authRepo.getUserIdByEmail(email);
@@ -399,5 +449,15 @@ class AuthController extends GetxController implements GetxService {
     _isLoading = false;
     update();
     return responseModel;
+  }
+
+  Future<String> generateInviteLink(String userProfileId) async {
+    Response response = await authRepo.generateInviteLink(userProfileId);
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      print("BAD generate link ${response.statusCode}");
+      return "";
+    }
   }
 }

@@ -65,7 +65,7 @@ class _CreateEventPageState extends State<CreateEventPage>
           print(frame.body);
           showCustomSnackBar(frame.body ?? "Null message");
           // Received a frame for this subscription
-          messages = jsonDecode(frame.body!).reversed.toList();
+          messages = jsonDecode(frame.body!).toList();
         });
   }
 
@@ -203,7 +203,7 @@ class _CreateEventPageState extends State<CreateEventPage>
                 width: double.maxFinite,
                 height: double.maxFinite,
                 decoration: BoxDecoration(
-                  color: AppColors.mainBlueColor,
+                  color: AppColors.mainBlueDarkColor,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(Dimensions.radius30),
                     topRight: Radius.circular(Dimensions.radius30),
@@ -314,7 +314,7 @@ class _CreateEventPageState extends State<CreateEventPage>
                       SizedBox(height: Dimensions.height30),
                       SlideTransition(
                         position: _slideAnimations[4],
-                        child: Row(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
@@ -429,7 +429,8 @@ class _CreateEventPageState extends State<CreateEventPage>
         padding: EdgeInsets.symmetric(
             vertical: Dimensions.height20, horizontal: Dimensions.height20),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.mainBlueDarkColor : Colors.grey[300],
+          color:
+              isSelected ? AppColors.mainBlueVeryDarkColor : Colors.grey[300],
           borderRadius: BorderRadius.circular(Dimensions.radius15 * 0.8),
         ),
         child: Text(

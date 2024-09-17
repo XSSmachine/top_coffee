@@ -34,24 +34,13 @@ final Map<String, String> labelTranslations = {
 };
 
 bool isSelected(String label, String selectedType) {
-  final String? translatedLabel = labelTranslations[label];
-
-  if (translatedLabel != null) {
-    return selectedType.toLowerCase() == label.toLowerCase() ||
-        selectedType.toLowerCase() == translatedLabel.toLowerCase();
-  } else {
-    return selectedType.toLowerCase() == label.toLowerCase();
-  }
+  final String englishLabel = labelTranslations[label] ?? label;
+  return selectedType.toLowerCase() == englishLabel.toLowerCase();
 }
 
 class _EventTypeChipState extends State<EventTypeChip> {
-  // Reverse the labelTranslations map for easy English lookup
-  final Map<String, String> englishTranslations = Map.fromEntries(
-    labelTranslations.entries.map((e) => MapEntry(e.value, e.key)),
-  );
-
   String getEnglishLabel(String label) {
-    return labelTranslations[label] ?? englishTranslations[label] ?? label;
+    return labelTranslations[label] ?? label;
   }
 
   @override
@@ -65,6 +54,7 @@ class _EventTypeChipState extends State<EventTypeChip> {
         icon: widget.icon,
         text: widget.label,
         iconColor: Colors.white,
+        size: IconAndTextSize.normal,
       ),
       backgroundColor: widget.color,
       selectedColor: widget.color,
@@ -72,12 +62,12 @@ class _EventTypeChipState extends State<EventTypeChip> {
         String englishLabel = selected
             ? getEnglishLabel(widget.label)
             : widget.firstSelected == null
-            ? getEnglishLabel(AppStrings.allFilter.tr)
-            : getEnglishLabel(widget.firstSelected!);
+                ? getEnglishLabel(
+                    'SVE') // Use 'SVE' instead of AppStrings.allFilter.tr
+                : getEnglishLabel(widget.firstSelected!);
         widget.onEventTypeChanged(englishLabel);
       },
       selected: isSelected(widget.label, widget.selectedEventType),
     );
   }
 }
-

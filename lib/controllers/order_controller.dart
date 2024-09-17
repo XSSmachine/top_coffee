@@ -32,6 +32,22 @@ class OrderController extends GetxController implements GetxService {
   List<OrderModel> get completedOrders => _completedOrders;
   List<OrderModel> get cancelledOrders => _cancelledOrders;
 
+  RxBool isActive = true.obs;
+  RxBool showCurrentEvent = false.obs;
+  RxInt currentPage = 0.obs;
+  RxBool isLoadingScreen = false.obs;
+  RxBool hasMore = true.obs;
+  RxInt pageSize = 10.obs;
+  RxString searchQuery = ''.obs;
+  RxString filterRating = ''.obs;
+  RxString filterType = ''.obs;
+  RxBool showFilters = false.obs;
+  RxBool showCancelledOrders = false.obs;
+
+  RxList<String> ratingOptions = ['ANY', '1', '2', '3', '4', '5'].obs;
+  RxInt currentRatingIndex = 0.obs;
+  RxList<String> typeOptionsEnglish = ['ALL', 'COFFEE', 'FOOD', 'BEVERAGE'].obs;
+
   void resetAllValues() {
     _currentOrder.value = null;
     _eventOrders.clear();
@@ -175,16 +191,6 @@ class OrderController extends GetxController implements GetxService {
   }) async {
     try {
       _isLoading.value = true;
-      print("page" +
-          page.toString() +
-          " size " +
-          size.toString() +
-          " rating " +
-          rating.toString() +
-          " type " +
-          type.toString() +
-          "search " +
-          search.toString());
       final List<OrderModel> newOrders = await orderRepo.getFilteredOrders(
         page: page,
         size: size,

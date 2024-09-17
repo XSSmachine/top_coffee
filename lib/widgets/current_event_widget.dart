@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import '../utils/string_resources.dart';
 import 'extensions.dart';
 import '../controllers/order_controller.dart';
 import '../models/event_model.dart';
@@ -120,12 +121,12 @@ class _CurrentEventWidgetState extends State<CurrentEventWidget> {
               Container(
                 padding: EdgeInsets.all(Dimensions.width10),
                 decoration: BoxDecoration(
-                  color: AppColors.mainBlueColor.withOpacity(0.1),
+                  color: AppColors.mainBlueDarkColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(Dimensions.radius15),
                 ),
                 child: Icon(Icons.event,
                     size: Dimensions.iconSize24,
-                    color: AppColors.mainBlueColor),
+                    color: AppColors.mainBlueDarkColor),
               ),
               SizedBox(width: Dimensions.width15),
               Expanded(
@@ -142,7 +143,7 @@ class _CurrentEventWidgetState extends State<CurrentEventWidget> {
                     ),
                     SizedBox(height: Dimensions.height10 / 2),
                     Text(
-                      "Date: ${formatDate(widget.event.createdAt)}",
+                      "${AppStrings.Date.tr}: ${formatDate(widget.event.createdAt)}",
                       style: TextStyle(
                         fontSize: Dimensions.font16,
                         color: Colors.grey[600],
@@ -160,7 +161,7 @@ class _CurrentEventWidgetState extends State<CurrentEventWidget> {
                   borderRadius: BorderRadius.circular(Dimensions.radius15),
                 ),
                 child: Text(
-                  formatStatus(widget.event.status),
+                  formatStatus(widget.event.status).tr,
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -176,7 +177,8 @@ class _CurrentEventWidgetState extends State<CurrentEventWidget> {
               _buildInfoChip(Icons.fastfood, widget.event.eventType ?? "Food",
                   Colors.green),
               SizedBox(width: Dimensions.width10),
-              _buildInfoChip(Icons.people, "$orders attendees", Colors.orange),
+              _buildInfoChip(Icons.people, "$orders ${AppStrings.Attendees.tr}",
+                  Colors.orange),
             ],
           ),
           SizedBox(height: Dimensions.height15),
@@ -186,7 +188,7 @@ class _CurrentEventWidgetState extends State<CurrentEventWidget> {
             },
             style: ElevatedButton.styleFrom(
               elevation: 0,
-              backgroundColor: AppColors.mainBlueColor,
+              backgroundColor: AppColors.mainBlueDarkColor,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(Dimensions.radius15),
@@ -195,7 +197,7 @@ class _CurrentEventWidgetState extends State<CurrentEventWidget> {
             ),
             child: Center(
               child: Text(
-                'View My Orders',
+                AppStrings.viewMyOrders.tr,
                 style: TextStyle(
                   fontSize: Dimensions.font16,
                   fontWeight: FontWeight.w600,
@@ -222,7 +224,7 @@ class _CurrentEventWidgetState extends State<CurrentEventWidget> {
           Icon(icon, color: color, size: Dimensions.iconSize16),
           SizedBox(width: Dimensions.width10 / 2),
           Text(
-            label,
+            label.tr,
             style: TextStyle(
               color: color,
               fontWeight: FontWeight.bold,

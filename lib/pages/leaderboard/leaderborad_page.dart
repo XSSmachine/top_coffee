@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import 'package:team_coffee/pages/leaderboard/widgets/skeleton_user_item.dart';
 import 'package:team_coffee/utils/app_constants.dart';
 import 'package:team_coffee/utils/string_resources.dart';
 
+import '../../controllers/group_controller.dart';
 import '../../controllers/user_controller.dart';
 import '../../models/user_model.dart';
 import '../../utils/colors.dart';
@@ -20,6 +22,7 @@ class LeaderboardScreen extends StatefulWidget {
 class _LeaderboardScreenState extends State<LeaderboardScreen>
     with TickerProviderStateMixin {
   final UserController userController = Get.find<UserController>();
+  final GroupController groupController = Get.find<GroupController>();
   bool showFilters = false;
   String selectedFilter = "FIRSTNAME";
   final ScrollController _scrollController = ScrollController();
@@ -29,6 +32,12 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   @override
   void initState() {
     super.initState();
+
+    ever(
+        groupController.currentGroupId,
+        (_) => setState(() {
+              _refreshLeaderboard();
+            }));
     _initializeLeaderboard();
     _scrollController.addListener(_onScroll);
     _animationController = AnimationController(
@@ -95,7 +104,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
               ? Dimensions.height10 * 17
               : Dimensions.height10 * 10.8,
           decoration: BoxDecoration(
-            color: AppColors.mainPurpleColor,
+            color: AppColors.mainBlueDarkColor,
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(Dimensions.radius20),
               bottomRight: Radius.circular(Dimensions.radius20),
@@ -113,13 +122,20 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
               children: [
                 AppBar(
                   backgroundColor: Colors.transparent,
+                  automaticallyImplyLeading: false,
                   elevation: 0,
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(width: Dimensions.width20 * 3.6),
-                      Text(AppStrings.leaderboardTitle.tr,
-                          style: const TextStyle(color: Colors.white)),
+                      Text(
+                        AppStrings.leaderboardTitle.tr,
+                        style: TextStyle(
+                          fontSize: Dimensions.font20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
                       GestureDetector(
                         onTap: () {
                           setState(() {
@@ -211,6 +227,18 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
               itemCount: 10,
               itemBuilder: (context, index) => SkeletonUserItem(),
             );
+          } else if (controller.allUserList.isEmpty) {
+            return Center(
+                child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Lottie.asset("assets/image/empty_leaderboard.json",
+                    height: Dimensions.height45 * 5,
+                    width: Dimensions.width30 * 7),
+                Text(AppStrings.noRatings.tr),
+              ],
+            ));
           }
           return RefreshIndicator(
             onRefresh: _refreshLeaderboard,

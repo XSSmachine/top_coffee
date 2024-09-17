@@ -5,6 +5,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import '../../controllers/group_controller.dart';
 import '../../models/update_group_model.dart';
 import '../../models/update_profile_model.dart';
 import '../../models/user_profile_model.dart';
@@ -15,7 +16,6 @@ class ApiClient extends GetConnect implements GetxService {
   late String groupId;
   final String appBaseUrl;
   late SharedPreferences sharedPreferences;
-
   late Map<String, String> _mainHeaders;
   late Map<String, String> _header;
 

@@ -43,7 +43,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
         }
       });
 
-      return formattedOptions.join('\n');
+      return formattedOptions.join('\n').replaceAll("description", "opis");
     } catch (e) {
       // Handle parsing errors
       print("Error parsing additional options: $e");
@@ -88,7 +88,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'MY ORDER',
+                          'MY ORDER'.tr,
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -196,7 +196,8 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                           _isCancelled
                               ? "CANCELLED"
                               : controller.currentOrder!.status!
-                                      .replaceAll("_", " ") ??
+                                      .replaceAll("_", " ")
+                                      .tr ??
                                   "Null",
                           style: TextStyle(
                             color: Colors.black,

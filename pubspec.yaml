@@ -42,6 +42,8 @@ dependencies:
   firebase_admin: any
   android_intent_plus: ^5.1.0
   pull_to_refresh: ^2.0.0
+  share_plus: any
+  rive: ^0.11.4
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -63,7 +65,7 @@ dependencies:
   googleapis_auth: any
   dropdown_button2: ^2.3.9
   stomp_dart_client: ^2.0.0
-  app_links: ^6.1.4
+  app_links: ^6.3.2
   flutter_staggered_animations: ^1.1.1
   flutter_staggered_grid_view: ^0.4.0
   device_info_plus: ^10.1.2
@@ -71,6 +73,8 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   fl_chart: ^0.68.0
   toggle_switch: ^2.3.0
+  uni_links: ^0.5.1
+  flutter_svg: ^2.0.9
 
 
 dev_dependencies:
@@ -99,10 +103,14 @@ flutter:
 
   assets:
     - assets/image/
-    - assets/image/kafa.png
-    - assets/image/donuts.png
-    - assets/image/fries.png
-    - assets/audio/crunchy.mp3
+    - assets/svg/
+    - assets/image/cook_animation.json
+    - assets/travel_icons_pack.riv
+    - assets/animations/nav_bar.riv
+#    - assets/image/kafa.png
+#    - assets/image/donuts.png
+#    - assets/image/fries.png
+#    - assets/audio/crunchy.mp3
 
 
   #   - images/a_dot_burr.jpeg

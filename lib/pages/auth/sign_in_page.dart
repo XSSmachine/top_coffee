@@ -107,13 +107,17 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
         authController.login(email, password).then((status) {
           if (status.isSuccess) {
             authController.getUserId();
-            eventController.eventsStream(
-                "ALL",
-                0,
-                11,
-                '',
-                EventFilters(
-                    eventType: "ALL", status: ['PENDING'], timeFilter: ''));
+            /*eventController.fetchFilteredEvents(
+              page: 0,
+              size: eventController.pageSize,
+              search: '',
+              filters: EventFilters(
+                eventType: eventController.selectedEventType.value,
+                status: eventController.selectedEventStatus.value,
+                timeFilter: eventController.selectedTimeFilter.value,
+              ),
+            );*/
+            ;
             print(AppStrings.successMsg.tr);
             Get.toNamed(RouteHelper.getGroupListPage());
           } else if (status.message == "Email is not verified.") {
@@ -252,7 +256,7 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
                             ),
                             Positioned(
                               top: Dimensions.height45 * 7.1,
-                              right: Dimensions.height30 * 7.5,
+                              right: Dimensions.height30 * 7.8,
                               child: Container(
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(
@@ -336,7 +340,7 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
                           decoration: BoxDecoration(
                             borderRadius:
                                 BorderRadius.circular(Dimensions.radius15),
-                            color: AppColors.mainPurpleColor,
+                            color: AppColors.mainBlueDarkColor,
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -355,7 +359,7 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(
                                       Dimensions.radius30),
-                                  color: AppColors.mainPurpleColor,
+                                  color: AppColors.mainBlueDarkColor,
                                 ),
                                 child: const Icon(
                                   Icons.arrow_forward,

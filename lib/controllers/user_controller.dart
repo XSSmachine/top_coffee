@@ -142,6 +142,40 @@ class UserController extends GetxController implements GetxService {
     }
   }
 
+  Future<void> kickUserFromGroup(String userProfileId) async {
+    try {
+      Response response = await userRepo.kickUserByUserProfileId(userProfileId);
+      if (response.statusCode == 200) {
+        print("KICKED SOME USER" + response.body);
+        update();
+      } else {
+        print("ERROR" + response.body);
+      }
+    } catch (e) {
+      print('Error fetching event stats: $e');
+    } finally {
+      _isLoading = false;
+      update();
+    }
+  }
+
+  Future<void> promoteUserFromGroup(String userProfileId, String role) async {
+    try {
+      Response response =
+          await userRepo.promoteUserByUserProfileId(userProfileId, role);
+      if (response.statusCode == 200) {
+        update();
+      } else {
+        print("ERROR" + response.statusCode.toString());
+      }
+    } catch (e) {
+      print('Error fetching event stats: $e');
+    } finally {
+      _isLoading = false;
+      update();
+    }
+  }
+
   Future<void> getEventsStats() async {
     _isLoading = true;
     update();

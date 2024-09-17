@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:team_coffee/models/my_orders_model.dart';
@@ -80,7 +78,6 @@ class OrderRepo {
           AppConstants.ALL_ORDERS_URI +
               '/update/all?eventId=$eventId&status=$status',
           "");
-
       if (response.statusCode == 200 || response.statusCode == 201) {
         return response;
       } else {

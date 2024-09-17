@@ -368,7 +368,7 @@ class LineChartSample1State extends State<LineChartSample1> {
             children: <Widget>[
               const SizedBox(height: 37),
               Text(
-                'Monthly Statistics',
+                'Monthly Statistics'.tr,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: Dimensions.font26,

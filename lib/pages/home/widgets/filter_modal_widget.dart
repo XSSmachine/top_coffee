@@ -25,14 +25,14 @@ class _FilterModalState extends State<FilterModal> {
     'ALL': AppColors.redChipColor,
     'COFFEE': AppColors.orangeChipColor,
     'FOOD': AppColors.greenChipColor,
-    'BEVERAGES': AppColors.blueChipColor,
+    'BEVERAGE': AppColors.blueChipColor,
   };
 
   final Map<String, IconData> eventTypeIcons = {
     'ALL': Icons.fastfood,
     'COFFEE': Icons.coffee,
     'FOOD': Icons.restaurant,
-    'BEVERAGES': Icons.liquor,
+    'BEVERAGE': Icons.liquor,
   };
 
   final Map<String, IconData> statusIcons = {
@@ -52,30 +52,29 @@ class _FilterModalState extends State<FilterModal> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Filter',
+            'Filter'.tr,
             style: TextStyle(
                 fontSize: Dimensions.font26, fontWeight: FontWeight.normal),
           ),
           SizedBox(height: Dimensions.height15),
           _buildEventTypeSelection(),
-          SizedBox(height: Dimensions.height30),
+          SizedBox(height: Dimensions.height20),
           Text(
-            "Event status",
+            "Event status".tr,
             style: TextStyle(
                 fontSize: Dimensions.font16, fontWeight: FontWeight.w600),
           ),
           SizedBox(height: Dimensions.height15),
           _buildEventStatusSelection(),
-          SizedBox(height: Dimensions.height30),
+          SizedBox(height: Dimensions.height20),
           Text(
-            "Time & Date",
+            "Time & Date".tr,
             style: TextStyle(
                 fontSize: Dimensions.font16, fontWeight: FontWeight.w600),
           ),
           SizedBox(height: 10),
           _buildTimeDateSelection(),
-          SizedBox(height: Dimensions.height15), //_buildPriceRangeSelection(),
-          SizedBox(height: Dimensions.height15),
+          SizedBox(height: Dimensions.height30), //_buildPriceRangeSelection(),
           _buildActionButtons(),
           SizedBox(height: Dimensions.height30),
         ],
@@ -90,7 +89,7 @@ class _FilterModalState extends State<FilterModal> {
         _buildEventTypeOption('ALL'),
         _buildEventTypeOption('COFFEE'),
         _buildEventTypeOption('FOOD'),
-        _buildEventTypeOption('BEVERAGES'),
+        _buildEventTypeOption('BEVERAGE'),
       ],
     );
   }
@@ -119,7 +118,7 @@ class _FilterModalState extends State<FilterModal> {
           ),
           SizedBox(height: 8),
           Text(
-            type,
+            type.tr,
             style: TextStyle(
               color: eventController.selectedEventType.value == type
                   ? eventTypeColors[type]
@@ -155,6 +154,9 @@ class _FilterModalState extends State<FilterModal> {
             : '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}')
         .join(' ');
 
+    // Define a consistent size for all options
+    const double optionSize = 100.0; // Adjust this value as needed
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -165,18 +167,41 @@ class _FilterModalState extends State<FilterModal> {
           }
         });
       },
-      child: Column(
-        children: [
-          Icon(
-            statusIcons[status] ??
-                Icons.help_outline, // Default icon if status is not mapped
-            color: eventController.selectedEventStatus.contains(status)
-                ? AppColors.mainBlueColor
-                : Colors.grey,
-            size: Dimensions.iconSize24,
+      child: SizedBox(
+        width: optionSize,
+        height: optionSize,
+        child: Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: eventController.selectedEventStatus.contains(status)
+                  ? AppColors.mainBlueColor
+                  : Colors.grey,
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(12),
           ),
-          Text(formattedStatus),
-        ],
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                statusIcons[status] ?? Icons.help_outline,
+                color: eventController.selectedEventStatus.contains(status)
+                    ? AppColors.mainBlueColor
+                    : Colors.grey,
+                size: Dimensions.iconSize24,
+              ),
+              SizedBox(height: 4),
+              Text(
+                formattedStatus.tr,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontSize:
+                        Dimensions.font16 * 0.8), // Adjust font size if needed
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -203,6 +228,8 @@ class _FilterModalState extends State<FilterModal> {
 
   Widget _buildTimeDateOption(String timeDate) {
     bool isSelected = eventController.selectedTimeFilter.value == timeDate;
+    String formattedtimeDate =
+        timeDate.tr.replaceAll('_', ' ').split(' ').join(' ');
     return OutlinedButton(
       onPressed: () {
         setState(() {
@@ -223,8 +250,9 @@ class _FilterModalState extends State<FilterModal> {
         ),
       ),
       child: Text(
-        timeDate,
+        formattedtimeDate,
         style: TextStyle(
+          fontSize: Dimensions.font16 * 0.8,
           color: isSelected ? Colors.white : Colors.grey[600],
         ),
       ),
@@ -242,8 +270,8 @@ class _FilterModalState extends State<FilterModal> {
         DateTime? pickedDate = await showDatePicker(
           context: context,
           initialDate: DateTime.now(),
-          firstDate: DateTime(2000),
-          lastDate: DateTime(2101),
+          firstDate: DateTime(2010),
+          lastDate: DateTime(2030),
         );
         if (pickedDate != null) {
           setState(() {
@@ -269,13 +297,15 @@ class _FilterModalState extends State<FilterModal> {
           Icon(Icons.calendar_today,
               color:
                   isCalendarSelected ? Colors.white : AppColors.mainBlueColor),
-          SizedBox(width: 8),
+          SizedBox(width: Dimensions.width10),
           Text(
             isCalendarSelected
                 ? eventController.selectedTimeFilter.value!
-                : 'Choose from calendar',
+                : 'Choose from calendar'.tr,
             style: TextStyle(
-                color: isCalendarSelected ? Colors.white : Colors.grey[700]),
+              fontSize: Dimensions.font16 * 0.8,
+              color: isCalendarSelected ? Colors.white : Colors.grey[700],
+            ),
           ),
           SizedBox(width: 8),
           Icon(Icons.arrow_forward_ios,
@@ -300,11 +330,11 @@ class _FilterModalState extends State<FilterModal> {
                 setState(() {
                   eventController.selectedEventType.value = 'ALL';
                   eventController.selectedEventStatus.value = ['PENDING'];
-                  eventController.selectedTimeFilter.value = 'TODAY';
+                  eventController.selectedTimeFilter.value = 'THIS_WEEK';
                 });
               },
               child: Text(
-                'RESET',
+                'RESET'.tr,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -337,7 +367,7 @@ class _FilterModalState extends State<FilterModal> {
                 Navigator.pop(context);
               },
               child: Text(
-                'APPLY',
+                'APPLY'.tr,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,

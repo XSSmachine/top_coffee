@@ -5,6 +5,7 @@ import 'package:team_coffee/models/event_status_count.dart';
 import 'package:team_coffee/models/fetch_me_model.dart';
 import 'package:team_coffee/models/order_status_count.dart';
 import '../controllers/auth_controller.dart';
+import '../controllers/group_controller.dart';
 import '../controllers/user_controller.dart';
 import '../models/group_data.dart';
 import '../pages/account/widgets/group_selection_screen.dart';
@@ -12,6 +13,7 @@ import '../pages/account/widgets/group_selector_widget.dart';
 import '../routes/route_helper.dart';
 import '../utils/colors.dart';
 import '../utils/dimensions.dart';
+import '../utils/string_resources.dart';
 
 class WordCustomCard extends StatefulWidget {
   final FetchMeModel user;
@@ -44,11 +46,12 @@ class _WordCustomCardState extends State<WordCustomCard> {
   Future<void> _fetchGroups() async {
     try {
       List<Group> fetchedGroups = await authController.fetchAllGroups();
+      final groupId = await authController.getGroupId();
       setState(() {
         _groups = fetchedGroups;
+
         _selectedGroup = _groups.firstWhereOrNull(
-          (group) =>
-              group.groupId == widget.userController.group.value?.groupId,
+          (group) => group.groupId == groupId,
         );
 
         if (_selectedGroup == null && _groups.isNotEmpty) {
@@ -151,7 +154,7 @@ class _WordCustomCardState extends State<WordCustomCard> {
                   margin: EdgeInsets.only(top: Dimensions.height45 * 6.5),
                   padding: const EdgeInsets.fromLTRB(20, 70, 20, 20),
                   decoration: BoxDecoration(
-                    color: AppColors.candyPurpleColor,
+                    color: AppColors.mainBlueColor,
                     borderRadius: BorderRadius.circular(Dimensions.radius30),
                     boxShadow: [
                       BoxShadow(
@@ -235,13 +238,7 @@ class _WordCustomCardState extends State<WordCustomCard> {
                               child: GroupSelector(
                                 groups: _groups,
                                 selectedGroup: _selectedGroup,
-                                onGroupSelected: (Group group) {
-                                  setState(() {
-                                    _selectedGroup = group;
-                                  });
-                                  widget.userController
-                                      .updateGroupName(group.name);
-                                },
+                                onGroupSelected: (Group group) {},
                               ),
                             ),
                             IconButton(
@@ -344,7 +341,7 @@ class _WordCustomCardState extends State<WordCustomCard> {
                   margin: EdgeInsets.only(top: Dimensions.height45 * 6.5),
                   padding: const EdgeInsets.fromLTRB(20, 70, 20, 20),
                   decoration: BoxDecoration(
-                    color: AppColors.candyPurpleColor,
+                    color: AppColors.mainBlueDarkColor,
                     borderRadius: BorderRadius.circular(Dimensions.radius30),
                     boxShadow: [
                       BoxShadow(
@@ -367,19 +364,19 @@ class _WordCustomCardState extends State<WordCustomCard> {
                           Expanded(
                             child: _buildStatColumn(
                                 '${widget.userController.orderStats.sumOrderStatusCounts()}',
-                                'ORDERS'),
+                                AppStrings.capsOrders.tr),
                           ),
                           Expanded(
                             child: _buildStatColumn(
                                 '${widget.userController.eventStats.sumAllCounts()}',
-                                'EVENTS'),
+                                AppStrings.capsEvents.tr),
                           ),
                           Expanded(
                             child: _buildStatColumn(
                                 widget.userController.userDetail?.score
                                         .toString() ??
                                     'N/A',
-                                'RATING'),
+                                AppStrings.capsRating.tr),
                           ),
                           Expanded(
                             flex: 0,
@@ -429,9 +426,12 @@ class _WordCustomCardState extends State<WordCustomCard> {
                                 groups: _groups,
                                 selectedGroup: _selectedGroup,
                                 onGroupSelected: (Group group) {
+                                  print("PRESSED NEW GROUP");
                                   setState(() {
                                     _selectedGroup = group;
                                   });
+                                  Get.find<GroupController>()
+                                      .changeGroup(group.groupId);
                                   widget.userController
                                       .updateGroupName(group.name);
                                 },

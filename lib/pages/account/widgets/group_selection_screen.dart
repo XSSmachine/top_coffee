@@ -41,7 +41,7 @@ class _GroupSelectionPageState extends State<GroupSelectionPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
-          'Select Group',
+          'Select Group'.tr,
           style: TextStyle(
             fontSize: Dimensions.font20,
             fontWeight: FontWeight.bold,
@@ -69,12 +69,15 @@ class _GroupSelectionPageState extends State<GroupSelectionPage> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: InkWell(
-                onTap: () {
+                onTap: () async {
                   setState(() {
+                    print("JEL TU DODES");
                     _selectedGroupId = group.groupId;
-                    authController.saveGroupId(group.groupId);
+                    widget.onGroupSelected(group);
+                    print("JEL TU DODES2");
                   });
-                  widget.onGroupSelected(group);
+                  print("JEL TU DODES3");
+                  await Get.find<AuthController>().saveGroupId(group.groupId);
                   Navigator.of(context).pop();
                 },
                 child: Padding(

@@ -5,6 +5,7 @@ import 'package:team_coffee/pages/account/widgets/group_selection_screen.dart';
 import 'package:team_coffee/pages/auth/verify_email_page.dart';
 import 'package:team_coffee/pages/detail/event_details_screen.dart';
 import 'package:team_coffee/pages/event/create_event_page.dart';
+import 'package:team_coffee/pages/home/bottom_nav_bar.dart';
 import 'package:team_coffee/pages/notifications/notification_list.dart';
 import 'package:team_coffee/pages/orders/order_selector_screen.dart';
 import 'package:team_coffee/pages/stats/complete_profile_statistics.dart';
@@ -138,7 +139,7 @@ class RouteHelper {
             eventId: eventId!,
           );
         }),
-    GetPage(name: "/", page: () => const HomePage()),
+    GetPage(name: "/", page: () => const BottomNavBar()),
     GetPage(
         name: eventCreatePage,
         page: () => const CreateEventPage(),

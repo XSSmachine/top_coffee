@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:team_coffee/controllers/event_controller.dart';
 import 'package:team_coffee/controllers/order_controller.dart';
 import 'package:team_coffee/models/fetch_me_model.dart';
+import 'package:team_coffee/pages/account/widgets/flag_icon_widget.dart';
 import 'package:team_coffee/widgets/user_profile.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/user_controller.dart';
@@ -164,9 +165,10 @@ class _AccountPageState extends State<AccountPage> {
                       Icons.support, AppStrings.support.tr, () {}),
                   _buildClickableRow(
                       Icons.groups_rounded, AppStrings.editGroup.tr, () async {
-                    Get.to(GroupScreen(
-                      groupId: await authController.getGroupId(),
-                    ));
+                    final groupId = await authController.getGroupId();
+                    Get.to(() => GroupScreen(
+                          groupId: groupId,
+                        ));
                   }),
                   // Second card
                   Card(
@@ -180,7 +182,8 @@ class _AccountPageState extends State<AccountPage> {
                           borderRadius:
                               BorderRadius.circular(Dimensions.radius15),
                           child: Image.asset(
-                            'assets/image/food_table.jpg', // Replace with your image
+                            'assets/image/food_table.jpg',
+                            // Replace with your image
                             fit: BoxFit.cover,
                             height: Dimensions.height20 * 6,
                             width: double.infinity,
@@ -206,37 +209,37 @@ class _AccountPageState extends State<AccountPage> {
                   SizedBox(
                     height: Dimensions.height10,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        width: Dimensions.width15,
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          authController.clearSharedData();
-                          userController.resetAllValues();
-                          eventController.resetAllValues();
-                          orderController.resetAllValues();
-                          Get.toNamed(RouteHelper.getSignInPage());
-                        },
-                        child: Text(
-                          AppStrings.logout.tr,
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: Dimensions.width10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            authController.clearSharedData();
+                            userController.resetAllValues();
+                            eventController.resetAllValues();
+                            orderController.resetAllValues();
+                            Get.toNamed(RouteHelper.getSignInPage());
+                          },
+                          child: Text(
+                            AppStrings.logout.tr,
+                            style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: Dimensions.font16 * 0.8),
+                          ),
+                        ),
+                        Text(
+                          "${AppStrings.version.tr} 2.0.0",
                           style: TextStyle(
-                              color: Colors.grey[600],
+                              color: Colors.grey,
                               fontSize: Dimensions.font16 * 0.8),
                         ),
-                      ),
-                      SizedBox(
-                        width: Dimensions.width15 * 6,
-                      ),
-                      Text(
-                        "${AppStrings.version.tr} 2.0.0",
-                        style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: Dimensions.font16 * 0.8),
-                      )
-                    ],
+                        FlagIconWidget(),
+                      ],
+                    ),
                   ),
                   SizedBox(
                     height: Dimensions.height20 * 2,

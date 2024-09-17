@@ -103,29 +103,28 @@ class AlternatingPieChartState extends State<AlternatingPieChart> {
             Center(child: CircularProgressIndicator())
           else if (filteredData.isEmpty)
             Center(
-                child: Expanded(
               child: Center(
                 child: Column(
                   children: [
                     SizedBox(
-                      height: Dimensions.height45,
-                    ),
-                    Image.asset(
-                      "assets/image/donuts.png",
-                      scale: 0.5,
-                      width: Dimensions.width20 * 10,
-                      height: Dimensions.width20 * 10,
+                      height: Dimensions.height20,
                     ),
                     Text(
                       AppStrings.noData.tr,
                       style: TextStyle(
-                          fontSize: Dimensions.font20,
+                          fontSize: Dimensions.font16,
                           fontWeight: FontWeight.bold),
+                    ),
+                    Image.asset(
+                      "assets/image/donuts.png",
+                      scale: 0.5,
+                      width: Dimensions.width20 * 8,
+                      height: Dimensions.width20 * 8,
                     ),
                   ],
                 ),
               ),
-            ))
+            )
           else
             AspectRatio(
               aspectRatio: 1.6,
@@ -239,7 +238,7 @@ class _Badge extends StatelessWidget {
       padding: EdgeInsets.all(size * .15),
       child: Center(
         child: Text(
-          text,
+          text.tr,
           style: TextStyle(
             color: borderColor,
             fontSize: size * .2,

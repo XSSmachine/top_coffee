@@ -3,7 +3,15 @@ import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:team_coffee/base/show_custom_snackbar.dart';
 import 'package:team_coffee/pages/auth/name_surname_page.dart';
+
+import '../controllers/auth_controller.dart';
+import '../controllers/notification_controller.dart';
+import '../models/group_data.dart';
+import '../pages/auth/sign_in_page.dart';
+import '../pages/group/group_list_screen.dart';
+import '../pages/home/home_page.dart';
 
 class AppLinksDeepLink {
   AppLinksDeepLink._privateConstructor();
@@ -16,24 +24,23 @@ class AppLinksDeepLink {
   late AppLinks _appLinks;
   StreamSubscription<Uri>? _linkSubscription;
 
+  final AuthController _authController = Get.find<AuthController>();
+  final notificationController = Get.find<NotificationController>();
+
   void onInit() {
     _appLinks = AppLinks();
     initDeepLinks();
   }
 
   Future<void> initDeepLinks() async {
-    // Check initial link if app was in cold state (terminated)
     final appLink = await _appLinks.getInitialLink();
     if (appLink != null) {
-      var uri = Uri.parse(appLink.toString());
-      Get.to(NameSurnamePage());
+      handleDeepLink(appLink);
     }
 
-    // Handle link when app is in warm state (front or background)
     _linkSubscription = _appLinks.uriLinkStream.listen(
-      (uriValue) {
-        print(' you will listen any url updates ');
-        print(' here you can redirect from url as per your need ');
+      (Uri uri) {
+        handleDeepLink(uri);
       },
       onError: (err) {
         debugPrint('====>>> error : $err');
@@ -42,5 +49,57 @@ class AppLinksDeepLink {
         _linkSubscription?.cancel();
       },
     );
+  }
+
+  void handleDeepLink(Uri uri) {
+    if (uri.pathSegments.contains('join')) {
+      final groupCode = uri.pathSegments.last;
+      if (_authController.userLoggedIn()) {
+        _joinGroup(groupCode);
+      } else {
+        _saveGroupCodeLocally(groupCode);
+        Get.to(() => SignInPage());
+      }
+    }
+  }
+
+  void _joinGroup(String groupCode) {
+    try {
+      _authController
+          .joinGroupViaInvitation(groupCode, notificationController)
+          .then((group) {
+        Group? groupInfo = group;
+        if (groupInfo != null) {
+          Get.to(() => GroupListScreen());
+          Future.delayed(const Duration(milliseconds: 1000), () {
+            showCustomEventSnackBar(
+                name: groupInfo.name,
+                surname: groupInfo.description,
+                eventTitle: "Success",
+                imageUrl:
+                    groupInfo.photoUrl ?? "https://via.placeholder.com/50x50");
+          });
+        } else {
+          Get.snackbar(
+              'Issue', 'There was an issue when trying to join the group.');
+        }
+      });
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to join the group. Please try again.');
+    }
+  }
+
+  void _saveGroupCodeLocally(String groupCode) {
+    // Save the group code locally, e.g., using shared preferences or GetX storage
+    // For this example, we'll use a simple variable in the AuthController
+    _authController.pendingGroupCode = groupCode;
+  }
+
+  // Call this method after successful login or registration
+  void checkPendingGroupJoin() {
+    if (_authController.pendingGroupCode != null) {
+      _joinGroup(_authController.pendingGroupCode!);
+      _authController.pendingGroupCode = null;
+    }
   }
 }

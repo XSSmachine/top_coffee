@@ -1,11 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
-import 'package:team_coffee/pages/event/all_events_screen.dart';
-import 'package:team_coffee/pages/home/widgets/animated_event_grid.dart';
-import 'package:team_coffee/pages/home/widgets/animated_event_list.dart';
-import 'package:team_coffee/pages/home/widgets/filter_modal_widget.dart';
+import 'package:team_coffee/pages/home/widgets/search_all_events_screen.dart';
 import 'package:team_coffee/utils/colors.dart';
 import 'package:team_coffee/widgets/icon_and_text_widget.dart';
 import '../../controllers/event_controller.dart';
@@ -22,7 +19,6 @@ class TopAppbar extends StatelessWidget {
   final String selectedEventType;
   final Function(String) onEventTypeChanged;
   final EventController eventController;
-  final Function(String) onSearch;
   final VoidCallback onFilterTap;
 
   const TopAppbar({
@@ -30,7 +26,6 @@ class TopAppbar extends StatelessWidget {
     required this.selectedEventType,
     required this.onEventTypeChanged,
     required this.eventController,
-    required this.onSearch,
     required this.onFilterTap,
   });
 
@@ -39,21 +34,22 @@ class TopAppbar extends StatelessWidget {
     return SliverAppBar(
       backgroundColor: Colors.transparent.withOpacity(0.0),
       forceMaterialTransparency: true,
+      automaticallyImplyLeading: false,
       pinned: true,
       floating: true,
       elevation: 2,
       snap: false,
-      expandedHeight: Dimensions.height10 * 20,
-      collapsedHeight: Dimensions.height10 * 20,
+      expandedHeight: Dimensions.height10 * 21,
+      collapsedHeight: Dimensions.height10 * 21,
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: EdgeInsets.only(bottom: 0.0),
         background: Stack(
           clipBehavior: Clip.none,
           children: [
             Container(
-              height: Dimensions.height10 * 19.5,
+              height: Dimensions.height10 * 20.5,
               decoration: const BoxDecoration(
-                color: AppColors.mainPurpleColor,
+                color: AppColors.mainBlueDarkColor,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(40),
                   bottomRight: Radius.circular(40),
@@ -83,7 +79,7 @@ class TopAppbar extends StatelessWidget {
                       const SizedBox(width: 70),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.2),
+                          color: AppColors.mainBlueMediumColor,
                           borderRadius:
                               BorderRadius.circular(Dimensions.radius20),
                           boxShadow: [
@@ -95,8 +91,12 @@ class TopAppbar extends StatelessWidget {
                           ],
                         ),
                         child: IconButton(
-                          icon: Icon(Icons.notifications_none,
-                              size: Dimensions.iconSize24, color: Colors.white),
+                          icon: Icon(
+                            Icons.notifications_none,
+                            size: Dimensions.iconSize24,
+                            color: Colors.white,
+                            weight: 5,
+                          ),
                           onPressed: () {
                             Get.toNamed(RouteHelper.notificationListPage);
                           },
@@ -106,48 +106,67 @@ class TopAppbar extends StatelessWidget {
                   ),
                   SizedBox(height: Dimensions.height10),
                   Container(
-                    padding: EdgeInsets.all(Dimensions.height10 * 1.2),
+                    padding: EdgeInsets.symmetric(
+                        vertical: Dimensions.height10 * 1.2),
                     decoration: BoxDecoration(
-                      color: AppColors.mainPurpleColor,
+                      color: AppColors.mainBlueDarkColor,
                       borderRadius: BorderRadius.circular(Dimensions.radius20),
                     ),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.search_outlined,
-                            color: Colors.grey, size: Dimensions.iconSize24),
-                        SizedBox(width: Dimensions.width10),
+                        SvgPicture.asset(
+                          "assets/svg/search.svg",
+                          width: Dimensions.width20 * 1.2,
+                          height: Dimensions.width20 * 1.2,
+                        ),
+                        SizedBox(width: Dimensions.width10 / 3),
                         Expanded(
                           child: TextField(
                             decoration: InputDecoration(
-                              hintText: '${AppStrings.searchTitle.tr}...',
-                              hintStyle: TextStyle(fontSize: Dimensions.font16),
+                              hintText: '  |  ${AppStrings.searchTitle.tr}...',
+                              hintStyle: TextStyle(
+                                  fontSize: Dimensions.font20 * 0.9,
+                                  color: Colors.white.withOpacity(0.8)),
                               border: InputBorder.none,
-                              prefixIcon: Text(
-                                "|   ",
-                                style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: Dimensions.font16),
-                              ),
                               prefixIconConstraints:
                                   BoxConstraints(minWidth: 0, minHeight: 0),
                             ),
-                            onChanged: onSearch,
+                            onTap: () {
+                              print("EVENT STATUS LIST" +
+                                  eventController.selectedEventStatus
+                                      .toString());
+                              Get.to(() => SearchAllEventScreen(
+                                  eventController: eventController,
+                                  eventStatuses:
+                                      eventController.selectedEventStatus));
+                            },
+                            readOnly: true,
                           ),
                         ),
-                        GestureDetector(
-                          onTap: onFilterTap,
-                          child: Container(
-                            padding: EdgeInsets.all(Dimensions.height10 * 0.8),
+                        ElevatedButton.icon(
+                          onPressed: onFilterTap,
+                          icon: Container(
+                            padding: EdgeInsets.all(Dimensions.height10 / 3),
                             decoration: BoxDecoration(
-                              color: Colors.grey.withOpacity(0.4),
-                              borderRadius:
-                                  BorderRadius.circular(Dimensions.radius20),
+                              color: Colors.white.withOpacity(0.5),
+                              shape: BoxShape.circle,
                             ),
-                            child: IconAndTextWidget(
-                              icon: Icons.filter_list,
-                              text: AppStrings.filtersTitle.tr,
-                              iconColor: Colors.grey,
+                            child: Icon(Icons.filter_list,
+                                color: AppColors.mainBlueDarkColor, size: 20),
+                          ),
+                          label: Text(
+                            AppStrings.filtersTitle.tr,
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.mainBlueMediumColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
                             ),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: Dimensions.width10,
+                                vertical: Dimensions.height10 / 2),
                           ),
                         ),
                       ],
@@ -176,50 +195,50 @@ class TopAppbar extends StatelessWidget {
               ),
             ),
             Positioned(
-              top: Dimensions.height10 * 17,
+              top: Dimensions.height10 * 18,
               left: 0,
               right: 0,
               child: SizedBox(
                 height: Dimensions.height15 * 4,
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      SizedBox(width: Dimensions.width10),
-                      EventTypeChip(
-                          label: AppStrings.allFilter.tr,
-                          color: AppColors.redChipColor,
-                          icon: Icons.fastfood,
-                          selectedEventType:
-                              eventController.selectedEventType.value,
-                          onEventTypeChanged: onEventTypeChanged),
-                      SizedBox(width: Dimensions.width10 * 0.8),
-                      EventTypeChip(
-                          label: AppStrings.coffeeFilter.tr,
-                          color: AppColors.orangeChipColor,
-                          icon: Icons.coffee,
-                          selectedEventType:
-                              eventController.selectedEventType.value,
-                          onEventTypeChanged: onEventTypeChanged),
-                      SizedBox(width: Dimensions.width10 * 0.8),
-                      EventTypeChip(
-                          label: AppStrings.foodFilter.tr,
-                          color: AppColors.greenChipColor,
-                          icon: Icons.restaurant,
-                          selectedEventType:
-                              eventController.selectedEventType.value,
-                          onEventTypeChanged: onEventTypeChanged),
-                      SizedBox(width: Dimensions.width10 * 0.8),
-                      EventTypeChip(
-                          label: AppStrings.beverageFilter.tr,
-                          color: AppColors.blueChipColor,
-                          icon: Icons.liquor,
-                          selectedEventType:
-                              eventController.selectedEventType.value,
-                          onEventTypeChanged: onEventTypeChanged),
-                      SizedBox(width: Dimensions.width10 * 0.8),
-                    ],
-                  ),
+                  child: Obx(() => Row(
+                        children: [
+                          SizedBox(width: Dimensions.width10),
+                          EventTypeChip(
+                              label: AppStrings.allFilter.tr,
+                              color: AppColors.redChipColor,
+                              icon: Icons.fastfood,
+                              selectedEventType:
+                                  eventController.selectedEventType.value,
+                              onEventTypeChanged: onEventTypeChanged),
+                          SizedBox(width: Dimensions.width10 * 0.8),
+                          EventTypeChip(
+                              label: AppStrings.coffeeFilter.tr,
+                              color: AppColors.orangeChipColor,
+                              icon: Icons.coffee,
+                              selectedEventType:
+                                  eventController.selectedEventType.value,
+                              onEventTypeChanged: onEventTypeChanged),
+                          SizedBox(width: Dimensions.width10 * 0.8),
+                          EventTypeChip(
+                              label: AppStrings.foodFilter.tr,
+                              color: AppColors.greenChipColor,
+                              icon: Icons.restaurant,
+                              selectedEventType:
+                                  eventController.selectedEventType.value,
+                              onEventTypeChanged: onEventTypeChanged),
+                          SizedBox(width: Dimensions.width10 * 0.8),
+                          EventTypeChip(
+                              label: AppStrings.beverageFilter.tr,
+                              color: AppColors.blueChipColor,
+                              icon: Icons.liquor,
+                              selectedEventType:
+                                  eventController.selectedEventType.value,
+                              onEventTypeChanged: onEventTypeChanged),
+                          SizedBox(width: Dimensions.width10 * 0.8),
+                        ],
+                      )),
                 ),
               ),
             ),

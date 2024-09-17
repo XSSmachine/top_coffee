@@ -9,11 +9,13 @@ import 'package:team_coffee/utils/dimensions.dart';
 import 'package:team_coffee/utils/string_resources.dart';
 import 'package:team_coffee/widgets/current_event_widget.dart';
 import '../../base/no_data_page.dart';
+import '../../controllers/group_controller.dart';
 import '../../controllers/order_controller.dart';
 import '../../models/event_model.dart';
 import '../../routes/route_helper.dart';
 import '../../utils/colors.dart';
 import '../../widgets/icon_and_text_widget.dart';
+import 'all_orders_screen.dart';
 
 class TypeOption {
   final String label;
@@ -34,6 +36,7 @@ class OrdersScreen extends StatefulWidget {
 
 class _OrdersScreenState extends State<OrdersScreen>
     with WidgetsBindingObserver {
+  final GroupController groupController = Get.find<GroupController>();
   bool isActive = true;
   bool showCurrentEvent = false;
   int currentPage = 0;
@@ -48,6 +51,7 @@ class _OrdersScreenState extends State<OrdersScreen>
 
   final List<String> ratingOptions = ['ANY', '1', '2', '3', '4', '5'];
   int currentRatingIndex = 0;
+  final List<String> typeOptionsEnglish = ['ALL', 'COFFEE', 'FOOD', 'BEVERAGE'];
   final List<TypeOption> typeOptions = [
     TypeOption(
         label: AppStrings.allFilter.tr,
@@ -74,6 +78,10 @@ class _OrdersScreenState extends State<OrdersScreen>
   @override
   void initState() {
     super.initState();
+    ever(groupController.currentGroupId, (_) async {
+      await _fetchOrders();
+      await _fetchCurrentEvent();
+    });
     _fetchOrders();
     _fetchCurrentEvent();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -153,7 +161,7 @@ class _OrdersScreenState extends State<OrdersScreen>
         rating: ratingOptions[currentRatingIndex] == "ANY"
             ? ''
             : ratingOptions[currentRatingIndex],
-        type: typeOptions[currentTypeIndex].label,
+        type: typeOptionsEnglish[currentTypeIndex],
         search: searchQuery,
       );
       setState(() {
@@ -208,7 +216,7 @@ class _OrdersScreenState extends State<OrdersScreen>
           AnimatedContainer(
             padding: EdgeInsets.only(top: Dimensions.height30),
             decoration: BoxDecoration(
-              color: AppColors.mainPurpleColor,
+              color: AppColors.mainBlueDarkColor,
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(Dimensions.radius20),
                 bottomRight: Radius.circular(Dimensions.radius20),
@@ -252,7 +260,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                       borderWidth: 4.6,
                       iconAnimationType: AnimationType.onHover,
                       style: ToggleStyle(
-                        indicatorColor: AppColors.mainPurpleColor,
+                        indicatorColor: AppColors.mainBlueMediumColor,
                         borderColor: Colors.transparent,
                         backgroundColor: Colors.white,
                         borderRadius: BorderRadius.circular(30.0),
@@ -432,64 +440,11 @@ class _OrdersScreenState extends State<OrdersScreen>
             },
           ),
           Expanded(
-            child: RefreshIndicator(
-              onRefresh: refresh,
-              child: NotificationListener<ScrollNotification>(
-                onNotification: (ScrollNotification scrollInfo) {
-                  if (scrollInfo is ScrollEndNotification) {
-                    _loadMore();
-                  }
-                  return true;
-                },
-                child: GetBuilder<OrderController>(
-                  builder: (orderController) {
-                    final orders = orderController.allOrders;
-                    return orders.isEmpty
-                        ? Center(
-                            child: NoDataPage(
-                            text: "${AppStrings.noOrders.tr}...",
-                            size: Dimensions.height45 * 2.5,
-                          ))
-                        : ListView.builder(
-                            padding: EdgeInsets.only(top: Dimensions.height20),
-                            controller: _scrollController,
-                            itemCount: orders.length + 1,
-                            itemBuilder: (context, index) {
-                              if (index < orders.length) {
-                                final order = orders[index];
-                                return OrderCard(
-                                  status: order.status,
-                                  time: order.createdAt.toString(),
-                                  name: order.additionalOptions.toString(),
-                                  foodType: order.eventType,
-                                  onTap: () {
-                                    Get.toNamed(
-                                      RouteHelper.getEventDetail(
-                                        order.eventId,
-                                        "orders",
-                                        order.orderId,
-                                      ),
-                                    );
-                                  },
-                                );
-                              } else {
-                                return Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 32),
-                                  child: Center(
-                                    child: isLoading
-                                        ? CircularProgressIndicator()
-                                        : hasMore
-                                            ? Text(AppStrings.loadMore.tr)
-                                            : Text(AppStrings.noMore.tr),
-                                  ),
-                                );
-                              }
-                            },
-                          );
-                  },
-                ),
-              ),
-            ),
+            child: AnimatedSwitcher(
+                switchInCurve: Curves.bounceIn,
+                switchOutCurve: Curves.easeOut,
+                duration: const Duration(milliseconds: 800),
+                child: _buildOrdersList()),
           ),
           // if (isLoading == true)
           //   Padding(
@@ -500,6 +455,69 @@ class _OrdersScreenState extends State<OrdersScreen>
           //     ),
           //   ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildOrdersList() {
+    return RefreshIndicator(
+      onRefresh: refresh,
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification scrollInfo) {
+          if (scrollInfo is ScrollEndNotification) {
+            _loadMore();
+          }
+          return true;
+        },
+        child: GetBuilder<OrderController>(
+          key: ValueKey<bool>(isActive),
+          builder: (orderController) {
+            final orders = orderController.allOrders;
+            return orders.isEmpty
+                ? Center(
+                    child: NoDataPage(
+                    text: "${AppStrings.noOrders.tr}...",
+                    size: Dimensions.height45 * 2.5,
+                  ))
+                : ListView.builder(
+                    key: ValueKey<bool>(isActive),
+                    padding: EdgeInsets.only(top: Dimensions.height20),
+                    controller: _scrollController,
+                    itemCount: orders.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index < orders.length) {
+                        final order = orders[index];
+                        return OrderCard(
+                          status: order.status,
+                          time: order.createdAt.toString(),
+                          name: order.additionalOptions.toString(),
+                          foodType: order.eventType,
+                          onTap: () {
+                            Get.toNamed(
+                              RouteHelper.getEventDetail(
+                                order.eventId,
+                                "orders",
+                                order.orderId,
+                              ),
+                            );
+                          },
+                        );
+                      } else {
+                        return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 32),
+                          child: Center(
+                            child: isLoading
+                                ? CircularProgressIndicator()
+                                : hasMore
+                                    ? Text(AppStrings.loadMore.tr)
+                                    : Text(AppStrings.noMore.tr),
+                          ),
+                        );
+                      }
+                    },
+                  );
+          },
+        ),
       ),
     );
   }
@@ -703,7 +721,7 @@ class OrderCard extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.only(left: Dimensions.width20),
                   child: Text(
-                    status.replaceAll("_", " "),
+                    status.replaceAll("_", " ").tr,
                     style: const TextStyle(
                       fontSize: 18,
                     ),
@@ -764,7 +782,7 @@ class OrderCard extends StatelessWidget {
                                 const Icon(Icons.label_important_sharp,
                                     color: Colors.deepOrangeAccent),
                                 const SizedBox(width: 5),
-                                Flexible(child: Text(name)),
+                                Flexible(child: Text(formatText(name))),
                               ],
                             ),
                             SizedBox(
@@ -779,7 +797,7 @@ class OrderCard extends StatelessWidget {
                                       icon: Icons.coffee,
                                       text: AppStrings.coffeeFilter.tr,
                                       iconColor: Colors.white,
-                                      isSmaller: true,
+                                      size: IconAndTextSize.small,
                                     ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(30),
@@ -796,7 +814,7 @@ class OrderCard extends StatelessWidget {
                                       icon: Icons.restaurant,
                                       text: AppStrings.foodFilter.tr,
                                       iconColor: Colors.white,
-                                      isSmaller: true,
+                                      size: IconAndTextSize.small,
                                     ),
                                     backgroundColor: AppColors.greenChipColor,
                                     onSelected: (bool value) {},
@@ -813,7 +831,7 @@ class OrderCard extends StatelessWidget {
                                       icon: Icons.liquor,
                                       text: AppStrings.beverageFilter.tr,
                                       iconColor: Colors.white,
-                                      isSmaller: true,
+                                      size: IconAndTextSize.small,
                                     ),
                                     backgroundColor: AppColors.blueChipColor,
                                     onSelected: (bool value) {},

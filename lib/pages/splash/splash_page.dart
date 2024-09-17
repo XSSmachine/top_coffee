@@ -6,6 +6,7 @@ import 'package:team_coffee/controllers/event_controller.dart';
 import 'package:team_coffee/models/response_model.dart';
 import 'package:team_coffee/pages/auth/sign_in_page.dart';
 import 'package:team_coffee/pages/group/group_list_screen.dart';
+import 'package:team_coffee/pages/home/bottom_nav_bar.dart';
 import 'package:team_coffee/pages/home/home_page.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
@@ -87,8 +88,16 @@ class _SplashScreenState extends State<SplashScreen>
         await player.resume();
       }
     });
-    _eventController.eventsStream("ALL", 0, 11, '',
-        EventFilters(eventType: "ALL", status: ['PENDING'], timeFilter: ''));
+    _eventController.fetchFilteredEvents(
+      page: 0,
+      size: _eventController.pageSize,
+      search: '',
+      filters: EventFilters(
+        eventType: 'ALL',
+        status: ['PENDING', 'IN_PROGRESS', 'COMPLETED'],
+        timeFilter: 'THIS_WEEK',
+      ),
+    );
     _startAnimation();
   }
 
@@ -134,7 +143,7 @@ class _SplashScreenState extends State<SplashScreen>
   void _navigateToHomePage() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const HomePage()),
+      MaterialPageRoute(builder: (context) => const BottomNavBar()),
     );
   }
 

@@ -86,6 +86,7 @@ class EventDetailsScreen extends StatelessWidget {
                                       MediaQuery.of(context).size.height * 0.4 -
                                           30),
                               // Timer container
+
                               Center(
                                 child: Container(
                                   padding: EdgeInsets.symmetric(
@@ -103,26 +104,33 @@ class EventDetailsScreen extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-                                  child: Column(
-                                    children: [
-                                      event.status == "PENDING"
-                                          ? Text(AppStrings.timePending.tr)
-                                          : Text(AppStrings.timeInProgress.tr),
-                                      event.status == "PENDING"
-                                          ? CountdownTimer(
-                                              initialMinutes: eventController
-                                                  .calculateRemainingTimeInRoundedMinutes(
-                                                      event.pendingUntil!),
-                                              onTimerExpired: () {
-                                                Get.back();
-                                              },
-                                            )
-                                          : CountTimer(
-                                              startTimeISO: event.pendingUntil!,
-                                              size: Dimensions.font16,
-                                            )
-                                    ],
-                                  ),
+                                  child: page != "completed"
+                                      ? Column(
+                                          children: [
+                                            event.status == "PENDING"
+                                                ? Text(
+                                                    AppStrings.timePending.tr)
+                                                : Text(AppStrings
+                                                    .timeInProgress.tr),
+                                            event.status == "PENDING"
+                                                ? CountdownTimer(
+                                                    initialMinutes: eventController
+                                                        .calculateRemainingTimeInRoundedMinutes(
+                                                            event
+                                                                .pendingUntil!),
+                                                    onTimerExpired: () {
+                                                      Get.back();
+                                                    },
+                                                  )
+                                                : CountTimer(
+                                                    startTimeISO:
+                                                        event.pendingUntil!,
+                                                    size: Dimensions.font16,
+                                                    showContainer: false,
+                                                  )
+                                          ],
+                                        )
+                                      : Text("FINISHED".tr),
                                 ),
                               ),
 

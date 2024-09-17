@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:team_coffee/base/no_data_page.dart';
 import 'package:team_coffee/controllers/event_controller.dart';
 import 'package:team_coffee/controllers/order_controller.dart';
+import 'package:team_coffee/pages/orders/orders_screen.dart';
 import 'package:team_coffee/utils/colors.dart';
 import 'package:team_coffee/utils/string_resources.dart';
 
@@ -116,7 +117,8 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
                     backgroundImage: AssetImage('assets/image/user.png'),
                   ),
                   title: Text(orders[index].firstName),
-                  subtitle: Text(orders[index].additionalOptions.toString()),
+                  subtitle: Text(
+                      formatText(orders[index].additionalOptions.toString())),
                   trailing: Checkbox(
                     value: orders[index].isChecked ?? false,
                     onChanged: (bool? value) {
@@ -140,8 +142,8 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
             textStyle: const TextStyle(fontSize: 18),
           ),
           child: orders.isEmpty
-              ? const Text(AppStrings.cancelEvent)
-              : const Text(AppStrings.finishBold),
+              ? Text(AppStrings.cancelEvent.tr)
+              : Text(AppStrings.finishBold.tr),
         ),
       ),
     );
@@ -155,4 +157,17 @@ class Order {
 
   Order(
       {required this.name, required this.description, this.isChecked = false});
+}
+
+String formatText(String input) {
+  // Remove curly braces
+  String formattedText = input.replaceAll(RegExp(r'[{}]'), '');
+
+  // Check if the active locale is Croatian
+  if (Get.locale?.languageCode == 'hr') {
+    // Translate "description" to "opis"
+    formattedText = formattedText.replaceAll('description', 'opis');
+  }
+
+  return formattedText;
 }

@@ -144,7 +144,7 @@ class EventRepo {
         "FETCHING FILTERED EVENTS _________ $page ---- $size---- $search ----${filters.eventType} ----- ${filters.status} ---- ${filters.timeFilter}");
     try {
       final response = await apiClient.postData(
-          '${AppConstants.GET_EVENT_URI}/filter?page=$page&size=$size&search=',
+          '${AppConstants.GET_EVENT_URI}/filter?page=$page&size=$size&search=$search',
           filters.toMap());
       if (response.statusCode == 200) {
         return response;

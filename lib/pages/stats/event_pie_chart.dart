@@ -44,12 +44,12 @@ class PieChart2State extends State<PieChartSample2> {
       setState(() {
         data = List<Map<String, dynamic>>.from(jsonData);
         types = [
-          AppStrings.allFilter.tr,
-          ...data.map((item) => item['type'] as String).toSet().toList()
+          'ALL',
+          ...{...data.map((item) => item['type'] as String)}.toList()
         ];
         statuses = [
-          AppStrings.allFilter.tr,
-          ...data.map((item) => item['eventStatus'] as String).toSet().toList()
+          'ALL',
+          ...{...data.map((item) => item['eventStatus'] as String)}.toList()
         ];
         isLoading = false;
       });
@@ -109,11 +109,13 @@ class PieChart2State extends State<PieChartSample2> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             DropdownButton<String>(
+              key: ValueKey('typeDropdown'),
               value: selectedType,
               items: types.map((String value) {
                 return DropdownMenuItem<String>(
+                  key: ValueKey(value),
                   value: value,
-                  child: Text(value),
+                  child: Text(value.tr),
                 );
               }).toList(),
               onChanged: (String? newValue) {
@@ -123,11 +125,13 @@ class PieChart2State extends State<PieChartSample2> {
               },
             ),
             DropdownButton<String>(
+              key: ValueKey('statusDropdown'),
               value: selectedStatus,
               items: statuses.map((String value) {
                 return DropdownMenuItem<String>(
+                  key: ValueKey(value),
                   value: value,
-                  child: Text(value),
+                  child: Text(value.tr),
                 );
               }).toList(),
               onChanged: (String? newValue) {
@@ -176,6 +180,8 @@ class PieChart2State extends State<PieChartSample2> {
       final double fontSize = isTouched ? 25.0 : 16.0;
       final double radius = isTouched ? 60.0 : 50.0;
       const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
+      final String eventStatus = item['eventStatus']?.toString() ?? '';
+      final String eventType = item['type']?.toString() ?? '';
 
       List<Color> colors = [
         AppColors.contentColorBlue,
@@ -200,7 +206,7 @@ class PieChart2State extends State<PieChartSample2> {
         ),
         badgeWidget: isTouched
             ? _Badge(
-                '${item['eventStatus']}\n(${item['type']})',
+                '${eventStatus.tr}\n(${eventType.tr})',
                 size: 40,
                 borderColor: colors[idx % colors.length],
               )
