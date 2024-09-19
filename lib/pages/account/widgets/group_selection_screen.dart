@@ -73,12 +73,10 @@ class _GroupSelectionPageState extends State<GroupSelectionPage> {
                   setState(() {
                     print("JEL TU DODES");
                     _selectedGroupId = group.groupId;
-                    widget.onGroupSelected(group);
-                    print("JEL TU DODES2");
                   });
-                  print("JEL TU DODES3");
                   await Get.find<AuthController>().saveGroupId(group.groupId);
                   Navigator.of(context).pop();
+                  widget.onGroupSelected(group);
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),

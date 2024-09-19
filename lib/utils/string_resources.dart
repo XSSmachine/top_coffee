@@ -33,6 +33,8 @@ class AppStrings {
   static const String emailIntentErrorMsg = "Error opening email app:";
   static const String emailCheckingStatus = 'Checking email status...';
   static const String userWarningMsg = "User registration is not complete.";
+  static const String userNotExistMsg =
+      "There was an issue with login process.";
   static const String emailSentTo = 'We\'ve sent a verification email to:';
   static const String continueRegistration =
       'Please continue your registration.';

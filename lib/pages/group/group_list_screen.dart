@@ -34,7 +34,6 @@ class _GroupListScreenState extends State<GroupListScreen> {
   Future<void> _loadData() async {
     try {
       groups = await authController.fetchAllGroups();
-      setState(() {});
     } catch (e) {
       Get.snackbar(AppStrings.errorMsg.tr, '${AppStrings.failLoadMsg.tr} $e');
     }
@@ -53,9 +52,11 @@ class _GroupListScreenState extends State<GroupListScreen> {
           if (controller.isLoading) {
             return Center(child: CircularProgressIndicator());
           }
-          if (groups.isEmpty) {
-            return Center(child: Text(AppStrings.noData.tr));
-          }
+          // if (groups.isEmpty) {
+          //   WidgetsBinding.instance.addPostFrameCallback((_) {
+          //     Get.toNamed(RouteHelper.getGroupPage('first'));
+          //   });
+          // }
           return Column(
             children: [
               // Lottie animation (unchanged)

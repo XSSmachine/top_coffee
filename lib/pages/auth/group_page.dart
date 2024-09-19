@@ -4,6 +4,7 @@ import 'package:tab_container/tab_container.dart';
 import 'package:team_coffee/controllers/auth_controller.dart';
 import 'package:team_coffee/widgets/group/create_group_widget.dart';
 import 'package:team_coffee/widgets/group/join_group_widget.dart';
+import '../../routes/route_helper.dart';
 import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
 import '../../utils/string_resources.dart';
@@ -151,7 +152,7 @@ class _GroupPageState extends State<GroupPage> with TickerProviderStateMixin {
                     ),
                   ),
                   Positioned(
-                    top: Dimensions.height45 * 4.8,
+                    top: Dimensions.height45 * 4.65,
                     right: Dimensions.height30 * 2.2,
                     child: AnimatedBuilder(
                       animation: _friesAnimation,
@@ -200,7 +201,7 @@ class _GroupPageState extends State<GroupPage> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
-                  if (widget.page != 'register')
+                  if (widget.page == 'join')
                     Positioned(
                       top: Dimensions.height45,
                       left: Dimensions.width20,
@@ -227,6 +228,7 @@ class _GroupPageState extends State<GroupPage> with TickerProviderStateMixin {
                           padding: EdgeInsets.zero, // Remove default padding
                           onPressed: () {
                             print("pressed");
+
                             Get.back();
                           },
                           icon: Icon(Icons.arrow_back),

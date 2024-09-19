@@ -16,6 +16,8 @@ import '../../widgets/app_text_field.dart';
 class NameSurnamePage extends StatelessWidget {
   NameSurnamePage({super.key});
 
+  AuthController controller = Get.find<AuthController>();
+
   var nameController = TextEditingController();
   var surnameController = TextEditingController();
 
@@ -37,7 +39,12 @@ class NameSurnamePage extends StatelessWidget {
       } else {
         authController.userProfile.value?.name = name;
         authController.userProfile.value?.surname = surname;
-        Get.toNamed(RouteHelper.getGroupPage('register'));
+        controller.createUserProfile().then((result) {
+          Get.offAllNamed(RouteHelper.signInPage);
+          showCustomSnackBar(AppStrings.successRegistration.tr,
+              title: AppStrings.successMsg.tr,
+              color: AppColors.mainBlueMediumColor);
+        });
       }
     }
 

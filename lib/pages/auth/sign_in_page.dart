@@ -8,6 +8,7 @@ import '../../base/custom_loader.dart';
 import '../../base/show_custom_snackbar.dart';
 import '../../controllers/auth_controller.dart';
 import '../../models/filter_model.dart';
+import '../../models/group_data.dart';
 import '../../routes/route_helper.dart';
 import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
@@ -32,6 +33,8 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
   late Animation<double> _friesAnimation;
   late Animation<double> _kafaAnimation;
   bool _rememberMe = true;
+  final AuthController authController = Get.find<AuthController>();
+  List<Group> groups = [];
 
   @override
   void initState() {
@@ -81,6 +84,14 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  Future<void> _loadData() async {
+    try {
+      groups = await authController.fetchAllGroups();
+    } catch (e) {
+      Get.snackbar(AppStrings.errorMsg.tr, '${AppStrings.failLoadMsg.tr} $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var emailController = TextEditingController();
@@ -93,16 +104,17 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
 
       if (email.isEmpty) {
         showCustomSnackBar(AppStrings.typeInEmail.tr,
-            title: AppStrings.email.tr);
+            title: AppStrings.email.tr, color: AppColors.mainBlueMediumColor);
       } else if (!GetUtils.isEmail(email)) {
         showCustomSnackBar(AppStrings.typeInEmail.tr,
-            title: "${AppStrings.valid.tr} ${AppStrings.email}");
+            title: "${AppStrings.valid.tr} ${AppStrings.email}",
+            color: AppColors.mainBlueMediumColor);
       } else if (password.isEmpty) {
         showCustomSnackBar(AppStrings.typeInPassword.tr,
-            title: AppStrings.pass.tr);
+            title: AppStrings.pass.tr, color: AppColors.mainBlueMediumColor);
       } else if (password.length < 3) {
         showCustomSnackBar(AppStrings.passWarningMsg.tr,
-            title: AppStrings.pass.tr);
+            title: AppStrings.pass.tr, color: AppColors.mainBlueMediumColor);
       } else {
         authController.login(email, password).then((status) {
           if (status.isSuccess) {
@@ -118,15 +130,32 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
               ),
             );*/
             ;
-            print(AppStrings.successMsg.tr);
-            Get.toNamed(RouteHelper.getGroupListPage());
+
+            _loadData().then((result) {
+              if (groups.isEmpty) {
+                print(AppStrings.successMsg.tr);
+                Get.offAllNamed(RouteHelper.getGroupPage("first"));
+              } else {
+                print(AppStrings.successMsg.tr);
+                Get.offAllNamed(RouteHelper.getGroupListPage());
+              }
+            });
           } else if (status.message == "Email is not verified.") {
-            showCustomSnackBar(AppStrings.emailWarningMsg.tr);
+            showCustomSnackBar(AppStrings.emailWarningMsg.tr,
+                isError: false,
+                title: "Warning".tr,
+                color: AppColors.mainBlueMediumColor);
             Get.offNamedUntil(
                 RouteHelper.getVerifyEmailPage(email), (route) => false);
           } else if (status.message == "User registration is not complete.") {
             showCustomSnackBar(AppStrings.userWarningMsg.tr);
             Get.off(NameSurnamePage());
+          } else if (status.message == "User is unauthorized.") {
+            showCustomSnackBar(
+              AppStrings.userNotExistMsg.tr,
+              color: AppColors.orangeChipColor,
+              title: "Error occurred".tr,
+            );
           } else {
             showCustomSnackBar(status.message);
           }

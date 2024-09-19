@@ -44,9 +44,8 @@ class JoinGroupWidget extends StatelessWidget {
                 title: "Success",
                 color: AppColors.mainBlueColor);
             print("PAGE -> " + page);
-            if (page == "register") {
-              await controller.createUserProfile();
-              Get.toNamed(RouteHelper.getSignInPage());
+            if (page == "first") {
+              Get.offNamed(RouteHelper.groupListPage);
             } else {
               print("PAGE -> " + page);
               Get.back();

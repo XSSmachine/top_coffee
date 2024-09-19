@@ -5,11 +5,12 @@ class AppConstants {
   //192.168.178.42
   //192.168.77.105
 
-  static const String BASE_URL = "http://192.168.77.105:8080";
-  //static const String BASE_URL = "https://oyster-app-p55vv.ondigitalocean.app";
-  static const String BASE_SOCKET_URL = "ws://localhost:8080/ws";
-  //static const String BASE_SOCKET_URL ="wss://oyster-app-p55vv.ondigitalocean.app/ws";
-  static const String HTTP_BASE_URL = "http://localhost:8080";
+  //static const String BASE_URL = "http://192.168.77.105:8080";
+  static const String BASE_URL = "https://lobster-app-6i7x3.ondigitalocean.app";
+  //static const String BASE_SOCKET_URL = "ws://localhost:8080/ws";
+  static const String BASE_SOCKET_URL =
+      "wss://lobster-app-6i7x3.ondigitalocean.app/ws";
+  //static const String HTTP_BASE_URL = "http://localhost:8080";
   static const String UPLOAD_URL = "/uploads/";
 //--------------------------------------------------------------
   //auth endpoints

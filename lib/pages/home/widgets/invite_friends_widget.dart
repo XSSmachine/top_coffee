@@ -83,7 +83,7 @@ class CustomCard extends StatelessWidget {
                             String link = await authController
                                 .generateInviteLink(userProfileId);
                             link = link.replaceAll('localhost',
-                                'oyster-app-p55vv.ondigitalocean.app');
+                                'lobster-app-6i7x3.ondigitalocean.app');
 
                             Share.share(
                                 "${AppStrings.joinGroup} $groupName ${AppStrings.followLink.tr}: $link");

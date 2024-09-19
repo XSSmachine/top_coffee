@@ -92,7 +92,7 @@ class ApiClient extends GetConnect implements GetxService {
     updateHeader(token, groupId);
     print('Sending request to: $uri');
     print(
-        'User ID: ${body.userId}, Group ID: ${body.groupId}, Name: ${body.name}, Surname: ${body.surname}');
+        'User ID: ${body.userId}, Group ID:% Name: ${body.name}, Surname: ${body.surname}');
 
     var request = http.MultipartRequest('POST', Uri.parse(uri));
 

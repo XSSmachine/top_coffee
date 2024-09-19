@@ -15,7 +15,6 @@ import '../helper/deeplink_handler.dart';
 import '../models/group/create_group.dart';
 import '../models/group/user_data.dart';
 import '../models/group_data.dart';
-import '../models/jwt_model.dart';
 import '../models/response_model.dart';
 import '../models/signup_body_model.dart';
 import '../models/user_profile_model.dart';
@@ -29,7 +28,6 @@ class AuthController extends GetxController implements GetxService {
   AuthController({required this.authRepo, required this.userRepo});
 
   bool _isLoading = false;
-
   bool get isLoading => _isLoading;
 
   String? pendingGroupCode;
@@ -41,11 +39,9 @@ class AuthController extends GetxController implements GetxService {
   List<Group>? get groupData => _groupData;
 
   String _groupId = '';
-
   String get groupId => _groupId;
 
   String _userToken = '';
-
   String get userToken => _userToken;
 
   Rx<UserProfileModel?> userProfile = Rx<UserProfileModel?>(null);
@@ -57,7 +53,7 @@ class AuthController extends GetxController implements GetxService {
       return response.body['isVerified'];
     } else {
       print("BAD ${response.statusCode}");
-      return true;
+      return false;
     }
   }
 
@@ -138,14 +134,13 @@ class AuthController extends GetxController implements GetxService {
   }
 
   Future<void> handleUnauthorizedAccess() async {
-    final userController = Get.find<UserController>();
-    final eventController = Get.find<EventController>();
-    final orderController = Get.find<OrderController>();
-
-    userController.resetAllValues();
-    eventController.resetAllValues();
-    orderController.resetAllValues();
-
+    // final userController = Get.find<UserController>();
+    // final eventController = Get.find<EventController>();
+    // final orderController = Get.find<OrderController>();
+    //
+    // userController.resetAllValues();
+    // eventController.resetAllValues();
+    // orderController.resetAllValues();
     await clearSharedData();
 
     GetPage(
@@ -201,7 +196,7 @@ class AuthController extends GetxController implements GetxService {
     late ResponseModel responseModel;
     if (response.statusCode == 200) {
       responseModel = ResponseModel(true, "New group created successfully");
-      userProfile.value?.groupId = response.body['groupId'];
+      //userProfile.value?.groupId = response.body['groupId'];
       await notificationController.subscribeToGroup(response.body['groupId']);
     } else {
       print("BAD ${response.statusCode}");
@@ -224,7 +219,7 @@ class AuthController extends GetxController implements GetxService {
     late ResponseModel responseModel;
     if (response.statusCode == 200) {
       responseModel = ResponseModel(true, "User sucessfuly joined group");
-      userProfile.value?.groupId = response.body['groupId'];
+      //userProfile.value?.groupId = response.body['groupId'];
       await notificationController.subscribeToGroup(response.body['groupId']);
     } else {
       print("BAD ${response.statusCode}");
@@ -252,7 +247,7 @@ class AuthController extends GetxController implements GetxService {
         final description = groupData['description'];
         final imageUrl = groupData['photoUrl'];
 
-        userProfile.value?.groupId = groupId;
+        //userProfile.value?.groupId = groupId;
         await notificationController.subscribeToGroup(groupId);
 
         //Get.snackbar('Success', 'Successfully joined the group');
@@ -361,7 +356,6 @@ class AuthController extends GetxController implements GetxService {
       userProfile.value = UserProfileModel(
         name: '',
         surname: '',
-        groupId: '',
         userId: response.body["userId"],
       );
       AppLinksDeepLink.instance.checkPendingGroupJoin();
@@ -391,12 +385,11 @@ class AuthController extends GetxController implements GetxService {
       responseModel = ResponseModel(true, response.body["accessToken"]);
     } else if (response.statusCode == 403) {
       Response response = await authRepo.getUserIdByEmail(email);
-      userProfile.value = UserProfileModel(
-        name: '',
-        surname: '',
-        groupId: '',
-        userId: response.body["userId"],
-      );
+      // userProfile.value = UserProfileModel(
+      //   name: '',
+      //   surname: '',
+      //   userId: response.body["userId"],
+      // );
       //call method to add userId: response.body["userId"],
       responseModel = ResponseModel(false, "Email is not verified.");
     } else if (response.statusCode == 404) {
@@ -404,12 +397,14 @@ class AuthController extends GetxController implements GetxService {
       userProfile.value = UserProfileModel(
         name: '',
         surname: '',
-        groupId: '',
         userId: response.body["userId"],
       );
       //call method to add userId: response.body["userId"],
       responseModel =
           ResponseModel(false, "User registration is not complete.");
+    } else if (response.statusCode == 401) {
+      //call method to add userId: response.body["userId"],
+      responseModel = ResponseModel(false, "User is unauthorized.");
     } else {
       responseModel = ResponseModel(false, response.statusText!);
     }
@@ -432,20 +427,17 @@ class AuthController extends GetxController implements GetxService {
     update();
     http.Response response;
     late ResponseModel responseModel;
-    if (userProfile.value != null && userProfile.value!.name.isNotEmpty) {
-      response = await authRepo.createProfile(userProfile.value!);
-      if (response.statusCode == 200) {
-        responseModel =
-            ResponseModel(true, jsonEncode(jsonDecode(response.body)));
-        print("GOOD ${response.body}");
-      } else {
-        print("BAD CREATING PROFILE${response.statusCode}");
-        responseModel = ResponseModel(false, response.statusCode.toString());
-      }
+
+    response = await authRepo.createProfile(userProfile.value!);
+    if (response.statusCode == 200) {
+      responseModel =
+          ResponseModel(true, jsonEncode(jsonDecode(response.body)));
+      print("GOOD ${response.body}");
     } else {
-      print("BAD CREATING PROFILE - userProfile data is missing");
-      responseModel = ResponseModel(false, "User profile data is missing");
+      print("BAD CREATING PROFILE${response.statusCode}");
+      responseModel = ResponseModel(false, response.statusCode.toString());
     }
+
     _isLoading = false;
     update();
     return responseModel;

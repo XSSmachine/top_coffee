@@ -48,6 +48,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   }
 
   Future<bool> _checkIsEmailVerified() async {
+    print("I am verifying this email -> ${widget.email}");
     final controller = Get.find<AuthController>();
     return await controller.checkEmail(widget.email);
   }

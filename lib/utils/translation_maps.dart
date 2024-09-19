@@ -39,6 +39,7 @@ class Messages extends Translations {
           AppStrings.emailCheckingStatus: 'Checking email status...',
           AppStrings.emailIntentErrorMsg: "Error opening email app:",
           AppStrings.userWarningMsg: "User registration is not complete.",
+          AppStrings.userNotExistMsg: "User credentials are unauthorized.",
           AppStrings.changeYourPass: 'Change your password',
           AppStrings.cancel: 'Cancel',
           AppStrings.confirm: 'Confirm',
@@ -175,6 +176,8 @@ class Messages extends Translations {
           "FINISHED": "FINISHED",
           'Monthly Statistics': 'Monthly Statistics',
           'Select Group': 'Select Group',
+          "Error occurred": "Error occurred",
+          "Warning": "Warning",
         },
         'hr_HR': {
           // Croatian translation
@@ -305,6 +308,7 @@ class Messages extends Translations {
           AppStrings.youSure: 'Jeste li sigurni?',
           AppStrings.youSureEvent:
               'Jeste li sigurni da želite završiti događaj?',
+          AppStrings.userNotExistMsg: "Došlo je do pogreške prilikom prijave.",
           AppStrings.noOrders: "Još nema narudžbi",
           AppStrings.activeOrders: 'Aktivne',
           AppStrings.completedOrders: 'Završene',
@@ -346,7 +350,9 @@ class Messages extends Translations {
           'MY ORDER': 'MOJA NARUDŽBA',
           "FINISHED": "ZAVRŠENO",
           'Monthly Statistics': 'Mjesečna Statistika',
-          'Select Group': 'Odaberi Grupu'
+          'Select Group': 'Odaberi Grupu',
+          "Error occurred": "Dogodila se greška",
+          "Warning": "Upozorenje",
         },
 
         'de_DE': {
