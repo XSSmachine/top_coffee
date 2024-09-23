@@ -8,23 +8,41 @@ import '../../controllers/notification_controller.dart';
 import '../../routes/route_helper.dart';
 import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
+import '../../utils/string_resources.dart';
 import '../app_text_field.dart';
 
-class CreateGroupWidget extends StatelessWidget {
-  final NotificationController notificationController =
-      Get.find<NotificationController>();
+class CreateGroupWidget extends StatefulWidget {
   final AuthController controller;
   final String page;
 
-  CreateGroupWidget({super.key, required this.controller, required this.page});
+  const CreateGroupWidget(
+      {Key? key, required this.controller, required this.page})
+      : super(key: key);
+
+  @override
+  _CreateGroupWidgetState createState() => _CreateGroupWidgetState();
+}
+
+class _CreateGroupWidgetState extends State<CreateGroupWidget> {
+  final NotificationController notificationController =
+      Get.find<NotificationController>();
+
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController password2Controller = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+
+  @override
+  void dispose() {
+    passwordController.dispose();
+    password2Controller.dispose();
+    nameController.dispose();
+    descriptionController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    var passwordController = TextEditingController();
-    var password2Controller = TextEditingController();
-    var nameController = TextEditingController();
-    var descriptionController = TextEditingController();
-
     void createGroup(AuthController authController) {
       String name = nameController.text.trim();
       String description = descriptionController.text.trim();
@@ -53,16 +71,21 @@ class CreateGroupWidget extends StatelessWidget {
             .createGroup(signUpBody, notificationController)
             .then((status) async {
           if (status.isSuccess) {
-            showCustomSnackBar(status.message,
-                isError: false,
-                title: "Success",
-                color: AppColors.mainBlueColor);
-
-            if (page == "first") {
+            print('Success group creating');
+            print(widget.page);
+            if (widget.page == "first") {
               Get.offNamed(RouteHelper.groupListPage);
             } else {
               Get.back();
             }
+            showCustomSnackBar(status.message,
+                isError: false,
+                title: "Success",
+                color: AppColors.mainBlueColor);
+          } else if (status.message == "400") {
+            print("ERROR ${status.message}");
+            showCustomSnackBar(
+                "Warning".tr + " " + "That name is already taken".tr);
           } else {
             print("ERROR ${status.message}");
             showCustomSnackBar(status.message);
@@ -80,7 +103,7 @@ class CreateGroupWidget extends StatelessWidget {
           ),
           AppTextField(
               textController: nameController,
-              hintText: "Group name",
+              hintText: "Group name".tr,
               icon: Icons.people_outline),
           SizedBox(
             height: Dimensions.height20,
@@ -88,7 +111,7 @@ class CreateGroupWidget extends StatelessWidget {
 
           AppTextField(
             textController: descriptionController,
-            hintText: "Short description",
+            hintText: "Short description".tr,
             icon: Icons.description_outlined,
             minLines: 2,
             maxLines: 3,
@@ -100,7 +123,7 @@ class CreateGroupWidget extends StatelessWidget {
           //your password
           AppTextField(
             textController: passwordController,
-            hintText: "Your password",
+            hintText: "Your password".tr,
             icon: Icons.lock_outline,
             isObscure: true,
           ),
@@ -110,14 +133,14 @@ class CreateGroupWidget extends StatelessWidget {
           //
           AppTextField(
             textController: password2Controller,
-            hintText: "Confirm password",
+            hintText: "Confirm password".tr,
             icon: Icons.lock_outline,
             isObscure: true,
           ),
           SizedBox(height: Dimensions.height20 * 1.5),
           GestureDetector(
             onTap: () {
-              createGroup(controller);
+              createGroup(widget.controller);
             },
             child: Container(
               width: Dimensions.screenWidth / 1.6,
@@ -134,7 +157,7 @@ class CreateGroupWidget extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      "CREATE",
+                      AppStrings.createTitle.tr,
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: Dimensions.font16,

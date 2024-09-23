@@ -14,9 +14,12 @@ import 'package:uni_links/uni_links.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await FirebaseApi().initNotifications();
+
   await dependencies.init();
+
   await Get.find<NotificationController>().requestPermission();
 
   final AppLinksDeepLink _appLinksDeepLink = AppLinksDeepLink.instance;
@@ -53,8 +56,8 @@ class _MyAppState extends State<MyApp> {
     return GetMaterialApp(
       translations: Messages(),
       locale: Get.deviceLocale,
-      fallbackLocale:
-          Locale('hr', 'HR'), // Fallback language in case of failure
+      fallbackLocale: Locale('hr', 'HR'),
+      // Fallback language in case of failure
       supportedLocales: [
         Locale('en', 'US'),
         Locale('hr', 'HR'),

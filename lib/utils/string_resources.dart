@@ -65,6 +65,10 @@ class AppStrings {
   static const String viewMyOrders = 'View My Orders';
   static const String Attendees = "attendees";
   static const String createEventWidget = 'Get some snacks for the team!';
+  static const String createEventSuccessWidget =
+      'Successfully created new event!';
+  static const String eventCreationFailed = 'Failed to create new event.';
+
   static const String shareMealsTogether = 'Share your meals together';
   static const String emptyPendingEventText = "Hmm looks empty here";
   static const String madeByText = "By";
@@ -123,6 +127,8 @@ class AppStrings {
   static const String searchEventsTitle = 'Search events';
   static const String filtersTitle = "Filters";
   static const String activeEventsTitle = "Active events";
+  static const String activeEventInProgressTitle =
+      "There is already active event in progress";
   static const String seeMoreTitle = "See more";
 
   static const String howDoesItWorkTitle = 'How does it work?';

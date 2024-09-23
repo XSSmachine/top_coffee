@@ -40,8 +40,25 @@ class _GroupScreenState extends State<GroupScreen> {
     Future.microtask(() async {
       await _fetchGroupDetails();
       await _fetchGroupMembers();
+      await userController.getUserProfile();
       if (mounted) setState(() {});
     });
+  }
+
+  bool get isPresident {
+    GroupMember? currentMember = userController.groupMembers.firstWhereOrNull(
+        (member) => member.userProfileId == userController.user!.userProfileId);
+    return currentMember?.roles.contains('PRESIDENT') ?? false;
+  }
+
+  bool get isAdmin {
+    GroupMember? currentMember = userController.groupMembers.firstWhereOrNull(
+        (member) => member.userProfileId == userController.user!.userProfileId);
+    return currentMember?.roles.contains('ADMIN') ?? false;
+  }
+
+  bool isCurrentUser(GroupMember user) {
+    return user.userProfileId == userController.user!.userProfileId;
   }
 
   Future<void> _fetchGroupDetails() async {
@@ -114,7 +131,7 @@ class _GroupScreenState extends State<GroupScreen> {
       child: Column(
         children: [
           GestureDetector(
-            onTap: _selectFile,
+            onTap: isPresident ? _selectFile : null,
             child: Container(
               width: Dimensions.width20 * 5,
               height: Dimensions.height20 * 5,
@@ -160,7 +177,7 @@ class _GroupScreenState extends State<GroupScreen> {
           ),
           SizedBox(height: 16),
           GestureDetector(
-            onTap: () => _startEditing('name'),
+            onTap: isPresident ? () => _startEditing('name') : null,
             child: isEditing
                 ? TextField(
                     controller: nameController,
@@ -175,7 +192,7 @@ class _GroupScreenState extends State<GroupScreen> {
           ),
           SizedBox(height: 8),
           GestureDetector(
-            onTap: () => _startEditing('description'),
+            onTap: isPresident ? () => _startEditing('description') : null,
             child: isEditing
                 ? TextField(
                     controller: descriptionController,
@@ -216,6 +233,7 @@ class _GroupScreenState extends State<GroupScreen> {
   }
 
   void _selectFile() async {
+    if (!isPresident) return;
     XFile? file = await ImagePicker().pickImage(
       source: ImageSource.gallery,
       maxHeight: 1800,
@@ -231,6 +249,7 @@ class _GroupScreenState extends State<GroupScreen> {
   }
 
   void _startEditing(String field) {
+    if (!isPresident) return;
     setState(() {
       isEditing = true;
       if (field == 'name') {
@@ -242,6 +261,7 @@ class _GroupScreenState extends State<GroupScreen> {
   }
 
   void _markAsUnsaved() {
+    if (!isPresident) return;
     setState(() {
       hasUnsavedChanges = true;
     });
@@ -295,26 +315,31 @@ class _GroupScreenState extends State<GroupScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(user.firstName + user.lastName),
+          title: Text('${user.firstName} ${user.lastName}'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
-                leading: Icon(Icons.edit),
-                title: Text('Edit Role'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _showEditRoleDialog(user);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.person_remove),
-                title: Text('Kick User'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _kickUser(user);
-                },
-              ),
+              if (isPresident && !isCurrentUser(user))
+                ListTile(
+                  leading: Icon(Icons.edit),
+                  title: Text('Edit Role'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showEditRoleDialog(user);
+                  },
+                ),
+              if ((isPresident || isAdmin) &&
+                      !user.roles.contains('PRESIDENT') ||
+                  isCurrentUser(user))
+                ListTile(
+                  leading: Icon(Icons.person_remove),
+                  title:
+                      Text(isCurrentUser(user) ? 'Leave Group' : 'Kick User'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _kickUser(user);
+                  },
+                ),
             ],
           ),
         );
@@ -323,12 +348,18 @@ class _GroupScreenState extends State<GroupScreen> {
   }
 
   void _showEditRoleDialog(GroupMember user) {
-    String newRole = user.roles[0];
+    if (!isPresident) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Only the president can edit roles')),
+      );
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Promote ${user.firstName} to Admin? '),
+          title: Text('Promote ${user.firstName} to Admin?'),
           actions: [
             TextButton(
               child: Text('No'),
@@ -348,11 +379,20 @@ class _GroupScreenState extends State<GroupScreen> {
   }
 
   Future<void> _updateUserRole(GroupMember user, String newRole) async {
+    if (!isPresident) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Only the president can update roles')),
+      );
+      return;
+    }
+
     print('Updating role for ${user.firstName} to $newRole');
     await userController.promoteUserFromGroup(user.userProfileId, newRole);
 
     setState(() {
-      user.roles.add(newRole);
+      if (!user.roles.contains(newRole)) {
+        user.roles.add(newRole);
+      }
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -362,15 +402,61 @@ class _GroupScreenState extends State<GroupScreen> {
 
 // Method to kick a user from the group
   Future<void> _kickUser(GroupMember user) async {
-    print('Kicking user: ${user.firstName}');
-    await userController.kickUserFromGroup(user.userProfileId);
+    if (!isPresident && !isAdmin && !isCurrentUser(user)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('You do not have permission to kick this user')),
+      );
+      return;
+    }
 
-    setState(() {
-      userController.groupMembers.remove(user);
-    });
+    if (user.roles.contains('PRESIDENT') && !isCurrentUser(user)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('The president cannot be kicked from the group')),
+      );
+      return;
+    }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('${user.firstName} removed from the group')),
+    String actionText = isCurrentUser(user) ? 'leave' : 'kick';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Action'),
+          content: Text(
+              'Are you sure you want to $actionText ${isCurrentUser(user) ? 'the group' : user.firstName}?'),
+          actions: [
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () => Navigator.pop(context),
+            ),
+            TextButton(
+              child: Text('Confirm'),
+              onPressed: () async {
+                Navigator.pop(context);
+                print('${actionText.capitalize} user: ${user.firstName}');
+                await userController.kickUserFromGroup(user.userProfileId);
+
+                setState(() {
+                  userController.groupMembers.remove(user);
+                });
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      content: Text(
+                          '${user.firstName} ${actionText == 'leave' ? 'left' : 'removed from'} the group')),
+                );
+
+                if (isCurrentUser(user)) {
+                  // Navigate back to the previous screen or to a group selection screen
+                  Navigator.pop(context);
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

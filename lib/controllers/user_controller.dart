@@ -20,8 +20,6 @@ class UserController extends GetxController implements GetxService {
 
   UserController({required this.userRepo});
 
-  //final RxList<UserModel> _allUserList = <UserModel>[].obs;
-  //List<UserModel> get allUserList => _allUserList;
   RxList allUserList = <UserModel>[].obs;
   var orderStats = <StatusCount>[].obs;
   var eventStats = <EventCount>[].obs;
@@ -343,22 +341,6 @@ class UserController extends GetxController implements GetxService {
     update();
     return responseModel;
   }
-
-  // Future<String> getGroupId() async {
-  //   _isLoading = true;
-  //   Response response = await userRepo.getUserInfo();
-  //   late String responseModel;
-  //   if (response.statusCode == 200) {
-  //     _user = FetchMeModel.fromJson(response.body);
-  //
-  //     responseModel = _user!.groupId;
-  //   } else {
-  //     responseModel = "Error getting groupId";
-  //   }
-  //   _isLoading = false;
-  //   update();
-  //   return responseModel;
-  // }
 
   Future<void> getGroupName() async {
     _isLoading = true;

@@ -8,14 +8,33 @@ import '../../controllers/notification_controller.dart';
 import '../../routes/route_helper.dart';
 import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';
+import '../../utils/string_resources.dart';
 import '../app_text_field.dart';
 
-class JoinGroupWidget extends StatelessWidget {
-  final notificationController = Get.find<NotificationController>();
+class JoinGroupWidget extends StatefulWidget {
   final AuthController controller;
   final String page;
 
-  JoinGroupWidget({super.key, required this.controller, required this.page});
+  const JoinGroupWidget(
+      {Key? key, required this.controller, required this.page})
+      : super(key: key);
+
+  @override
+  _JoinGroupWidgetState createState() => _JoinGroupWidgetState();
+}
+
+class _JoinGroupWidgetState extends State<JoinGroupWidget> {
+  final notificationController = Get.find<NotificationController>();
+
+  final TextEditingController groupPasswordController = TextEditingController();
+  final TextEditingController groupNameController = TextEditingController();
+
+  @override
+  void dispose() {
+    groupPasswordController.dispose();
+    groupNameController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,11 +62,11 @@ class JoinGroupWidget extends StatelessWidget {
                 isError: false,
                 title: "Success",
                 color: AppColors.mainBlueColor);
-            print("PAGE -> " + page);
-            if (page == "first") {
+            print("PAGE -> " + widget.page);
+            if (widget.page == "first") {
               Get.offNamed(RouteHelper.groupListPage);
             } else {
-              print("PAGE -> " + page);
+              print("PAGE -> " + widget.page);
               Get.back();
             }
           } else {
@@ -65,14 +84,14 @@ class JoinGroupWidget extends StatelessWidget {
           ),
           AppTextField(
               textController: groupNameController,
-              hintText: "Group Name",
+              hintText: "Group name".tr,
               icon: Icons.people_outline),
           SizedBox(
             height: Dimensions.height20,
           ),
           AppTextField(
             textController: groupPasswordController,
-            hintText: "Password",
+            hintText: AppStrings.pass.tr,
             icon: Icons.lock_outline,
             isObscure: true,
           ),
@@ -81,7 +100,7 @@ class JoinGroupWidget extends StatelessWidget {
           ),
           GestureDetector(
             onTap: () {
-              login(controller);
+              login(widget.controller);
             },
             child: Container(
               width: Dimensions.screenWidth / 1.6,
@@ -98,7 +117,7 @@ class JoinGroupWidget extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      "CONTINUE",
+                      "CONTINUE".tr,
                       style: TextStyle(
                           color: Colors.white, fontSize: Dimensions.font16),
                     ),

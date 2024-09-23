@@ -30,14 +30,6 @@ class FirebaseApi {
     // Handle background messages
     FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
 
-    // Handle foreground messages
-    // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    //   showCustomSnackBar(
-    //     message.notification?.body ?? '',
-    //     title: message.notification?.title ?? '',
-    //   );
-    // });
-
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print("Notification clicked: ${message.data}");
       handleNotificationClick(message);
@@ -81,11 +73,6 @@ class FirebaseApi {
     print("Navigating to all orders: $eventId");
     Get.toNamed(RouteHelper.allOrderPage, arguments: {'eventId': eventId});
   }
-
-  // void showCustomSnackBar(String message, {String? title}) {
-  //   // Implement your custom snackbar here
-  //   Get.snackbar(title ?? 'Notification', message);
-  // }
 }
 
 @pragma('vm:entry-point')

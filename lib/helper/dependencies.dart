@@ -46,36 +46,5 @@ Future<void> init() async {
       eventRepo: Get.find(), orderRepo: Get.find(), userRepo: Get.find()));
   Get.put(OrderController(orderRepo: Get.find()));
 
-  // Initialize controllers that depend on GroupController
-  final groupController = Get.find<GroupController>();
-  final eventController = Get.find<EventController>();
-  final orderController = Get.find<OrderController>();
-  final userController = Get.find<UserController>();
-
-  // Set up listeners for group changes
-  ever(groupController.currentGroupId, (_) {
-    // eventController.fetchFilteredEvents(
-    //   page: 0,
-    //   size: eventController.pageSize,
-    //   search: '',
-    //   filters: EventFilters(
-    //     eventType: eventController.selectedEventType.value,
-    //     status: eventController.selectedEventStatus.value,
-    //     timeFilter: eventController.selectedTimeFilter.value,
-    //   ),
-    // );
-    //
-    // orderController.getFilteredOrders(
-    //   page: 0,
-    //   size: 10, // Assuming a default page size
-    //   status: "IN_PROGRESS", // Default status, you might want to adjust this
-    //   rating: '',
-    //   type: 'ALL',
-    //   search: '',
-    // );
-
-    //userController.getLeaderBoard("FIRSTNAME");
-  });
-
   print("All dependencies initialized");
 }

@@ -56,6 +56,9 @@ class Messages extends Translations {
           AppStrings.inviteFriends: 'Invite your friends',
           AppStrings.inviteBtn: 'INVITE',
           AppStrings.createEventWidget: 'Get some snacks for the team!',
+          AppStrings.createEventSuccessWidget:
+              'Successfully created new event!',
+          AppStrings.eventCreationFailed: 'Failed to create new event.',
           AppStrings.shareMealsTogether: 'Share your meals together',
           AppStrings.inviteFriendsDesc:
               'Send invite to your friends or collagues to share good food and pleasant moments together.',
@@ -105,6 +108,8 @@ class Messages extends Translations {
           AppStrings.searchEventsTitle: 'Search events',
           AppStrings.filtersTitle: "Filters",
           AppStrings.activeEventsTitle: "Active events",
+          AppStrings.activeEventInProgressTitle:
+              "There is already active event in progress",
           AppStrings.seeMoreTitle: "See more",
           AppStrings.howDoesItWorkTitle: 'How does it work?',
           AppStrings.Attendees: 'attendees',
@@ -178,6 +183,12 @@ class Messages extends Translations {
           'Select Group': 'Select Group',
           "Error occurred": "Error occurred",
           "Warning": "Warning",
+          "That name is already taken": "That name is already taken",
+          "Group name": "Group name",
+          "Short description": "Short description",
+          "Your password": "Your password",
+          "Confirm password": "Confirm password",
+          "CONTINUE": "CONTINUE",
         },
         'hr_HR': {
           // Croatian translation
@@ -235,6 +246,9 @@ class Messages extends Translations {
               "Molimo provjerite jesu li obje lozinke iste.",
           AppStrings.inviteFriends: 'Pozovi prijatelje',
           AppStrings.createEventWidget: 'Riješi neku marendu za ekipu!',
+          AppStrings.createEventSuccessWidget: 'Uspješno kreiran novi gablec!',
+          AppStrings.eventCreationFailed:
+              'Pogrerška pri kreiranju novog gableca.',
           AppStrings.emptyPendingEventText: "Hmm ovdje je nešto prazno",
           AppStrings.inviteFriendsDesc:
               'Pošaljite pozivnicu svojim prijateljima ili kolegama da zajedno dijelite dobru hranu i ugodne trenutke.',
@@ -282,6 +296,8 @@ class Messages extends Translations {
           AppStrings.searchOrdersTitle: 'Pretraži gablece',
           AppStrings.filtersTitle: "Filteri",
           AppStrings.activeEventsTitle: "Aktivni događaji",
+          AppStrings.activeEventInProgressTitle:
+              "Već postoji aktivan gablec u tijeku",
           AppStrings.seeMoreTitle: "Vidi više",
           AppStrings.howDoesItWorkTitle: 'Kako to funkcionira?',
           AppStrings.howDoesItWorkDesc: "Otkrijte, naručite, uživajte:",
@@ -353,6 +369,12 @@ class Messages extends Translations {
           'Select Group': 'Odaberi Grupu',
           "Error occurred": "Dogodila se greška",
           "Warning": "Upozorenje",
+          "That name is already taken": "Upisano ime je već zauzeto",
+          "Group name": "Ime grupe",
+          "Short description": "Kratak opis",
+          "Your password": "Tvoja lozinka",
+          "Confirm password": "Potvrdi lozinku",
+          "CONTINUE": "NASTAVI"
         },
 
         'de_DE': {

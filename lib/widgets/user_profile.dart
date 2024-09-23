@@ -33,6 +33,7 @@ class WordCustomCard extends StatefulWidget {
 
 class _WordCustomCardState extends State<WordCustomCard> {
   final AuthController authController = Get.find<AuthController>();
+  final GroupController groupController = Get.find<GroupController>();
   bool _isExpanded = false;
   Group? _selectedGroup;
   List<Group> _groups = [];
@@ -46,12 +47,11 @@ class _WordCustomCardState extends State<WordCustomCard> {
   Future<void> _fetchGroups() async {
     try {
       List<Group> fetchedGroups = await authController.fetchAllGroups();
-      final groupId = await authController.getGroupId();
       setState(() {
         _groups = fetchedGroups;
 
         _selectedGroup = _groups.firstWhereOrNull(
-          (group) => group.groupId == groupId,
+          (group) => group.groupId == groupController.currentGroupId,
         );
 
         if (_selectedGroup == null && _groups.isNotEmpty) {
@@ -237,8 +237,11 @@ class _WordCustomCardState extends State<WordCustomCard> {
                               height: Dimensions.radius30 * 2,
                               child: GroupSelector(
                                 groups: _groups,
-                                selectedGroup: _selectedGroup,
-                                onGroupSelected: (Group group) {},
+                                onGroupSelected: (Group group) {
+                                  setState(() {
+                                    _selectedGroup = group;
+                                  });
+                                },
                               ),
                             ),
                             IconButton(
@@ -424,7 +427,6 @@ class _WordCustomCardState extends State<WordCustomCard> {
                               height: Dimensions.radius30 * 2,
                               child: GroupSelector(
                                 groups: _groups,
-                                selectedGroup: _selectedGroup,
                                 onGroupSelected: (Group group) {
                                   print("PRESSED NEW GROUP");
                                   setState(() {

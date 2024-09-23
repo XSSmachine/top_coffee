@@ -111,11 +111,15 @@ class PieChart2State extends State<PieChartSample2> {
             DropdownButton<String>(
               key: ValueKey('typeDropdown'),
               value: selectedType,
+              dropdownColor: AppColors.mainBlueMediumColor,
               items: types.map((String value) {
                 return DropdownMenuItem<String>(
                   key: ValueKey(value),
                   value: value,
-                  child: Text(value.tr),
+                  child: Text(
+                    value.tr,
+                    style: TextStyle(color: Colors.white),
+                  ),
                 );
               }).toList(),
               onChanged: (String? newValue) {
@@ -127,11 +131,15 @@ class PieChart2State extends State<PieChartSample2> {
             DropdownButton<String>(
               key: ValueKey('statusDropdown'),
               value: selectedStatus,
+              dropdownColor: AppColors.mainBlueMediumColor,
               items: statuses.map((String value) {
                 return DropdownMenuItem<String>(
                   key: ValueKey(value),
                   value: value,
-                  child: Text(value.tr),
+                  child: Text(
+                    value.tr,
+                    style: TextStyle(color: Colors.white),
+                  ),
                 );
               }).toList(),
               onChanged: (String? newValue) {

@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:team_coffee/routes/route_helper.dart';
 import 'package:team_coffee/widgets/timer/count_timer_widget.dart';
-
 import '../../controllers/event_controller.dart';
-import '../../controllers/order_controller.dart';
 import '../../models/event_model.dart';
 import '../../utils/colors.dart';
 import '../../utils/dimensions.dart';

@@ -26,6 +26,7 @@ class CreateEventPage extends StatefulWidget {
 
 class _CreateEventPageState extends State<CreateEventPage>
     with TickerProviderStateMixin {
+  bool _isLoading = false;
   final String webSocketUrl = AppConstants.BASE_SOCKET_URL;
   late client.StompClient _client;
   List<dynamic> messages = List.empty();
@@ -237,43 +238,61 @@ class _CreateEventPageState extends State<CreateEventPage>
                       ),
                       SizedBox(height: Dimensions.height20),
                       SlideTransition(
-                        position: _slideAnimations[1],
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: Dimensions.width10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              EventTypeChip(
-                                label: AppStrings.coffeeFilter.tr,
-                                color: AppColors.orangeChipColor,
-                                icon: Icons.coffee,
-                                selectedEventType: _selectedEventType,
-                                onEventTypeChanged: _updateSelectedEventType,
-                                firstSelected: "FOOD",
-                              ),
-                              SizedBox(width: Dimensions.width15 / 3),
-                              EventTypeChip(
-                                label: AppStrings.foodFilter.tr,
-                                color: AppColors.greenChipColor,
-                                icon: Icons.restaurant,
-                                selectedEventType: _selectedEventType,
-                                onEventTypeChanged: _updateSelectedEventType,
-                                firstSelected: "FOOD",
-                              ),
-                              SizedBox(width: Dimensions.width15 / 3),
-                              EventTypeChip(
-                                label: AppStrings.beverageFilter.tr,
-                                color: AppColors.blueChipColor,
-                                icon: Icons.liquor,
-                                selectedEventType: _selectedEventType,
-                                onEventTypeChanged: _updateSelectedEventType,
-                                firstSelected: "FOOD",
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                          position: _slideAnimations[1],
+                          child: LayoutBuilder(
+                            builder: (BuildContext context,
+                                BoxConstraints constraints) {
+                              return SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                      minWidth: constraints.maxWidth),
+                                  child: IntrinsicWidth(
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: Dimensions.width10),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          EventTypeChip(
+                                            label: AppStrings.coffeeFilter.tr,
+                                            color: AppColors.orangeChipColor,
+                                            icon: Icons.coffee,
+                                            selectedEventType:
+                                                _selectedEventType,
+                                            onEventTypeChanged:
+                                                _updateSelectedEventType,
+                                            firstSelected: "FOOD",
+                                          ),
+                                          EventTypeChip(
+                                            label: AppStrings.foodFilter.tr,
+                                            color: AppColors.greenChipColor,
+                                            icon: Icons.restaurant,
+                                            selectedEventType:
+                                                _selectedEventType,
+                                            onEventTypeChanged:
+                                                _updateSelectedEventType,
+                                            firstSelected: "FOOD",
+                                          ),
+                                          EventTypeChip(
+                                            label: AppStrings.beverageFilter.tr,
+                                            color: AppColors.blueChipColor,
+                                            icon: Icons.liquor,
+                                            selectedEventType:
+                                                _selectedEventType,
+                                            onEventTypeChanged:
+                                                _updateSelectedEventType,
+                                            firstSelected: "FOOD",
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          )),
                       SizedBox(height: Dimensions.height20),
                       SlideTransition(
                         position: _slideAnimations[2],
@@ -341,64 +360,121 @@ class _CreateEventPageState extends State<CreateEventPage>
                       Center(
                         child: SlideTransition(
                           position: _slideAnimations[5],
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              final String profileId =
-                                  await userController.getProfileId();
-                              final String title = _titleController.text.trim();
-                              final String description =
-                                  _descriptionController.text.trim();
-                              final String eventType = _selectedEventType;
-                              //final String groupId = await userController.getGroupId(); // You need to provide a way to set this
+                          child: _isLoading
+                              ? CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
+                                )
+                              : ElevatedButton(
+                                  onPressed: () async {
+                                    final String profileId =
+                                        await userController.getProfileId();
+                                    final String title =
+                                        _titleController.text.trim();
+                                    final String description =
+                                        _descriptionController.text.trim();
+                                    final String eventType = _selectedEventType;
+                                    //final String groupId = await userController.getGroupId(); // You need to provide a way to set this
 
-                              if (title.isNotEmpty && description.isNotEmpty) {
-                                print("PROFIL ID $profileId");
-                                await Get.find<EventController>().createEvent(
-                                    EventBody(
-                                      //creatorId: profileId ,
-                                      time: selectedDuration.inMinutes,
-                                      title: title,
-                                      description: description,
-                                      eventType: eventType,
-                                      //groupId: groupId,
-                                    ),
-                                    notificationController);
-                                await Get.find<EventController>()
-                                    .getActiveEvent2();
-                                Navigator.pop(context);
-                                // Optionally, you can add a success message or navigation here
-                              } else {
-                                // Show an error message if title or description is empty
-                                Get.snackbar(AppStrings.errorMsg.tr,
-                                    AppStrings.fillInAllFields.tr);
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: Dimensions.width30 * 1.2,
-                                    vertical: Dimensions.height15),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                foregroundColor: Colors.white,
-                                backgroundColor: Colors.white),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  AppStrings.createTitle.tr,
-                                  style: TextStyle(
-                                    fontSize: Dimensions.font16,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.mainBlueMediumColor,
+                                    if (title.isNotEmpty &&
+                                        description.isNotEmpty) {
+                                      setState(() {
+                                        _isLoading = true;
+                                      });
+
+                                      // Await the result of createEvent
+                                      bool? result =
+                                          await Get.find<EventController>()
+                                              .createEvent(
+                                                  EventBody(
+                                                    time: selectedDuration
+                                                        .inMinutes,
+                                                    title: title,
+                                                    description: description,
+                                                    eventType: eventType,
+                                                  ),
+                                                  notificationController);
+
+                                      if (result == true) {
+                                        // Event created successfully
+                                        Get.snackbar(
+                                          AppStrings.successMsg.tr,
+                                          AppStrings
+                                              .createEventSuccessWidget.tr,
+                                          backgroundColor:
+                                              AppColors.mainBlueMediumColor,
+                                          colorText: Colors.white,
+                                        );
+
+                                        await Get.find<EventController>()
+                                            .getActiveEvent2();
+                                        Navigator.pop(context);
+                                      } else if (result == false) {
+                                        // An active event already exists
+                                        setState(() {
+                                          _isLoading = false;
+                                        });
+                                        Get.snackbar(
+                                          "Warning".tr,
+                                          AppStrings
+                                              .activeEventInProgressTitle.tr,
+                                          backgroundColor:
+                                              AppColors.candyPurpleColor,
+                                          colorText: Colors.white,
+                                        );
+                                      } else if (result == null) {
+                                        // Error occurred
+                                        setState(() {
+                                          _isLoading = false;
+                                        });
+                                        Get.snackbar(
+                                          AppStrings.errorMsg.tr,
+                                          AppStrings.eventCreationFailed.tr,
+                                          backgroundColor:
+                                              AppColors.orangeChipColor,
+                                          colorText: Colors.white,
+                                        );
+                                      }
+                                    } else {
+                                      // Show an error message if title or description is empty
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+                                      Get.snackbar(
+                                        AppStrings.errorMsg.tr,
+                                        AppStrings.fillInAllFields.tr,
+                                        backgroundColor:
+                                            AppColors.mainBlueMediumColor,
+                                        colorText: Colors.white,
+                                      );
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: Dimensions.width30 * 1.2,
+                                          vertical: Dimensions.height15),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                      foregroundColor: Colors.white,
+                                      backgroundColor: Colors.white),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        AppStrings.createTitle.tr,
+                                        style: TextStyle(
+                                          fontSize: Dimensions.font16,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.mainBlueMediumColor,
+                                        ),
+                                      ),
+                                      SizedBox(width: Dimensions.height15 / 2),
+                                      Icon(Icons.arrow_forward,
+                                          color: AppColors.mainBlueMediumColor),
+                                    ],
                                   ),
                                 ),
-                                SizedBox(width: Dimensions.height15 / 2),
-                                Icon(Icons.arrow_forward,
-                                    color: AppColors.mainBlueMediumColor),
-                              ],
-                            ),
-                          ),
                         ),
                       ),
                       SizedBox(height: Dimensions.height30),

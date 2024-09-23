@@ -84,7 +84,6 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
       });
     } catch (e) {
       print('Error fetching orders: $e');
-      // Handle error (e.g., show a snackbar)
     }
   }
 
@@ -160,14 +159,9 @@ class Order {
 }
 
 String formatText(String input) {
-  // Remove curly braces
   String formattedText = input.replaceAll(RegExp(r'[{}]'), '');
-
-  // Check if the active locale is Croatian
   if (Get.locale?.languageCode == 'hr') {
-    // Translate "description" to "opis"
     formattedText = formattedText.replaceAll('description', 'opis');
   }
-
   return formattedText;
 }

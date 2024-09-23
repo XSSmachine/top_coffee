@@ -12,6 +12,7 @@ import '../../utils/string_resources.dart';
 /// This class displays 2 forms for joining or creating new group
 class GroupPage extends StatefulWidget {
   final String page;
+
   const GroupPage({super.key, required this.page});
 
   @override
@@ -225,7 +226,8 @@ class _GroupPageState extends State<GroupPage> with TickerProviderStateMixin {
                         child: IconButton(
                           color: Colors.black,
                           iconSize: Dimensions.iconSize24,
-                          padding: EdgeInsets.zero, // Remove default padding
+                          padding: EdgeInsets.zero,
+                          // Remove default padding
                           onPressed: () {
                             print("pressed");
 

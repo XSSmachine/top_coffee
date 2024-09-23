@@ -51,7 +51,7 @@ class _CompleteProfileStatisticsState extends State<CompleteProfileStatistics> {
                       cornerRadius: Dimensions.radius30,
                       activeFgColor: Colors.white,
                       inactiveBgColor: Colors.grey,
-                      inactiveFgColor: Colors.white,
+                      inactiveFgColor: Colors.black,
                       totalSwitches: 2,
                       radiusStyle: true,
                       animate: true,

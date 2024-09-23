@@ -14,37 +14,4 @@ class GroupController extends GetxController {
     update();
     print("should update everything!");
   }
-
-  // void _updateControllers() {
-  //   print("CALL FUNCTIONS BUT DOESNT WORK!");
-  //   if (Get.isRegistered<EventController>()) {
-  //     print("CALL FUNCTIONS IN GROUP CONTROLLER");
-  //     final eventController = Get.find<EventController>();
-  //     eventController.fetchFilteredEvents(
-  //       page: 0,
-  //       size: eventController.pageSize,
-  //       search: '',
-  //       filters: EventFilters(
-  //         eventType: eventController.selectedEventType.value,
-  //         status: eventController.selectedEventStatus.value,
-  //         timeFilter: eventController.selectedTimeFilter.value,
-  //       ),
-  //     );
-  //   }
-  //
-  //   if (Get.isRegistered<OrderController>()) {
-  //     Get.find<OrderController>().getFilteredOrders(
-  //       page: 0,
-  //       size: 10, // Assuming a default page size
-  //       status: "IN_PROGRESS", // Default status, you might want to adjust this
-  //       rating: '',
-  //       type: 'ALL',
-  //       search: '',
-  //     );
-  //   }
-
-  // if (Get.isRegistered<UserController>()) {
-  //   final userController = Get.find<UserController>();
-  //   userController.getLeaderBoard("FIRSTNAME");
-  // }
 }

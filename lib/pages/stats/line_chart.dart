@@ -130,9 +130,7 @@ class _LineChart extends StatelessWidget {
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 14,
-    );
+        fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white);
 
     int maxCount = max(
         ordersData
@@ -159,9 +157,7 @@ class _LineChart extends StatelessWidget {
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 16,
-    );
+        fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white);
     Widget text;
     int index = value.toInt();
     if (index >= 0 && index < 6 && index < ordersData.length) {

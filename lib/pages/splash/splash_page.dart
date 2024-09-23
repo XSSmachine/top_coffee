@@ -113,8 +113,6 @@ class _SplashScreenState extends State<SplashScreen>
 
       if (auth.userLoggedIn()) {
         try {
-          // await _eventController.fetchPendingEvents("MIX");
-          // await _eventController.fetchInProgressEvents("MIX");
           auth.getGroupId().then((value) {
             print("GROUP ID -> " + value);
             if (value == "None") {

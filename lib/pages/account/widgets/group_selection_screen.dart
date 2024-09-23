@@ -3,35 +3,26 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:team_coffee/controllers/auth_controller.dart';
 
+import '../../../controllers/group_controller.dart';
 import '../../../models/group_data.dart';
 import '../../../utils/colors.dart';
 import '../../../utils/dimensions.dart';
 
-class GroupSelectionPage extends StatefulWidget {
+class GroupSelectionPage extends StatelessWidget {
   final List<Group> groups;
   final String? selectedGroupId;
   final Function(Group) onGroupSelected;
 
-  const GroupSelectionPage({
+  GroupSelectionPage({
     Key? key,
     required this.groups,
     required this.selectedGroupId,
     required this.onGroupSelected,
   }) : super(key: key);
 
-  @override
-  _GroupSelectionPageState createState() => _GroupSelectionPageState();
-}
-
-class _GroupSelectionPageState extends State<GroupSelectionPage> {
-  AuthController authController = Get.find<AuthController>();
-  String? _selectedGroupId;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedGroupId = widget.selectedGroupId;
-  }
+  final AuthController authController = Get.find<AuthController>();
+  final GroupController groupController =
+      Get.put(GroupController()); // New controller
 
   @override
   Widget build(BuildContext context) {
@@ -54,9 +45,9 @@ class _GroupSelectionPageState extends State<GroupSelectionPage> {
         ),
       ),
       body: ListView.builder(
-        itemCount: widget.groups.length,
+        itemCount: groups.length,
         itemBuilder: (context, index) {
-          Group group = widget.groups[index];
+          Group group = groups[index];
           return Padding(
             padding: EdgeInsets.symmetric(
               vertical: Dimensions.height10 * 0.8,
@@ -69,15 +60,7 @@ class _GroupSelectionPageState extends State<GroupSelectionPage> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: InkWell(
-                onTap: () async {
-                  setState(() {
-                    print("JEL TU DODES");
-                    _selectedGroupId = group.groupId;
-                  });
-                  await Get.find<AuthController>().saveGroupId(group.groupId);
-                  Navigator.of(context).pop();
-                  widget.onGroupSelected(group);
-                },
+                onTap: () => _selectGroup(group),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
@@ -114,7 +97,7 @@ class _GroupSelectionPageState extends State<GroupSelectionPage> {
                           ],
                         ),
                       ),
-                      if (_selectedGroupId == group.groupId)
+                      if (groupController.currentGroupId.value == group.groupId)
                         Icon(
                           Icons.check_outlined,
                           color: Colors.white,
@@ -129,5 +112,17 @@ class _GroupSelectionPageState extends State<GroupSelectionPage> {
         },
       ),
     );
+  }
+
+  void _selectGroup(Group group) async {
+    try {
+      groupController.changeGroup(group.groupId);
+      await authController.saveGroupId(group.groupId);
+      onGroupSelected(group);
+      Get.back();
+    } catch (e) {
+      print('Error saving group ID: $e');
+      Get.snackbar('Error', 'Failed to select group. Please try again.');
+    }
   }
 }

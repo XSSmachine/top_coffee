@@ -129,14 +129,14 @@ class EventController extends GetxController implements GetxService {
           return true;
         }
       } else if (response.statusCode == 400) {
-        showCustomSnackBar("Error 400");
+        return false;
       }
     } catch (e) {
       print('Error creating event: $e');
+      return null;
     } finally {
       _isLoading.value = false;
     }
-    return false;
   }
 
   /// Method for changing event status into "COMPLETED" or "CANCELLED"

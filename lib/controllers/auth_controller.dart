@@ -195,9 +195,9 @@ class AuthController extends GetxController implements GetxService {
     Response response = await authRepo.createGroup(newGroup);
     late ResponseModel responseModel;
     if (response.statusCode == 200) {
+      await notificationController.subscribeToGroup(response.body['groupId']);
       responseModel = ResponseModel(true, "New group created successfully");
       //userProfile.value?.groupId = response.body['groupId'];
-      await notificationController.subscribeToGroup(response.body['groupId']);
     } else {
       print("BAD ${response.statusCode}");
       responseModel = ResponseModel(false, response.statusText!);

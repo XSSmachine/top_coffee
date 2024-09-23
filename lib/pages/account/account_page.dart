@@ -110,12 +110,18 @@ class _AccountPageState extends State<AccountPage> {
                         ClipRRect(
                           borderRadius:
                               BorderRadius.circular(Dimensions.radius15),
-                          child: Image.asset(
-                            'assets/image/group_eating.jpg',
-                            fit: BoxFit.cover,
-                            opacity: const AlwaysStoppedAnimation(0.5),
-                            height: Dimensions.height20 * 8,
-                            width: double.infinity,
+                          child: ColorFiltered(
+                            colorFilter: ColorFilter.mode(
+                              Colors.black
+                                  .withOpacity(0.5), // Adjust opacity as needed
+                              BlendMode.darken,
+                            ),
+                            child: Image.asset(
+                              'assets/image/group_eating.jpg',
+                              fit: BoxFit.cover,
+                              height: Dimensions.height20 * 8,
+                              width: double.infinity,
+                            ),
                           ),
                         ),
                         Positioned(
@@ -133,22 +139,39 @@ class _AccountPageState extends State<AccountPage> {
                                     child: Text(
                                       AppStrings.inviteFriends.tr,
                                       style: TextStyle(
-                                        color: Colors.black,
+                                        color: Colors.white,
                                         fontSize: Dimensions.font20,
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w900,
+                                        shadows: [
+                                          Shadow(
+                                            color: Colors.blue.shade900
+                                                .withOpacity(0.9),
+                                            offset: Offset(0.0, 0.0),
+                                            blurRadius: 2,
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
                                   Icon(Icons.arrow_forward,
-                                      color: Colors.black),
+                                      color: Colors.white),
                                 ],
                               ),
                               SizedBox(height: Dimensions.height10),
                               Text(
                                 AppStrings.inviteFriendsDesc.tr,
                                 style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: Dimensions.font16),
+                                  color: Colors.white,
+                                  fontSize: Dimensions.font16,
+                                  fontWeight: FontWeight.w700,
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.black.withOpacity(0.9),
+                                      offset: Offset(0.0, 0.0),
+                                      blurRadius: 2,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -198,7 +221,14 @@ class _AccountPageState extends State<AccountPage> {
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: Dimensions.font16,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w800,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black.withOpacity(0.9),
+                                  offset: Offset(0.0, 0.0),
+                                  blurRadius: 5,
+                                ),
+                              ],
                             ),
                           ),
                         ),

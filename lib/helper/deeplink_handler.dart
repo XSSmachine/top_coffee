@@ -4,14 +4,11 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:team_coffee/base/show_custom_snackbar.dart';
-import 'package:team_coffee/pages/auth/name_surname_page.dart';
-
 import '../controllers/auth_controller.dart';
 import '../controllers/notification_controller.dart';
 import '../models/group_data.dart';
 import '../pages/auth/sign_in_page.dart';
 import '../pages/group/group_list_screen.dart';
-import '../pages/home/home_page.dart';
 
 class AppLinksDeepLink {
   AppLinksDeepLink._privateConstructor();
